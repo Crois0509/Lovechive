@@ -1,0 +1,646 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		AAB858FA2D78686E000AEBB2 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = AAB858F92D78686E000AEBB2 /* SnapKit */; };
+		AAB858FD2D786879000AEBB2 /* RxKeyboard in Frameworks */ = {isa = PBXBuildFile; productRef = AAB858FC2D786879000AEBB2 /* RxKeyboard */; };
+		AAB859002D786883000AEBB2 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = AAB858FF2D786883000AEBB2 /* RxCocoa */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		AAB858DA2D786772000AEBB2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAB858BB2D786771000AEBB2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AAB858C22D786771000AEBB2;
+			remoteInfo = Lovechive;
+		};
+		AAB858E42D786772000AEBB2 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAB858BB2D786771000AEBB2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AAB858C22D786771000AEBB2;
+			remoteInfo = Lovechive;
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXFileReference section */
+		AAB858C32D786771000AEBB2 /* Lovechive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lovechive.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAB858D92D786772000AEBB2 /* LovechiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LovechiveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		AAB858E32D786772000AEBB2 /* LovechiveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LovechiveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AAB858EB2D786772000AEBB2 /* Exceptions for "Lovechive" folder in "Lovechive" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Application/Info.plist,
+			);
+			target = AAB858C22D786771000AEBB2 /* Lovechive */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		AAB858C52D786771000AEBB2 /* Lovechive */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AAB858EB2D786772000AEBB2 /* Exceptions for "Lovechive" folder in "Lovechive" target */,
+			);
+			path = Lovechive;
+			sourceTree = "<group>";
+		};
+		AAB858DC2D786772000AEBB2 /* LovechiveTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LovechiveTests;
+			sourceTree = "<group>";
+		};
+		AAB858E62D786772000AEBB2 /* LovechiveUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = LovechiveUITests;
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		AAB858C02D786771000AEBB2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AAB859002D786883000AEBB2 /* RxCocoa in Frameworks */,
+				AAB858FA2D78686E000AEBB2 /* SnapKit in Frameworks */,
+				AAB858FD2D786879000AEBB2 /* RxKeyboard in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAB858D62D786772000AEBB2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAB858E02D786772000AEBB2 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		AAB858BA2D786771000AEBB2 = {
+			isa = PBXGroup;
+			children = (
+				AAB858C52D786771000AEBB2 /* Lovechive */,
+				AAB858DC2D786772000AEBB2 /* LovechiveTests */,
+				AAB858E62D786772000AEBB2 /* LovechiveUITests */,
+				AAB858C42D786771000AEBB2 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		AAB858C42D786771000AEBB2 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				AAB858C32D786771000AEBB2 /* Lovechive.app */,
+				AAB858D92D786772000AEBB2 /* LovechiveTests.xctest */,
+				AAB858E32D786772000AEBB2 /* LovechiveUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		AAB858C22D786771000AEBB2 /* Lovechive */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAB858EC2D786772000AEBB2 /* Build configuration list for PBXNativeTarget "Lovechive" */;
+			buildPhases = (
+				AAB858BF2D786771000AEBB2 /* Sources */,
+				AAB858C02D786771000AEBB2 /* Frameworks */,
+				AAB858C12D786771000AEBB2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AAB858C52D786771000AEBB2 /* Lovechive */,
+			);
+			name = Lovechive;
+			packageProductDependencies = (
+				AAB858F92D78686E000AEBB2 /* SnapKit */,
+				AAB858FC2D786879000AEBB2 /* RxKeyboard */,
+				AAB858FF2D786883000AEBB2 /* RxCocoa */,
+			);
+			productName = Lovechive;
+			productReference = AAB858C32D786771000AEBB2 /* Lovechive.app */;
+			productType = "com.apple.product-type.application";
+		};
+		AAB858D82D786772000AEBB2 /* LovechiveTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAB858F12D786772000AEBB2 /* Build configuration list for PBXNativeTarget "LovechiveTests" */;
+			buildPhases = (
+				AAB858D52D786772000AEBB2 /* Sources */,
+				AAB858D62D786772000AEBB2 /* Frameworks */,
+				AAB858D72D786772000AEBB2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AAB858DB2D786772000AEBB2 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AAB858DC2D786772000AEBB2 /* LovechiveTests */,
+			);
+			name = LovechiveTests;
+			packageProductDependencies = (
+			);
+			productName = LovechiveTests;
+			productReference = AAB858D92D786772000AEBB2 /* LovechiveTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		AAB858E22D786772000AEBB2 /* LovechiveUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AAB858F42D786772000AEBB2 /* Build configuration list for PBXNativeTarget "LovechiveUITests" */;
+			buildPhases = (
+				AAB858DF2D786772000AEBB2 /* Sources */,
+				AAB858E02D786772000AEBB2 /* Frameworks */,
+				AAB858E12D786772000AEBB2 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				AAB858E52D786772000AEBB2 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				AAB858E62D786772000AEBB2 /* LovechiveUITests */,
+			);
+			name = LovechiveUITests;
+			packageProductDependencies = (
+			);
+			productName = LovechiveUITests;
+			productReference = AAB858E32D786772000AEBB2 /* LovechiveUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		AAB858BB2D786771000AEBB2 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 1620;
+				LastUpgradeCheck = 1620;
+				TargetAttributes = {
+					AAB858C22D786771000AEBB2 = {
+						CreatedOnToolsVersion = 16.2;
+					};
+					AAB858D82D786772000AEBB2 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = AAB858C22D786771000AEBB2;
+					};
+					AAB858E22D786772000AEBB2 = {
+						CreatedOnToolsVersion = 16.2;
+						TestTargetID = AAB858C22D786771000AEBB2;
+					};
+				};
+			};
+			buildConfigurationList = AAB858BE2D786771000AEBB2 /* Build configuration list for PBXProject "Lovechive" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = AAB858BA2D786771000AEBB2;
+			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				AAB858F82D78686E000AEBB2 /* XCRemoteSwiftPackageReference "SnapKit" */,
+				AAB858FB2D786879000AEBB2 /* XCRemoteSwiftPackageReference "RxKeyboard" */,
+				AAB858FE2D786883000AEBB2 /* XCRemoteSwiftPackageReference "RxSwift" */,
+			);
+			preferredProjectObjectVersion = 77;
+			productRefGroup = AAB858C42D786771000AEBB2 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				AAB858C22D786771000AEBB2 /* Lovechive */,
+				AAB858D82D786772000AEBB2 /* LovechiveTests */,
+				AAB858E22D786772000AEBB2 /* LovechiveUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		AAB858C12D786771000AEBB2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAB858D72D786772000AEBB2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAB858E12D786772000AEBB2 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		AAB858BF2D786771000AEBB2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAB858D52D786772000AEBB2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		AAB858DF2D786772000AEBB2 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		AAB858DB2D786772000AEBB2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AAB858C22D786771000AEBB2 /* Lovechive */;
+			targetProxy = AAB858DA2D786772000AEBB2 /* PBXContainerItemProxy */;
+		};
+		AAB858E52D786772000AEBB2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AAB858C22D786771000AEBB2 /* Lovechive */;
+			targetProxy = AAB858E42D786772000AEBB2 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		AAB858ED2D786772000AEBB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.0.0;
+				DEVELOPMENT_TEAM = 52LJKQN5WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Crois.Lovechive;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Debug;
+		};
+		AAB858EE2D786772000AEBB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1.0.0;
+				DEVELOPMENT_TEAM = 52LJKQN5WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.lifestyle";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Crois.Lovechive;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 1;
+			};
+			name = Release;
+		};
+		AAB858EF2D786772000AEBB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Lovechive/Application/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		AAB858F02D786772000AEBB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				INFOPLIST_FILE = Lovechive/Application/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		AAB858F22D786772000AEBB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 52LJKQN5WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Crois.LovechiveTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lovechive.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Lovechive";
+			};
+			name = Debug;
+		};
+		AAB858F32D786772000AEBB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 52LJKQN5WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.2;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Crois.LovechiveTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/Lovechive.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/Lovechive";
+			};
+			name = Release;
+		};
+		AAB858F52D786772000AEBB2 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 52LJKQN5WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Crois.LovechiveUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Lovechive;
+			};
+			name = Debug;
+		};
+		AAB858F62D786772000AEBB2 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 52LJKQN5WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Crois.LovechiveUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = Lovechive;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		AAB858BE2D786771000AEBB2 /* Build configuration list for PBXProject "Lovechive" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAB858EF2D786772000AEBB2 /* Debug */,
+				AAB858F02D786772000AEBB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAB858EC2D786772000AEBB2 /* Build configuration list for PBXNativeTarget "Lovechive" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAB858ED2D786772000AEBB2 /* Debug */,
+				AAB858EE2D786772000AEBB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAB858F12D786772000AEBB2 /* Build configuration list for PBXNativeTarget "LovechiveTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAB858F22D786772000AEBB2 /* Debug */,
+				AAB858F32D786772000AEBB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		AAB858F42D786772000AEBB2 /* Build configuration list for PBXNativeTarget "LovechiveUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AAB858F52D786772000AEBB2 /* Debug */,
+				AAB858F62D786772000AEBB2 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		AAB858F82D78686E000AEBB2 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.7.1;
+			};
+		};
+		AAB858FB2D786879000AEBB2 /* XCRemoteSwiftPackageReference "RxKeyboard" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/RxSwiftCommunity/RxKeyboard";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.0.1;
+			};
+		};
+		AAB858FE2D786883000AEBB2 /* XCRemoteSwiftPackageReference "RxSwift" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/ReactiveX/RxSwift";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 6.9.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		AAB858F92D78686E000AEBB2 /* SnapKit */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAB858F82D78686E000AEBB2 /* XCRemoteSwiftPackageReference "SnapKit" */;
+			productName = SnapKit;
+		};
+		AAB858FC2D786879000AEBB2 /* RxKeyboard */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAB858FB2D786879000AEBB2 /* XCRemoteSwiftPackageReference "RxKeyboard" */;
+			productName = RxKeyboard;
+		};
+		AAB858FF2D786883000AEBB2 /* RxCocoa */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAB858FE2D786883000AEBB2 /* XCRemoteSwiftPackageReference "RxSwift" */;
+			productName = RxCocoa;
+		};
+/* End XCSwiftPackageProductDependency section */
+	};
+	rootObject = AAB858BB2D786771000AEBB2 /* Project object */;
+}
