@@ -7,6 +7,12 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		AAA080A82D797A2B0025DE23 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = AAA080A72D797A2B0025DE23 /* FirebaseAnalytics */; };
+		AAA080AA2D797A2B0025DE23 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = AAA080A92D797A2B0025DE23 /* FirebaseAuth */; };
+		AAA080AC2D797A2B0025DE23 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = AAA080AB2D797A2B0025DE23 /* FirebaseCrashlytics */; };
+		AAA080AE2D797A2B0025DE23 /* FirebaseFirestore in Frameworks */ = {isa = PBXBuildFile; productRef = AAA080AD2D797A2B0025DE23 /* FirebaseFirestore */; };
+		AAA080B02D797A2B0025DE23 /* FirebaseMessaging in Frameworks */ = {isa = PBXBuildFile; productRef = AAA080AF2D797A2B0025DE23 /* FirebaseMessaging */; };
+		AAA080B22D797A2B0025DE23 /* FirebaseStorage in Frameworks */ = {isa = PBXBuildFile; productRef = AAA080B12D797A2B0025DE23 /* FirebaseStorage */; };
 		AAB858FA2D78686E000AEBB2 /* SnapKit in Frameworks */ = {isa = PBXBuildFile; productRef = AAB858F92D78686E000AEBB2 /* SnapKit */; };
 		AAB858FD2D786879000AEBB2 /* RxKeyboard in Frameworks */ = {isa = PBXBuildFile; productRef = AAB858FC2D786879000AEBB2 /* RxKeyboard */; };
 		AAB859002D786883000AEBB2 /* RxCocoa in Frameworks */ = {isa = PBXBuildFile; productRef = AAB858FF2D786883000AEBB2 /* RxCocoa */; };
@@ -71,9 +77,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				AAA080B02D797A2B0025DE23 /* FirebaseMessaging in Frameworks */,
 				AAB859002D786883000AEBB2 /* RxCocoa in Frameworks */,
+				AAA080B22D797A2B0025DE23 /* FirebaseStorage in Frameworks */,
+				AAA080AA2D797A2B0025DE23 /* FirebaseAuth in Frameworks */,
 				AAB858FA2D78686E000AEBB2 /* SnapKit in Frameworks */,
+				AAA080AC2D797A2B0025DE23 /* FirebaseCrashlytics in Frameworks */,
+				AAA080A82D797A2B0025DE23 /* FirebaseAnalytics in Frameworks */,
 				AAB858FD2D786879000AEBB2 /* RxKeyboard in Frameworks */,
+				AAA080AE2D797A2B0025DE23 /* FirebaseFirestore in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -137,6 +149,12 @@
 				AAB858F92D78686E000AEBB2 /* SnapKit */,
 				AAB858FC2D786879000AEBB2 /* RxKeyboard */,
 				AAB858FF2D786883000AEBB2 /* RxCocoa */,
+				AAA080A72D797A2B0025DE23 /* FirebaseAnalytics */,
+				AAA080A92D797A2B0025DE23 /* FirebaseAuth */,
+				AAA080AB2D797A2B0025DE23 /* FirebaseCrashlytics */,
+				AAA080AD2D797A2B0025DE23 /* FirebaseFirestore */,
+				AAA080AF2D797A2B0025DE23 /* FirebaseMessaging */,
+				AAA080B12D797A2B0025DE23 /* FirebaseStorage */,
 			);
 			productName = Lovechive;
 			productReference = AAB858C32D786771000AEBB2 /* Lovechive.app */;
@@ -224,6 +242,7 @@
 				AAB858F82D78686E000AEBB2 /* XCRemoteSwiftPackageReference "SnapKit" */,
 				AAB858FB2D786879000AEBB2 /* XCRemoteSwiftPackageReference "RxKeyboard" */,
 				AAB858FE2D786883000AEBB2 /* XCRemoteSwiftPackageReference "RxSwift" */,
+				AAA080A62D797A2B0025DE23 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = AAB858C42D786771000AEBB2 /* Products */;
@@ -598,6 +617,14 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
+		AAA080A62D797A2B0025DE23 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/firebase/firebase-ios-sdk";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 11.9.0;
+			};
+		};
 		AAB858F82D78686E000AEBB2 /* XCRemoteSwiftPackageReference "SnapKit" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/SnapKit/SnapKit.git";
@@ -625,6 +652,36 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
+		AAA080A72D797A2B0025DE23 /* FirebaseAnalytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAA080A62D797A2B0025DE23 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAnalytics;
+		};
+		AAA080A92D797A2B0025DE23 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAA080A62D797A2B0025DE23 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseAuth;
+		};
+		AAA080AB2D797A2B0025DE23 /* FirebaseCrashlytics */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAA080A62D797A2B0025DE23 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseCrashlytics;
+		};
+		AAA080AD2D797A2B0025DE23 /* FirebaseFirestore */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAA080A62D797A2B0025DE23 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseFirestore;
+		};
+		AAA080AF2D797A2B0025DE23 /* FirebaseMessaging */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAA080A62D797A2B0025DE23 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseMessaging;
+		};
+		AAA080B12D797A2B0025DE23 /* FirebaseStorage */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = AAA080A62D797A2B0025DE23 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			productName = FirebaseStorage;
+		};
 		AAB858F92D78686E000AEBB2 /* SnapKit */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = AAB858F82D78686E000AEBB2 /* XCRemoteSwiftPackageReference "SnapKit" */;
