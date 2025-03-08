@@ -153,5 +153,56 @@ final class FirestoreManager {
         }
     }
     
-    
+    func deleteFromFirestore(type: FirestoreDataTypes) {
+        switch type {
+        case .user:
+            let userId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.userId) ?? ""
+            let collection = db.collection(type.typeName).document(userId)
+            
+            collection.delete { error in
+                if let error {
+                    debugPrint(error.localizedDescription, "❌ 데이터 삭제 실패")
+                } else {
+                    debugPrint("✅ 데이터 삭제 성공")
+                }
+            }
+            
+        case .couple:
+            let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) ?? ""
+            let collection = db.collection(type.typeName).document(coupleId)
+            
+            collection.delete { error in
+                if let error {
+                    debugPrint(error.localizedDescription, "❌ 데이터 삭제 실패")
+                } else {
+                    debugPrint("✅ 데이터 삭제 성공")
+                }
+            }
+            
+        case .diary:
+            let diaryId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.diaryId) ?? ""
+            let collection = db.collection(type.typeName).document(diaryId)
+            
+            collection.delete { error in
+                if let error {
+                    debugPrint(error.localizedDescription, "❌ 데이터 삭제 실패")
+                } else {
+                    debugPrint("✅ 데이터 삭제 성공")
+                }
+            }
+            
+        case .schedule:
+            let scheduleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.scheduleId) ?? ""
+            let collection = db.collection(type.typeName).document(scheduleId)
+            
+            collection.delete { error in
+                if let error {
+                    debugPrint(error.localizedDescription, "❌ 데이터 삭제 실패")
+                } else {
+                    debugPrint("✅ 데이터 삭제 성공")
+                }
+            }
+
+        }
+    }
 }
