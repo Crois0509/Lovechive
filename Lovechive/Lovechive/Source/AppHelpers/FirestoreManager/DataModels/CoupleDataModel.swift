@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Firestore의 couples 컬렉션 데이터 모델
 struct CoupleDataModel: FirestoreModelProtocol {
     let user1: String
     let user2: String

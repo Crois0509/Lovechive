@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// FirestoreManager의 State를 정의하는 enum
 enum FirestoreDataTypes {
     case user
     case couple

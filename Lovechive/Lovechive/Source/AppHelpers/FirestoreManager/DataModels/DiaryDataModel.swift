@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Firestore의 diaries 컬렉션 데이터 모델
 struct DiaryDataModel: FirestoreModelProtocol {
     let author: String
     let coupleId: String

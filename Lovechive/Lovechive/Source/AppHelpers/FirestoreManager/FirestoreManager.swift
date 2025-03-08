@@ -8,13 +8,18 @@
 import Foundation
 import Firebase
 
+/// Firestore의 CRUD 메소드를 관리하는 객체
 final class FirestoreManager {
     
-    private let db = Firestore.firestore()
+    private let db = Firestore.firestore() // Firestore Database
     
     static let shared = FirestoreManager()
     private init() {}
     
+    /// Firestore에 저장/업데이트를 실행하는 메소드
+    /// - Parameters:
+    ///   - data: 저장/업데이트 할 데이터
+    ///   - type: 저장할 데이터 타입
     func saveToFirestore(_ data: FirestoreModelProtocol, type: FirestoreDataTypes) {
         switch type {
         case .user:
@@ -64,6 +69,10 @@ final class FirestoreManager {
         }
     }
     
+    /// Firestore에서 데이터를 불러오는 메소드
+    /// - Parameters:
+    ///   - type: 불러올 데이터 타입
+    ///   - completion: 불러온 데이터를 처리할 closure
     func readFromFirestore(type: FirestoreDataTypes, _ completion: @escaping ([String: Any]?) -> Void) {
         switch type {
         case .user:
@@ -153,6 +162,8 @@ final class FirestoreManager {
         }
     }
     
+    /// Firestore의 데이터를 삭제하는 메소드
+    /// - Parameter type: 삭제할 데이터 타입
     func deleteFromFirestore(type: FirestoreDataTypes) {
         switch type {
         case .user:

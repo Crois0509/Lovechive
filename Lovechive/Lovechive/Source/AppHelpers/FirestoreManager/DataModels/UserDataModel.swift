@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Firestore의 users 컬렉션 데이터 모델
 struct UserDataModel: FirestoreModelProtocol {
     let name: String
     let email: String

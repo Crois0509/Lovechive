@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Firestore의 schedules 컬렉션 데이터 모델
 struct ScheduleDataModel: FirestoreModelProtocol {
     let title: String
     let coupleId: String

@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// Firestore 데이터 모델 공용 프로토콜
 protocol FirestoreModelProtocol {
     func transform() -> [String: Any]
 }
