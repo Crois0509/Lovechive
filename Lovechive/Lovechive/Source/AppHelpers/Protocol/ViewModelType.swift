@@ -8,6 +8,7 @@
 import Foundation
 import RxSwift
 
+/// 뷰 모델 타입을 정의하는 protocol
 protocol ViewModelType: AnyObject {
     associatedtype Input
     associatedtype Output

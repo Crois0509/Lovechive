@@ -10,14 +10,21 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
-class MainViewController: UIViewController {
+/// 럽카이브 프로젝트의 메인 뷰 컨트롤러
+final class MainViewController: UIViewController {
+    
+    // MARK: - Rx Properties
     
     private let viewModel = MainViewModel()
     private var disposeBag = DisposeBag()
     
+    // MARK: - UI Components
+    
     private let tabBarView = TabBarView()
     private let currentPageViewController = PageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
 
+    // MARK: - VC LifeCycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -31,6 +38,8 @@ class MainViewController: UIViewController {
     }
 
 }
+
+// MARK: - UI Setting Method
 
 private extension MainViewController {
     
@@ -48,6 +57,7 @@ private extension MainViewController {
         }
     }
     
+    /// 서브 뷰 컨트롤러를 설정하는 메소드
     func setupChildViewController() {
         addChild(currentPageViewController)
         view.addSubview(currentPageViewController.view)
@@ -67,6 +77,7 @@ private extension MainViewController {
         }
     }
     
+    /// 데이터 바인딩 메소드
     func bind() {
         let input = MainViewModel.Input(firstButtonTapped: tabBarView.rx.firstButtonTapped,
                                         secondButtonTapped: tabBarView.rx.secondButtonTapped,

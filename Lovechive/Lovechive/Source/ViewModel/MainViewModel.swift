@@ -9,7 +9,9 @@ import UIKit
 import RxSwift
 import RxCocoa
 
+/// 메인 뷰 컨트롤러의 비즈니스 로직을 담당하는 뷰 모델
 final class MainViewModel: ViewModelType {
+    
     struct Input {
         let firstButtonTapped: ControlEvent<Void>
         let secondButtonTapped: ControlEvent<Void>

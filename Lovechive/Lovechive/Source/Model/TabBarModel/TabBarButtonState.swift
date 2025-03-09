@@ -7,12 +7,14 @@
 
 import UIKit
 
+/// 탭 바의 상태를 정의하는 enum
 enum TabBarButtonState: CaseIterable {
     case home
     case calendar
     case diary
     case setting
     
+    /// 탭 바의 상태에 따라 title 설정
     var tabTitle: String {
         switch self {
         case .home:
@@ -26,6 +28,7 @@ enum TabBarButtonState: CaseIterable {
         }
     }
     
+    /// 탭 바의 상태에 따라 image 설정
     var tabImage: UIImage {
         switch self {
         case .home:

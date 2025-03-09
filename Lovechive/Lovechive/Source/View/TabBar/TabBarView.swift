@@ -10,14 +10,19 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 탭바 UI를 구현하는 뷰
 final class TabBarView: UIView {
+    
+    // MARK: - UI Components
     
     fileprivate lazy var firstTabButton: UIButton = createTabButton(state: .home)
     fileprivate lazy var secondTabButton: UIButton = createTabButton(state: .calendar)
     fileprivate lazy var thirdTabButton: UIButton = createTabButton(state: .diary)
     fileprivate lazy var forthTabButton: UIButton = createTabButton(state: .setting)
     
-    private lazy var buttonStack = UIStackView()
+    private lazy var buttonStack = UIStackView() // 탭바 버튼들을 담을 스택
+    
+    // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -29,6 +34,8 @@ final class TabBarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 버튼의 상태를 변경하는 메소드
+    /// - Parameter state: 변경할 버튼의 상태
     func changeButtonState(state: TabBarButtonState) {
         switch state {
         case .home:
@@ -55,6 +62,8 @@ final class TabBarView: UIView {
     }
     
 }
+
+// MARK: - UI Setting Method
 
 private extension TabBarView {
     
@@ -91,6 +100,9 @@ private extension TabBarView {
         }
     }
     
+    /// 탭바의 버튼을 생성하는 메소드
+    /// - Parameter state: 생성할 버튼의 상태
+    /// - Returns: 탭바 버튼 UI
     func createTabButton(state: TabBarButtonState) -> UIButton {
         var config = UIButton.Configuration.plain()
         config.title = state.tabTitle
@@ -113,6 +125,8 @@ private extension TabBarView {
     }
     
 }
+
+// MARK: - Reactive Extension
 
 extension Reactive where Base: TabBarView {
     var firstButtonTapped: ControlEvent<Void> {
