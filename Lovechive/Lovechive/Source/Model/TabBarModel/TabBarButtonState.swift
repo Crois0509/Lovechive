@@ -7,7 +7,7 @@
 
 import UIKit
 
-enum TabBarButtonState {
+enum TabBarButtonState: CaseIterable {
     case home
     case calendar
     case diary
