@@ -73,92 +73,103 @@ final class FirestoreManager {
     /// - Parameters:
     ///   - type: 불러올 데이터 타입
     ///   - completion: 불러온 데이터를 처리할 closure
-    func readFromFirestore(type: FirestoreDataTypes, _ completion: @escaping ([String: Any]?) -> Void) {
+    func readFromFirestore(type: FirestoreDataTypes, _ completion: @escaping ([QueryDocumentSnapshot]?) -> Void) {
         switch type {
         case .user:
-            let userId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.userId) ?? ""
-            let collection = db.collection(type.typeName).document(userId)
+            guard let userId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.userId) else { return }
+            let collection = db.collection(type.typeName)
             
-            collection.getDocument { (document, error) in
-                if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 읽기 실패")
-                    completion(nil)
-                } else if let document {
-                    if document.exists {
-                        debugPrint("✅ 데이터 불러오기 성공", document.data()!.values)
-                        completion(document.data())
-                    } else {
-                        debugPrint("❌ 데이터가 비어있습니다.")
-                        completion(nil)
-                    }
+            collection.getDocuments { querySnapshot, error in
+                if let error = error {
+                    debugPrint("❌ 데이터 가져오기 실패: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let documents = querySnapshot?.documents else {
+                    debugPrint("❌ 문서가 없음")
+                    return
+                }
+
+                // 📌 문서 ID를 기준으로 필터링
+                let filteredDocuments = documents.filter { $0.documentID.contains(userId) }
+
+                if filteredDocuments.isEmpty {
+                    debugPrint("❌ 해당하는 문서를 찾을 수 없음")
                 } else {
-                    debugPrint("❌ 데이터를 불러올 수 없습니다.")
-                    completion(nil)
+                    debugPrint("✅ 필터링된 문서 수:", filteredDocuments.count)
+                    completion(filteredDocuments)
                 }
             }
+            
         case .couple:
-            let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) ?? ""
-            let collection = db.collection(type.typeName).document(coupleId)
+            guard let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) else { return }
+            let collection = db.collection(type.typeName)
             
-            collection.getDocument { (document, error) in
-                if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 읽기 실패")
-                    completion(nil)
-                } else if let document {
-                    if document.exists {
-                        debugPrint("✅ 데이터 불러오기 성공", document.data()!.values)
-                        completion(document.data())
-                    } else {
-                        debugPrint("❌ 데이터가 비어있습니다.")
-                        completion(nil)
-                    }
+            collection.getDocuments { querySnapshot, error in
+                if let error = error {
+                    debugPrint("❌ 데이터 가져오기 실패: \(error.localizedDescription)")
+                    return
+                }
+
+                guard let documents = querySnapshot?.documents else {
+                    debugPrint("❌ 문서가 없음")
+                    return
+                }
+
+                // 📌 문서 ID를 기준으로 필터링
+                let filteredDocuments = documents.filter { $0.documentID.contains(coupleId) }
+
+                if filteredDocuments.isEmpty {
+                    debugPrint("❌ 해당하는 문서를 찾을 수 없음")
                 } else {
-                    debugPrint("❌ 데이터를 불러올 수 없습니다.")
-                    completion(nil)
+                    debugPrint("✅ 필터링된 문서 수:", filteredDocuments.count)
+                    completion(filteredDocuments)
                 }
             }
+            
         case .diary:
-            let diaryId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.diaryId) ?? ""
-            let collection = db.collection(type.typeName).document(diaryId)
+            guard let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) else { return }
+            let collection = db.collection(type.typeName)
             
-            collection.getDocument { (document, error) in
-                if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 읽기 실패")
-                    completion(nil)
-                } else if let document {
-                    if document.exists {
-                        debugPrint("✅ 데이터 불러오기 성공", document.data()!.values)
-                        completion(document.data())
-                    } else {
-                        debugPrint("❌ 데이터가 비어있습니다.")
+            collection.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: coupleId)
+                .getDocuments { querySnapshot, error in
+                    if let error = error {
+                        debugPrint(error.localizedDescription, "❌ 데이터 읽기 실패")
                         completion(nil)
+                        return
                     }
-                } else {
-                    debugPrint("❌ 데이터를 불러올 수 없습니다.")
-                    completion(nil)
+                    
+                    guard let documents = querySnapshot?.documents, !documents.isEmpty else {
+                        debugPrint("❌ 데이터가 없습니다.")
+                        completion(nil)
+                        return
+                    }
+                    
+                    debugPrint("✅ 데이터 불러오기 성공, 불러온 데이터 수:", documents.count)
+                    completion(documents)
                 }
-            }
+            
         case .schedule:
-            let scheduleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.scheduleId) ?? ""
-            let collection = db.collection(type.typeName).document(scheduleId)
+            guard let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) else { return }
+            let collection = db.collection(type.typeName)
             
-            collection.getDocument { (document, error) in
-                if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 읽기 실패")
-                    completion(nil)
-                } else if let document {
-                    if document.exists {
-                        debugPrint("✅ 데이터 불러오기 성공", document.data()!.values)
-                        completion(document.data())
-                    } else {
-                        debugPrint("❌ 데이터가 비어있습니다.")
+            collection.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: coupleId)
+                .getDocuments { querySnapshot, error in
+                    if let error = error {
+                        debugPrint(error.localizedDescription, "❌ 데이터 읽기 실패")
                         completion(nil)
+                        return
                     }
-                } else {
-                    debugPrint("❌ 데이터를 불러올 수 없습니다.")
-                    completion(nil)
+                    
+                    guard let documents = querySnapshot?.documents, !documents.isEmpty else {
+                        debugPrint("❌ 데이터가 없습니다.")
+                        completion(nil)
+                        return
+                    }
+                    
+                    debugPrint("✅ 데이터 불러오기 성공, 불러온 데이터 수:", documents.count)
+                    completion(documents)
                 }
-            }
         }
     }
     
