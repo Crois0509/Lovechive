@@ -72,9 +72,7 @@ private extension TabBarView {
     
     func setupLayout() {
         buttonStack.snp.makeConstraints {
-            $0.horizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(safeAreaLayoutGuide)
-            $0.height.equalTo(64)
+            $0.edges.equalToSuperview()
         }
     }
     
