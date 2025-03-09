@@ -64,7 +64,8 @@ private extension DDayView {
     func setupUserState() {
         FirestoreManager.shared.readFromFirestore(type: .couple) { [weak self] data in
             guard let self,
-                  let startDay = (data?["dDay"] as? Timestamp)?.dateValue(),
+                  let userData = data?.first,
+                  let startDay = (userData["dDay"] as? Timestamp)?.dateValue(),
                   let dDay = Calendar.current.dateComponents([.day], from: startDay, to: Date()).day
             else { return }
             
