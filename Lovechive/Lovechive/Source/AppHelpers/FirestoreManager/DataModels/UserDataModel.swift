@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 /// Firestore의 users 컬렉션 데이터 모델
 struct UserDataModel: FirestoreModelProtocol {
@@ -20,8 +21,8 @@ struct UserDataModel: FirestoreModelProtocol {
             "name": self.name,
             "email": self.email,
             "coupleId": self.coupleId,
-            "birthDay": self.birthDay,
-            "createdAt": self.createdAt
+            "birthDay": Timestamp(date: self.birthDay),
+            "createdAt": Timestamp(date: self.createdAt)
         ]
     }
 }

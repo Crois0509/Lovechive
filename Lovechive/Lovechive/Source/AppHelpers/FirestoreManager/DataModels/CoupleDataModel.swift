@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 /// Firestore의 couples 컬렉션 데이터 모델
 struct CoupleDataModel: FirestoreModelProtocol {
@@ -17,7 +18,7 @@ struct CoupleDataModel: FirestoreModelProtocol {
         return [
             "user1": self.user1,
             "user2": self.user2,
-            "dDay": self.dDay
+            "dDay": Timestamp(date: self.dDay)
         ]
     }
 }

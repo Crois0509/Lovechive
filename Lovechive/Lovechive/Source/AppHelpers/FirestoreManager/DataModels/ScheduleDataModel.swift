@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 /// Firestore의 schedules 컬렉션 데이터 모델
 struct ScheduleDataModel: FirestoreModelProtocol {
@@ -18,7 +19,7 @@ struct ScheduleDataModel: FirestoreModelProtocol {
         return [
             "title": self.title,
             "coupleId": self.coupleId,
-            "date": self.date,
+            "date": Timestamp(date: self.date),
             "createdBy": self.createdBy
         ]
     }
