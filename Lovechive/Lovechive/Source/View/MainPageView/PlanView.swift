@@ -14,7 +14,7 @@ final class PlanView: UIView {
     
     private let titleView = UILabel()
     private let calendarImageView = UIImageView()
-    private let planView = UITableView()
+    let planView = UITableView()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -50,13 +50,13 @@ private extension PlanView {
         titleView.snp.makeConstraints {
             $0.top.equalToSuperview().inset(16)
             $0.leading.equalToSuperview().inset(16)
-            $0.width.equalTo(100).priority(.low)
+            $0.width.equalTo(100)
         }
         
         calendarImageView.snp.makeConstraints {
             $0.centerY.equalTo(titleView)
             $0.trailing.equalToSuperview().inset(16)
-            $0.width.height.equalTo(20).priority(.high)
+            $0.width.height.equalTo(20)
         }
         
         planView.snp.makeConstraints {
@@ -80,12 +80,12 @@ private extension PlanView {
     }
     
     func setupTableView() {
-        planView.rowHeight = 48
+        planView.rowHeight = 64 // 기본 높이 설정
         planView.backgroundColor = .clear
         planView.separatorStyle = .none
         planView.showsVerticalScrollIndicator = false
         planView.showsHorizontalScrollIndicator = false
-        planView.dequeueReusableCell(withIdentifier: PlanViewCell.id)
+        planView.register(PlanViewCell.self, forCellReuseIdentifier: PlanViewCell.id)
     }
     
 }

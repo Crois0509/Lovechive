@@ -31,6 +31,11 @@ final class PlanViewCell: UITableViewCell {
         
         configureReused()
     }
+    
+    func configureCell(title: String, date: Date) {
+        titleView.text = title
+        dateView.text = date.formattedDateAndTime()
+    }
 }
 
 private extension PlanViewCell {
@@ -42,30 +47,36 @@ private extension PlanViewCell {
     
     func configureSelf() {
         backgroundColor = .clear
+        contentView.backgroundColor = .clear
         [circleView, titleView, dateView].forEach {
-            addSubview($0)
+            contentView.addSubview($0)
         }
     }
     
     func setupLayout() {
         circleView.snp.makeConstraints {
             $0.width.height.equalTo(16)
-            $0.leading.equalToSuperview().inset(16)
+            $0.leading.equalToSuperview()
             $0.centerY.equalToSuperview()
         }
         
         titleView.snp.makeConstraints {
             $0.leading.equalTo(circleView.snp.trailing).offset(12)
             $0.top.equalToSuperview()
-            $0.trailing.equalToSuperview().inset(16)
+            $0.trailing.equalToSuperview()
             $0.height.equalTo(24)
         }
         
         dateView.snp.makeConstraints {
             $0.leading.equalTo(circleView.snp.trailing).offset(12)
             $0.bottom.equalToSuperview()
-            $0.trailing.equalToSuperview().inset(16)
+            $0.trailing.equalToSuperview()
             $0.height.equalTo(24)
+        }
+        
+        contentView.snp.makeConstraints {
+            $0.verticalEdges.equalToSuperview().inset(8)
+            $0.horizontalEdges.equalToSuperview()
         }
     }
     
