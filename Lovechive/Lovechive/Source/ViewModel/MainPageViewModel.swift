@@ -38,7 +38,11 @@ final class MainPageViewModel: ViewModelType {
         FirestoreManager.shared.readFromFirestore(type: .schedule, { query in
             guard let query else { return }
             
-            let data = query.map {
+            let data = query.filter {
+                let date = ($0.data()["date"] as? Timestamp)?.dateValue() ?? Date()
+                
+                return Date() <= date
+            }.map {
                 ScheduleDataModel(
                     title: $0.data()["title"] as? String ?? "",
                     coupleId: $0.data()["coupleId"] as? String ?? "",
@@ -47,7 +51,11 @@ final class MainPageViewModel: ViewModelType {
                 )
             }
             
-            let section = PlanTableViewSection(items: data)
+            let result = Array(data.sorted(by: {
+                $0.date < $1.date
+            }).prefix(3))
+            
+            let section = PlanTableViewSection(items: result)
             self.sections.accept([section])
         })
     }

@@ -60,8 +60,9 @@ private extension PlanView {
         }
         
         planView.snp.makeConstraints {
-            $0.top.equalTo(titleView.snp.bottom).offset(16)
-            $0.bottom.horizontalEdges.equalToSuperview().inset(16)
+            $0.top.equalTo(titleView.snp.bottom).offset(8)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview().inset(8)
         }
     }
     
@@ -83,6 +84,7 @@ private extension PlanView {
         planView.rowHeight = 64 // 기본 높이 설정
         planView.backgroundColor = .clear
         planView.separatorStyle = .none
+        planView.isScrollEnabled = false
         planView.showsVerticalScrollIndicator = false
         planView.showsHorizontalScrollIndicator = false
         planView.register(PlanViewCell.self, forCellReuseIdentifier: PlanViewCell.id)

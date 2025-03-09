@@ -21,7 +21,7 @@ final class PageViewController: UIPageViewController {
     // MARK: - Properties
     
     private let pages: [UIViewController] = [
-        TestHomeViewController(),
+        MainPageViewController(),
         TestCalendarViewController(),
         TestDiaryViewController(),
         TestSettingViewController()

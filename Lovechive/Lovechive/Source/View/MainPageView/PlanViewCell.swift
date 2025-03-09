@@ -62,21 +62,16 @@ private extension PlanViewCell {
         
         titleView.snp.makeConstraints {
             $0.leading.equalTo(circleView.snp.trailing).offset(12)
-            $0.top.equalToSuperview()
-            $0.trailing.equalToSuperview()
+            $0.top.equalToSuperview().inset(8)
+            $0.trailing.equalToSuperview().inset(16)
             $0.height.equalTo(24)
         }
         
         dateView.snp.makeConstraints {
             $0.leading.equalTo(circleView.snp.trailing).offset(12)
-            $0.bottom.equalToSuperview()
-            $0.trailing.equalToSuperview()
+            $0.bottom.equalToSuperview().inset(8)
+            $0.trailing.equalTo(titleView.snp.trailing)
             $0.height.equalTo(24)
-        }
-        
-        contentView.snp.makeConstraints {
-            $0.verticalEdges.equalToSuperview().inset(8)
-            $0.horizontalEdges.equalToSuperview()
         }
     }
     

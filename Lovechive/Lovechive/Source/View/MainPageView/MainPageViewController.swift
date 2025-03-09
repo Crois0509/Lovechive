@@ -25,12 +25,17 @@ final class MainPageViewController: UIViewController {
         super.viewDidLoad()
         
         setupUI()
+        fetchTrigger.accept(())
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+    override func viewWillLayoutSubviews() {
+        super.viewWillLayoutSubviews()
         
-        fetchTrigger.accept(())
+        planerView.planView.layoutIfNeeded()
+        let tableHeight = planerView.planView.contentSize.height
+        planerView.snp.updateConstraints {
+            $0.height.equalTo(tableHeight + 50)
+        }
     }
 }
 
@@ -64,7 +69,7 @@ private extension MainPageViewController {
         planerView.snp.makeConstraints {
             $0.top.equalTo(dDayView.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.equalTo(250)
+            $0.height.equalTo(50)
         }
     }
     
