@@ -15,45 +15,57 @@ final class MainViewModel: ViewModelType {
         let secondButtonTapped: ControlEvent<Void>
         let thirdButtonTapped: ControlEvent<Void>
         let forthButtonTapped: ControlEvent<Void>
+        let changedPage: PublishRelay<Int>
     }
     
     struct Output {
-        let changeCurretPage: PublishRelay<TabBarButtonState>
+        let changedCurretPage: PublishRelay<TabBarButtonState>
+        let scrollToPage: PublishRelay<TabBarButtonState>
     }
     
     private var disposeBag = DisposeBag()
     
-    private let changeCurretPage = PublishRelay<TabBarButtonState>()
+    private let changedCurretPage = PublishRelay<TabBarButtonState>()
+    private let scrollToPage = PublishRelay<TabBarButtonState>()
     
     func transform(input: Input) -> Output {
         input.firstButtonTapped
             .asSignal(onErrorSignalWith: .empty())
             .withUnretained(self)
             .emit { owner, _ in
-                owner.changeCurretPage.accept(.home)
+                owner.changedCurretPage.accept(.home)
             }.disposed(by: disposeBag)
         
         input.secondButtonTapped
             .asSignal(onErrorSignalWith: .empty())
             .withUnretained(self)
             .emit { owner, _ in
-                owner.changeCurretPage.accept(.calendar)
+                owner.changedCurretPage.accept(.calendar)
             }.disposed(by: disposeBag)
         
         input.thirdButtonTapped
             .asSignal(onErrorSignalWith: .empty())
             .withUnretained(self)
             .emit { owner, _ in
-                owner.changeCurretPage.accept(.diary)
+                owner.changedCurretPage.accept(.diary)
             }.disposed(by: disposeBag)
         
         input.forthButtonTapped
             .asSignal(onErrorSignalWith: .empty())
             .withUnretained(self)
             .emit { owner, _ in
-                owner.changeCurretPage.accept(.setting)
+                owner.changedCurretPage.accept(.setting)
             }.disposed(by: disposeBag)
         
-        return Output(changeCurretPage: changeCurretPage)
+        input.changedPage
+            .asSignal(onErrorSignalWith: .empty())
+            .withUnretained(self)
+            .emit { owner, index in
+                let state = TabBarButtonState.allCases[index]
+                owner.scrollToPage.accept(state)
+            }.disposed(by: disposeBag)
+        
+        return Output(changedCurretPage: changedCurretPage,
+                      scrollToPage: scrollToPage)
     }
 }
