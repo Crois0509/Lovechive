@@ -17,6 +17,7 @@ struct ScheduleDataModel: FirestoreModelProtocol, IdentifiableType, Equatable {
         return self.date.hashValue
     }
     
+    let id: String
     let title: String
     let coupleId: String
     let date: Date
