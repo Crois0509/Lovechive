@@ -36,7 +36,7 @@ extension MainPageViewController {
     var dataSource: DataSource {
         let dataSource = DataSource(configureCell: { dataSource, tableView, indexPath, item in
             
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: PlanViewCell.id, for: indexPath) as? PlanViewCell else { return .init() }
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: AppConfig.PlanerView.cellId, for: indexPath) as? PlanViewCell else { return .init() }
             
             cell.configureCell(title: item.title, date: item.date)
             cell.selectionStyle = .none

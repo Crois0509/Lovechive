@@ -67,7 +67,7 @@ private extension PlanView {
     }
     
     func setupTitleView() {
-        titleView.text = "다가오는 일정"
+        titleView.text = AppConfig.PlanerView.title
         titleView.textColor = .Personal.highlightPink
         titleView.font = .systemFont(ofSize: 16, weight: .bold)
         titleView.numberOfLines = 1
@@ -87,7 +87,7 @@ private extension PlanView {
         planView.isScrollEnabled = false
         planView.showsVerticalScrollIndicator = false
         planView.showsHorizontalScrollIndicator = false
-        planView.register(PlanViewCell.self, forCellReuseIdentifier: PlanViewCell.id)
+        planView.register(PlanViewCell.self, forCellReuseIdentifier: AppConfig.PlanerView.cellId)
     }
     
 }

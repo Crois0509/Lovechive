@@ -88,7 +88,7 @@ private extension LatestDiaryView {
     }
     
     func setupTitleView() {
-        titleView.text = "최근 작성한 일기"
+        titleView.text = AppConfig.LatestDiary.title
         titleView.textColor = .Personal.highlightPink
         titleView.font = .systemFont(ofSize: 16, weight: .bold)
         titleView.numberOfLines = 1
@@ -102,7 +102,7 @@ private extension LatestDiaryView {
     }
     
     func setupContentView() {
-        contentView.text = "아직 작성한 일기가 없습니다."
+        contentView.text = AppConfig.LatestDiary.content
         contentView.textColor = .Gray.naturalBlack
         contentView.font = .systemFont(ofSize: 14, weight: .regular)
         contentView.numberOfLines = 2
@@ -110,7 +110,7 @@ private extension LatestDiaryView {
     }
     
     func setupDateView() {
-        dateView.text = "2000.01.01 오후 12시"
+        dateView.text = AppConfig.LatestDiary.date
         dateView.textColor = .Gray.unSelected
         dateView.font = .systemFont(ofSize: 14, weight: .regular)
         dateView.numberOfLines = 1

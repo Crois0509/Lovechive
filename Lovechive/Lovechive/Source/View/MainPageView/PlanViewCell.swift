@@ -10,8 +10,6 @@ import SnapKit
 
 final class PlanViewCell: UITableViewCell {
     
-    static let id: String = "PlanViewCell"
-    
     private lazy var circleView = createCircleView()
     private lazy var titleView = createLabelView("", 16, .medium, .Gray.naturalBlack)
     private lazy var dateView = createLabelView("", 14, .regular, .Gray.unSelected)
