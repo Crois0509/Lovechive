@@ -18,11 +18,11 @@ struct UserDataModel: FirestoreModelProtocol {
     
     func transform() -> [String: Any] {
         return [
-            "name": self.name,
-            "email": self.email,
-            "coupleId": self.coupleId,
-            "birthDay": Timestamp(date: self.birthDay),
-            "createdAt": Timestamp(date: self.createdAt)
+            AppConfig.UserModel.name: self.name,
+            AppConfig.UserModel.email: self.email,
+            AppConfig.UserModel.coupleId: self.coupleId,
+            AppConfig.UserModel.birthDay: Timestamp(date: self.birthDay),
+            AppConfig.UserModel.createdAt: Timestamp(date: self.createdAt)
         ]
     }
 }

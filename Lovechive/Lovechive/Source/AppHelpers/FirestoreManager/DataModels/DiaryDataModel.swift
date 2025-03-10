@@ -19,11 +19,11 @@ struct DiaryDataModel: FirestoreModelProtocol {
     
     func transform() -> [String : Any] {
         return [
-            "author": self.author,
-            "coupleId": self.coupleId,
-            "content": self.content,
-            "image": self.image,
-            "createdAt": Timestamp(date: self.createdAt)
+            AppConfig.DiariesModel.author: self.author,
+            AppConfig.DiariesModel.coupleId: self.coupleId,
+            AppConfig.DiariesModel.content: self.content,
+            AppConfig.DiariesModel.image: self.image,
+            AppConfig.DiariesModel.createdAt: Timestamp(date: self.createdAt)
         ]
     }
 }

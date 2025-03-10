@@ -29,10 +29,10 @@ struct ScheduleDataModel: FirestoreModelProtocol, IdentifiableType, Equatable {
     
     func transform() -> [String : Any] {
         return [
-            "title": self.title,
-            "coupleId": self.coupleId,
-            "date": Timestamp(date: self.date),
-            "createdBy": self.createdBy
+            AppConfig.SchedulesModel.title: self.title,
+            AppConfig.SchedulesModel.coupleId: self.coupleId,
+            AppConfig.SchedulesModel.date: Timestamp(date: self.date),
+            AppConfig.SchedulesModel.createdBy: self.createdBy
         ]
     }
 }
