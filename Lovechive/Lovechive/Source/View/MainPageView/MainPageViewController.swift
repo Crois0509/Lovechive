@@ -18,9 +18,8 @@ final class MainPageViewController: UIViewController {
     private let viewModel = MainPageViewModel()
     
     private let logoView = LogoView()
-    private let dDayView = DDayView()
-    private let planerView = PlanView()
-    
+    private let contentsView = MainPageScrollView()
+        
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -30,12 +29,8 @@ final class MainPageViewController: UIViewController {
     
     override func viewWillLayoutSubviews() {
         super.viewWillLayoutSubviews()
-        
-        planerView.planView.layoutIfNeeded()
-        let tableHeight = planerView.planView.contentSize.height
-        planerView.snp.updateConstraints {
-            $0.height.equalTo(tableHeight + 50)
-        }
+
+        contentsView.updateTableViewSize()
     }
 }
 
@@ -49,7 +44,7 @@ private extension MainPageViewController {
     
     func configureSelf() {
         view.backgroundColor = .Personal.backgroundPink
-        [logoView, dDayView, planerView].forEach {
+        [logoView, contentsView].forEach {
             view.addSubview($0)
         }
     }
@@ -60,16 +55,9 @@ private extension MainPageViewController {
             $0.height.equalTo(40)
         }
         
-        dDayView.snp.makeConstraints {
+        contentsView.snp.makeConstraints {
             $0.top.equalTo(logoView.snp.bottom).offset(16)
-            $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.equalTo(120)
-        }
-        
-        planerView.snp.makeConstraints {
-            $0.top.equalTo(dDayView.snp.bottom).offset(16)
-            $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.equalTo(50)
+            $0.bottom.horizontalEdges.equalToSuperview()
         }
     }
     
@@ -79,7 +67,14 @@ private extension MainPageViewController {
         let output = viewModel.transform(input: input)
         
         output.sections
-            .bind(to: planerView.planView.rx.items(dataSource: dataSource))
+            .bind(to: contentsView.planerView.planView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
+        
+        output.latestDiaryRelay
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, data in
+                owner.contentsView.diaryView.configureView(content: data.content, date: data.createdAt, image: data.image)
+            }.disposed(by: disposeBag)
     }
 }
