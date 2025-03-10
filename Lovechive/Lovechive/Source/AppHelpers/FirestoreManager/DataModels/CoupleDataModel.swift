@@ -16,9 +16,9 @@ struct CoupleDataModel: FirestoreModelProtocol {
     
     func transform() -> [String : Any] {
         return [
-            "user1": self.user1,
-            "user2": self.user2,
-            "dDay": Timestamp(date: self.dDay)
+            AppConfig.CouplesModel.user1: self.user1,
+            AppConfig.CouplesModel.user2: self.user2,
+            AppConfig.CouplesModel.dDay: Timestamp(date: self.dDay)
         ]
     }
 }

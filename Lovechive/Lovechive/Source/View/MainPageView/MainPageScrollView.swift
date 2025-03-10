@@ -8,14 +8,19 @@
 import UIKit
 import SnapKit
 
+/// 메인 페이지의 뷰들을 담아두는 스크롤 뷰
 final class MainPageScrollView: UIView {
+        
+    // MARK: - UI Components
     
-    private let dDayView = DDayView()
+    private(set) var dDayView = DDayView()
     private(set) var planerView = PlanView()
     private(set) var diaryView = LatestDiaryView()
     
     private let contentView = UIView()
     private let contentsScrollView = UIScrollView()
+    
+    // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -27,15 +32,16 @@ final class MainPageScrollView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateTableViewSize() {
-        planerView.planView.layoutIfNeeded()
-        let tableHeight = planerView.planView.contentSize.height
-        planerView.snp.updateConstraints {
-            $0.height.equalTo(tableHeight + 50)
+    /// 0.5초 후 테이블뷰의 높이를 업데이트 하는 메소드
+    func updateTableViewData() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.updateTableViewSize()
         }
-        
     }
+    
 }
+
+// MARK: - UI Setting Method
 
 private extension MainPageScrollView {
     
@@ -70,7 +76,7 @@ private extension MainPageScrollView {
         planerView.snp.makeConstraints {
             $0.top.equalTo(dDayView.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(50)
+            $0.height.equalTo(100)
         }
         
         diaryView.snp.makeConstraints {
@@ -95,6 +101,21 @@ private extension MainPageScrollView {
         contentsScrollView.contentInset.bottom = 50
         contentsScrollView.layoutMargins = .zero
         contentsScrollView.addSubview(contentView)
+    }
+    
+    /// 테이블 뷰의 사이즈를 업데이트 하는 메소드
+    func updateTableViewSize() {
+        planerView.planView.layoutIfNeeded()
+        let tableHeight = planerView.planView.contentSize.height
+        
+        if tableHeight == 0 {
+            planerView.tableViewIsNoItem(true)
+        } else {
+            planerView.tableViewIsNoItem(false)
+            planerView.snp.updateConstraints {
+                $0.height.equalTo(tableHeight + 50)
+            }
+        }
     }
 
 }

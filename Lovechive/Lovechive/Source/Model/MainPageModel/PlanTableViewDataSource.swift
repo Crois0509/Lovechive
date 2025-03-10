@@ -11,6 +11,7 @@ import RxCocoa
 import RxDataSources
 import FirebaseFirestore
 
+/// 메인 페이지의 플래너 뷰 SectionModel
 struct PlanTableViewSection: AnimatableSectionModelType {
     typealias Identity = String
     typealias Item = ScheduleDataModel
@@ -30,13 +31,15 @@ struct PlanTableViewSection: AnimatableSectionModelType {
     }
 }
 
+// MARK: - MainPageViewController DataSource
+
 extension MainPageViewController {
     typealias DataSource = RxTableViewSectionedAnimatedDataSource<PlanTableViewSection>
     
     var dataSource: DataSource {
         let dataSource = DataSource(configureCell: { dataSource, tableView, indexPath, item in
             
-            guard let cell = tableView.dequeueReusableCell(withIdentifier: PlanViewCell.id, for: indexPath) as? PlanViewCell else { return .init() }
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: AppConfig.PlanerView.cellId, for: indexPath) as? PlanViewCell else { return .init() }
             
             cell.configureCell(title: item.title, date: item.date)
             cell.selectionStyle = .none

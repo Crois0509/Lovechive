@@ -87,6 +87,7 @@ private extension MainViewController {
         
         let output = viewModel.transform(input: input)
         
+        // 버튼을 눌렀을 때 해당 페이지로 이동하는 이벤트
         output.changedCurretPage
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] state in
@@ -94,6 +95,7 @@ private extension MainViewController {
                 self?.currentPageViewController.changePage(to: state)
             }.disposed(by: disposeBag)
         
+        // 페이지를 스와이프 했을 때 해당 페이지로 이동하는 이벤트
         output.scrollToPage
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] state in

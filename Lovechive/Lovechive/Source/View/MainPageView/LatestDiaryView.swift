@@ -8,13 +8,18 @@
 import UIKit
 import SnapKit
 
+/// 메인 페이지의 일기를 보여주는 UIView
 final class LatestDiaryView: UIView {
+    
+    // MARK: - UI Components
     
     private let titleView = UILabel()
     private let editImageView = UIImageView()
     private let contentView = UILabel()
     private let dateView = UILabel()
     private let imageView = UIImageView()
+    
+    // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -26,13 +31,20 @@ final class LatestDiaryView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 최근 작성한 일기를 설정하는 메소드
+    /// - Parameters:
+    ///   - content: 일기 내용
+    ///   - date: 일기 작성 일자
+    ///   - image: 일기의 이미지 경로
     func configureView(content: String, date: Date, image: String) {
         contentView.text = content
         dateView.text = date.formattedDateAndTime()
-        imageView.image = ImageManager.shared.loadImage(url: image) == nil ? .no : ImageManager.shared.loadImage(url: image)
+        imageView.image = ImageManager.shared.loadImage(path: image) == nil ? .no : ImageManager.shared.loadImage(path: image)
     }
     
 }
+
+// MARK: - UI Setting Method
 
 private extension LatestDiaryView {
     
@@ -88,7 +100,7 @@ private extension LatestDiaryView {
     }
     
     func setupTitleView() {
-        titleView.text = "최근 작성한 일기"
+        titleView.text = AppConfig.LatestDiary.title
         titleView.textColor = .Personal.highlightPink
         titleView.font = .systemFont(ofSize: 16, weight: .bold)
         titleView.numberOfLines = 1
@@ -102,7 +114,7 @@ private extension LatestDiaryView {
     }
     
     func setupContentView() {
-        contentView.text = "아직 작성한 일기가 없습니다."
+        contentView.text = AppConfig.LatestDiary.content
         contentView.textColor = .Gray.naturalBlack
         contentView.font = .systemFont(ofSize: 14, weight: .regular)
         contentView.numberOfLines = 2
@@ -110,7 +122,7 @@ private extension LatestDiaryView {
     }
     
     func setupDateView() {
-        dateView.text = "2000.01.01 오후 12시"
+        dateView.text = AppConfig.LatestDiary.date
         dateView.textColor = .Gray.unSelected
         dateView.font = .systemFont(ofSize: 14, weight: .regular)
         dateView.numberOfLines = 1
