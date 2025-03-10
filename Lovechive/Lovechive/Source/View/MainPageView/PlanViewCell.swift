@@ -8,11 +8,16 @@
 import UIKit
 import SnapKit
 
+/// 메인 페이지의 일정 테이블뷰의 커스텀 셀 UI
 final class PlanViewCell: UITableViewCell {
+    
+    // MARK: - UI Components
     
     private lazy var circleView = createCircleView()
     private lazy var titleView = createLabelView("", 16, .medium, .Gray.naturalBlack)
     private lazy var dateView = createLabelView("", 14, .regular, .Gray.unSelected)
+    
+    // MARK: - Initializer
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -24,17 +29,24 @@ final class PlanViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // 셀 재사용 옵션
     override func prepareForReuse() {
         super.prepareForReuse()
         
         configureReused()
     }
     
+    /// 셀의 UI를 설정하는 메소드
+    /// - Parameters:
+    ///   - title: 일정의 title
+    ///   - date: 일정의 Date
     func configureCell(title: String, date: Date) {
         titleView.text = title
         dateView.text = date.formattedDateAndTime()
     }
 }
+
+// MARK: - UI Setting Method
 
 private extension PlanViewCell {
     
@@ -73,6 +85,8 @@ private extension PlanViewCell {
         }
     }
     
+    /// 셀이 재사용될 때 호출되는 메소드
+    /// UI 설정을 초기화
     func configureReused() {
         titleView.text = ""
         dateView.text = ""

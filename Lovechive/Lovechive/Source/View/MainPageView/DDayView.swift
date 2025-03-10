@@ -8,13 +8,18 @@
 import UIKit
 import SnapKit
 
+/// D-Day를 표현하는 UIView
 final class DDayView: UIView {
+    
+    // MARK: - UI Components
     
     private lazy var dDayView = createLabelView("D + 0", 20, .bold, .Personal.deepPink)
     private lazy var titleTextView = createLabelView("우리의 시작", 14, .regular, .Personal.highlightPink)
     private lazy var infoLabel = createLabelView("2000.01.01부터", 14, .regular, .Personal.highlightPink)
     
     private let textStackView = UIStackView()
+    
+    // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -26,6 +31,8 @@ final class DDayView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// D-Day Text를 설정하는 메소드
+    /// - Parameter date: D-Day Date
     func configureDDayView(_ date: Date) {
         let dDay = Calendar.current.dateComponents([.day], from: date, to: Date()).day
         dDayView.text = "D + \(dDay ?? 0)"
@@ -33,6 +40,8 @@ final class DDayView: UIView {
     }
     
 }
+
+// MARK: - UI Setting Method
 
 private extension DDayView {
     

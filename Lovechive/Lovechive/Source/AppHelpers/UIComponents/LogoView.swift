@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// 프로젝트에서 공용으로 사용할 LogoView
 final class LogoView: UIImageView {
     init() {
         super.init(frame: .zero)

@@ -11,6 +11,7 @@ import RxCocoa
 import RxDataSources
 import FirebaseFirestore
 
+/// 메인 페이지의 플래너 뷰 SectionModel
 struct PlanTableViewSection: AnimatableSectionModelType {
     typealias Identity = String
     typealias Item = ScheduleDataModel
@@ -29,6 +30,8 @@ struct PlanTableViewSection: AnimatableSectionModelType {
         self.items = items
     }
 }
+
+// MARK: - MainPageViewController DataSource
 
 extension MainPageViewController {
     typealias DataSource = RxTableViewSectionedAnimatedDataSource<PlanTableViewSection>

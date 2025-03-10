@@ -10,16 +10,23 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 메인 페이지를 관리하는 ViewController
 final class MainPageViewController: UIViewController {
+    
+    // MARK: - Rx Properties
     
     private var disposeBag = DisposeBag()
     private let fetchTrigger = PublishRelay<Void>()
     
     private let viewModel = MainPageViewModel()
     
+    // MARK: - UI Components
+    
     private let logoView = LogoView()
     private let contentsView = MainPageScrollView()
         
+    // MARK: - VC LifeCycle
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -28,6 +35,8 @@ final class MainPageViewController: UIViewController {
     }
 
 }
+
+// MARK: - UI Setting Method
 
 private extension MainPageViewController {
     
@@ -56,15 +65,18 @@ private extension MainPageViewController {
         }
     }
     
+    /// 데이터 바인딩 메소드
     func bind() {
         let input = MainPageViewModel.Input(fetchTrigger: fetchTrigger)
         
         let output = viewModel.transform(input: input)
         
+        // 플래너뷰 데이터소스 연동
         output.sections
             .bind(to: contentsView.planerView.planView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        // 플래너뷰 동적 사이즈 조절
         output.sections
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
@@ -72,6 +84,7 @@ private extension MainPageViewController {
                 owner.contentsView.updateTableViewData()
             }.disposed(by: disposeBag)
         
+        // 최근 작성한 일기 업데이트
         output.latestDiaryRelay
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
@@ -79,6 +92,7 @@ private extension MainPageViewController {
                 owner.contentsView.diaryView.configureView(content: data.content, date: data.createdAt, image: data.image)
             }.disposed(by: disposeBag)
         
+        // D-Day 업데이트
         output.dDayRelay
             .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())

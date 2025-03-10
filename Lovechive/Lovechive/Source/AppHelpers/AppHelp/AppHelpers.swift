@@ -9,6 +9,8 @@ import UIKit
 
 enum AppHelpers {
     
+    /// 현재 window의 최상단 VC를 가져오는 메소드
+    /// - Returns: 최상단 VC
     static func getTopViewController() -> UIViewController? {
         guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
               let window = windowScene.windows.first(where: { $0.isKeyWindow }) else {

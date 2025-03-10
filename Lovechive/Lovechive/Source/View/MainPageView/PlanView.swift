@@ -10,12 +10,17 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 메인 페이지의 일정을 표현하는 UIView
 final class PlanView: UIView {
+    
+    // MARK: - UI Components
     
     private let titleView = UILabel()
     private let calendarImageView = UIImageView()
     private let infoView = UILabel()
-    let planView = UITableView()
+    private(set) var planView = UITableView()
+    
+    // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -27,10 +32,14 @@ final class PlanView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 테이블뷰에 아이템이 없는지 확인하고, 정보 레이블의 표시를 결정하는 메소드
+    /// - Parameter value: 테이블뷰에 아이템이 없는지 확인(Bool)
     func tableViewIsNoItem(_ value: Bool) {
         infoView.isHidden = !value
     }
 }
+
+// MARK: - UI Setting Method
 
 private extension PlanView {
     

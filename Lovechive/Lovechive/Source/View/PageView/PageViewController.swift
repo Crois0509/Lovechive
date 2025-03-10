@@ -90,12 +90,6 @@ extension Reactive where Base: PageViewController {
 
 // MARK: - TestViewControllers
 
-final class TestHomeViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .red
-    }
-}
 final class TestCalendarViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()

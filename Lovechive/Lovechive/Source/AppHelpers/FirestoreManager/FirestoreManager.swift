@@ -14,7 +14,6 @@ final class FirestoreManager {
     
     private let db = Firestore.firestore() // Firestore Database
     private let udm = UserDefaultsManager()
-    private var alert = AlertManager(title: "알림", message: "", cancelTitle: "확인")
     
     static let shared = FirestoreManager()
     private init() {}

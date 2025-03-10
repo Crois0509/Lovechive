@@ -7,10 +7,15 @@
 
 import UIKit
 
+/// 로컬 directory에 이미지를 저장하거나 불러오는 역할을 맡는 객체
 final class ImageManager {
     static let shared = ImageManager()
     private init() {}
     
+    /// 로컬 디렉토리에 이미지를 저장하는 메소드
+    /// - Parameters:
+    ///   - image: 저장할 이미지
+    ///   - completion: 저장 완료 후에 실행할 액션
     func saveImage(image: UIImage, completion: @escaping (String?) -> Void) {
         guard let data = image.jpegData(compressionQuality: 0.7) ?? image.pngData(),
               let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
@@ -31,8 +36,11 @@ final class ImageManager {
         }
     }
     
-    func loadImage(url: String) -> UIImage? {
-        let fileURL = URL(fileURLWithPath: url)
+    /// 로컬 디렉토리에서 이미지를 불러오는 메소드
+    /// - Parameter url: 불러올 이미지의 경로
+    /// - Returns: 불러온 이미지
+    func loadImage(path: String) -> UIImage? {
+        let fileURL = URL(fileURLWithPath: path)
         
         // 파일이 존재하는지 확인
         if !FileManager.default.fileExists(atPath: fileURL.path) {
