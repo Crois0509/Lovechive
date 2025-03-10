@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import FirebaseFirestore
 
 /// Firestore의 diaries 컬렉션 데이터 모델
 struct DiaryDataModel: FirestoreModelProtocol {
@@ -19,7 +20,7 @@ struct DiaryDataModel: FirestoreModelProtocol {
             "author": self.author,
             "coupleId": self.coupleId,
             "content": self.content,
-            "createdAt": self.createdAt
+            "createdAt": Timestamp(date: self.createdAt)
         ]
     }
 }
