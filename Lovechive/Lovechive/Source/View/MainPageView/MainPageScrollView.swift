@@ -10,7 +10,7 @@ import SnapKit
 
 final class MainPageScrollView: UIView {
     
-    private let dDayView = DDayView()
+    private(set) var dDayView = DDayView()
     private(set) var planerView = PlanView()
     private(set) var diaryView = LatestDiaryView()
     
