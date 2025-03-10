@@ -9,7 +9,7 @@ import UIKit
 import SnapKit
 
 final class MainPageScrollView: UIView {
-    
+        
     private(set) var dDayView = DDayView()
     private(set) var planerView = PlanView()
     private(set) var diaryView = LatestDiaryView()
@@ -27,14 +27,12 @@ final class MainPageScrollView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
-    func updateTableViewSize() {
-        planerView.planView.layoutIfNeeded()
-        let tableHeight = planerView.planView.contentSize.height
-        planerView.snp.updateConstraints {
-            $0.height.equalTo(tableHeight + 50)
+    func updateTableViewData() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            self.updateTableViewSize()
         }
-        
     }
+    
 }
 
 private extension MainPageScrollView {
@@ -70,7 +68,7 @@ private extension MainPageScrollView {
         planerView.snp.makeConstraints {
             $0.top.equalTo(dDayView.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(50)
+            $0.height.equalTo(100)
         }
         
         diaryView.snp.makeConstraints {
@@ -95,6 +93,20 @@ private extension MainPageScrollView {
         contentsScrollView.contentInset.bottom = 50
         contentsScrollView.layoutMargins = .zero
         contentsScrollView.addSubview(contentView)
+    }
+    
+    func updateTableViewSize() {
+        planerView.planView.layoutIfNeeded()
+        let tableHeight = planerView.planView.contentSize.height
+        
+        if tableHeight == 0 {
+            planerView.tableViewIsNoItem(true)
+        } else {
+            planerView.tableViewIsNoItem(false)
+            planerView.snp.updateConstraints {
+                $0.height.equalTo(tableHeight + 50)
+            }
+        }
     }
 
 }

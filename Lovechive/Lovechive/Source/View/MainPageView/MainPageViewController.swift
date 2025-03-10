@@ -69,7 +69,7 @@ private extension MainPageViewController {
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
             .drive { owner, _ in
-                owner.contentsView.updateTableViewSize()
+                owner.contentsView.updateTableViewData()
             }.disposed(by: disposeBag)
         
         output.latestDiaryRelay

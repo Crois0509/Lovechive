@@ -14,6 +14,7 @@ final class PlanView: UIView {
     
     private let titleView = UILabel()
     private let calendarImageView = UIImageView()
+    private let infoView = UILabel()
     let planView = UITableView()
     
     override init(frame: CGRect) {
@@ -26,11 +27,15 @@ final class PlanView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func tableViewIsNoItem(_ value: Bool) {
+        infoView.isHidden = !value
+    }
 }
 
 private extension PlanView {
     
     func setupUI() {
+        setupInfoView()
         setupTableView()
         setupTitleView()
         setupImageView()
@@ -41,7 +46,7 @@ private extension PlanView {
     func configureSelf() {
         backgroundColor = .white
         layer.cornerRadius = 16
-        [titleView, calendarImageView, planView].forEach {
+        [titleView, calendarImageView, infoView, planView].forEach {
             addSubview($0)
         }
     }
@@ -51,12 +56,19 @@ private extension PlanView {
             $0.top.equalToSuperview().inset(16)
             $0.leading.equalToSuperview().inset(16)
             $0.width.equalTo(100)
+            $0.height.equalTo(24)
         }
         
         calendarImageView.snp.makeConstraints {
             $0.centerY.equalTo(titleView)
             $0.trailing.equalToSuperview().inset(16)
             $0.width.height.equalTo(20)
+        }
+        
+        infoView.snp.makeConstraints {
+            $0.top.equalTo(titleView.snp.bottom).offset(8)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.bottom.equalToSuperview().inset(8)
         }
         
         planView.snp.makeConstraints {
@@ -78,6 +90,14 @@ private extension PlanView {
         calendarImageView.image = .Icon.planIcon
         calendarImageView.contentMode = .scaleAspectFit
         calendarImageView.backgroundColor = .clear
+    }
+    
+    func setupInfoView() {
+        infoView.text = AppConfig.PlanerView.info
+        infoView.font = .systemFont(ofSize: 14, weight: .regular)
+        infoView.textColor = .Gray.unSelected
+        infoView.numberOfLines = 1
+        infoView.textAlignment = .left
     }
     
     func setupTableView() {
