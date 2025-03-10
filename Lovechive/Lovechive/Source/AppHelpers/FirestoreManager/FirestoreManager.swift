@@ -7,11 +7,13 @@
 
 import Foundation
 import Firebase
+import RxSwift
 
 /// Firestore의 CRUD 메소드를 관리하는 객체
 final class FirestoreManager {
     
     private let db = Firestore.firestore() // Firestore Database
+    private let udm = UserDefaultsManager()
     private var alert = AlertManager(title: "알림", message: "", cancelTitle: "확인")
     
     static let shared = FirestoreManager()
@@ -21,59 +23,46 @@ final class FirestoreManager {
     /// - Parameters:
     ///   - data: 저장/업데이트 할 데이터
     ///   - type: 저장할 데이터 타입
-    func saveToFirestore(_ data: FirestoreModelProtocol, type: FirestoreDataTypes) {
-        switch type {
-        case .user:
-            let userId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.userId) ?? ""
-            let collection = db.collection(type.typeName).document(userId)
+    func saveToFirestore(_ data: FirestoreModelProtocol, type: FirestoreDataTypes) -> Single<Void> {
+        return Single.create { single in
+            let collectionRef = self.db.collection(type.typeName)
+            var documentRef: DocumentReference
             
-            collection.setData(data.transform()) { [weak self] error in
-                if let error {
-                    debugPrint("❌ User 데이터 저장 실패", error.localizedDescription)
-                    self?.alert.message = "데이터 저장에 실패했습니다."
-                    self?.alert.showAlert(.alert)
+            switch type {
+            case .user:
+                let userId = self.udm.userId
+                documentRef = collectionRef.document(userId)
+                
+            case .couple:
+                let coupleId = self.udm.coupleId
+                documentRef = collectionRef.document(coupleId)
+                
+            case .diary(id: let id):
+                if !id.isEmpty {
+                    documentRef = collectionRef.document(id)
                 } else {
-                    debugPrint("✅ User 데이터 저장 성공", data.transform().values)
+                    documentRef = collectionRef.document()
+                }
+                
+            case .schedule(id: let id):
+                if !id.isEmpty {
+                    documentRef = collectionRef.document(id)
+                } else {
+                    documentRef = collectionRef.document()
                 }
             }
             
-        case .couple:
-            let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) ?? ""
-            let collection = db.collection(type.typeName).document(coupleId)
-            
-            collection.setData(data.transform()) { error in
+            documentRef.setData(data.transform()) { error in
                 if let error {
-                    debugPrint("❌ Couple 데이터 저장 실패", error.localizedDescription)
+                    debugPrint("❌ \(type.typeName) 데이터 저장 실패: \(error.localizedDescription)")
+                    single(.failure(error))
                 } else {
-                    debugPrint("✅ Couple 데이터 저장 성공", data.transform().values)
+                    debugPrint("✅ \(type.typeName) 데이터 저장 성공: \(data.transform().values)")
+                    single(.success(()))
                 }
             }
             
-        case .diary:
-            let collection = db.collection(type.typeName)
-            
-            collection.addDocument(data: data.transform()) { [weak self] error in
-                if let error {
-                    debugPrint("❌ Diary 데이터 저장 실패", error.localizedDescription)
-                    self?.alert.message = "다이어리 저장에 실패했습니다."
-                    self?.alert.showAlert(.alert)
-                } else {
-                    debugPrint("✅ Diary 데이터 저장 성공", data.transform().values)
-                }
-            }
-            
-        case .schedule:
-            let collection = db.collection(type.typeName)
-            
-            collection.addDocument(data: data.transform()) { [weak self] error in
-                if let error {
-                    debugPrint("❌ Schedule 데이터 저장 실패", error.localizedDescription)
-                    self?.alert.message = "일정 저장에 실패했습니다."
-                    self?.alert.showAlert(.alert)
-                } else {
-                    debugPrint("✅ Schedule 데이터 저장 성공", data.transform().values)
-                }
-            }
+            return Disposables.create()
         }
     }
     
@@ -81,186 +70,86 @@ final class FirestoreManager {
     /// - Parameters:
     ///   - type: 불러올 데이터 타입
     ///   - completion: 불러온 데이터를 처리할 closure
-    func readFromFirestore(type: FirestoreDataTypes, _ completion: @escaping ([QueryDocumentSnapshot]?) -> Void) {
-        switch type {
-        case .user:
-            guard let userId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.userId) else { return }
-            let collection = db.collection(type.typeName)
+    func readFromFirestore(type: FirestoreDataTypes) -> Single<[QueryDocumentSnapshot]> {
+        return Single.create { single in
+            let collectionRef = self.db.collection(type.typeName)
+            var query: Query = collectionRef
             
-            collection.getDocuments { querySnapshot, error in
-                if let error = error {
-                    debugPrint("❌ 데이터 가져오기 실패: \(error.localizedDescription)")
-                    return
-                }
-
-                guard let documents = querySnapshot?.documents else {
-                    debugPrint("❌ 문서가 없음")
-                    return
-                }
-
-                // 📌 문서 ID를 기준으로 필터링
-                let filteredDocuments = documents.filter { $0.documentID.contains(userId) }
-
-                if filteredDocuments.isEmpty {
-                    debugPrint("❌ 해당하는 문서를 찾을 수 없음")
+            switch type {
+            case .user:
+                let userId = self.udm.userId
+                query = collectionRef.whereField(FieldPath.documentID(), isEqualTo: userId)
+                
+            case .couple:
+                let coupleId = self.udm.coupleId
+                query = collectionRef.whereField(FieldPath.documentID(), isEqualTo: coupleId)
+                
+            case .diary, .schedule:
+                let coupleId = self.udm.coupleId
+                query = collectionRef.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: coupleId)
+            }
+            
+            query.getDocuments { querySnapshot, error in
+                if let error {
+                    debugPrint("❌ \(type.typeName) 데이터 불러오기 실패: \(error.localizedDescription)")
+                    single(.failure(error))
+                    
+                } else if let documents = querySnapshot?.documents, !documents.isEmpty {
+                    debugPrint("✅ \(type.typeName) 데이터 불러오기 성공")
+                    single(.success(documents))
+                    
                 } else {
-                    debugPrint("✅ 필터링된 문서 수:", filteredDocuments.count)
-                    completion(filteredDocuments)
+                    debugPrint("❌ \(type.typeName) 문서 없음")
+                    single(.success([]))
                 }
             }
             
-        case .couple:
-            guard let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) else { return }
-            let collection = db.collection(type.typeName)
-            
-            collection.getDocuments { querySnapshot, error in
-                if let error = error {
-                    debugPrint("❌ 데이터 가져오기 실패: \(error.localizedDescription)")
-                    return
-                }
-
-                guard let documents = querySnapshot?.documents else {
-                    debugPrint("❌ 문서가 없음")
-                    return
-                }
-
-                // 📌 문서 ID를 기준으로 필터링
-                let filteredDocuments = documents.filter { $0.documentID.contains(coupleId) }
-
-                if filteredDocuments.isEmpty {
-                    debugPrint("❌ 해당하는 문서를 찾을 수 없음")
-                } else {
-                    debugPrint("✅ 필터링된 문서 수:", filteredDocuments.count)
-                    completion(filteredDocuments)
-                }
-            }
-            
-        case .diary:
-            guard let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) else { return }
-            let collection = db.collection(type.typeName)
-            
-            collection.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: coupleId)
-                .getDocuments { querySnapshot, error in
-                    if let error = error {
-                        debugPrint(error.localizedDescription, "❌ 데이터 읽기 실패")
-                        completion(nil)
-                        return
-                    }
-                    
-                    guard let documents = querySnapshot?.documents, !documents.isEmpty else {
-                        debugPrint("❌ 데이터가 없습니다.")
-                        completion(nil)
-                        return
-                    }
-                    
-                    debugPrint("✅ 데이터 불러오기 성공, 불러온 데이터 수:", documents.count)
-                    completion(documents)
-                }
-            
-        case .schedule:
-            guard let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) else { return }
-            let collection = db.collection(type.typeName)
-            
-            collection.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: coupleId)
-                .getDocuments { querySnapshot, error in
-                    if let error = error {
-                        debugPrint(error.localizedDescription, "❌ 데이터 읽기 실패")
-                        completion(nil)
-                        return
-                    }
-                    
-                    guard let documents = querySnapshot?.documents, !documents.isEmpty else {
-                        debugPrint("❌ 데이터가 없습니다.")
-                        completion(nil)
-                        return
-                    }
-                    
-                    debugPrint("✅ 데이터 불러오기 성공, 불러온 데이터 수:", documents.count)
-                    completion(documents)
-                }
+            return Disposables.create()
         }
     }
     
     /// Firestore의 데이터를 삭제하는 메소드
     /// - Parameter type: 삭제할 데이터 타입
-    func deleteFromFirestore(type: FirestoreDataTypes) {
-        switch type {
-        case .user:
-            let userId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.userId) ?? ""
-            let collection = db.collection(type.typeName).document(userId)
+    func deleteFromFirestore(type: FirestoreDataTypes) -> Single<Void> {
+        return Single.create { single in
+            let collectionRef = self.db.collection(type.typeName)
+            var documentRef: DocumentReference
             
-            collection.delete { error in
-                if let error {
-                    debugPrint("❌ User 데이터 삭제 실패", error.localizedDescription)
+            switch type {
+            case .user:
+                let userId = self.udm.userId
+                documentRef = collectionRef.document(userId)
+                
+            case .couple:
+                let coupleId = self.udm.coupleId
+                documentRef = collectionRef.document(coupleId)
+                
+            case .diary(id: let id):
+                if !id.isEmpty {
+                    documentRef = collectionRef.document(id)
                 } else {
-                    debugPrint("✅ User 데이터 삭제 성공")
+                    documentRef = collectionRef.document()
+                }
+                
+            case .schedule(id: let id):
+                if !id.isEmpty {
+                    documentRef = collectionRef.document(id)
+                } else {
+                    documentRef = collectionRef.document()
                 }
             }
             
-        case .couple:
-            let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) ?? ""
-            let collection = db.collection(type.typeName).document(coupleId)
-            
-            collection.delete { error in
+            documentRef.delete { error in
                 if let error {
-                    debugPrint("❌ Couple 데이터 삭제 실패", error.localizedDescription)
+                    debugPrint("❌ \(type.typeName) 데이터 삭제 실패: \(error.localizedDescription)")
+                    single(.failure(error))
                 } else {
-                    debugPrint("✅ Couple 데이터 삭제 성공")
+                    debugPrint("✅ \(type.typeName) 데이터 삭제 성공")
+                    single(.success(()))
                 }
             }
             
-        case .diary(id: let id):
-            let collection = db.collection(type.typeName)
-            
-            collection.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: id)
-                .getDocuments { querySnapshot, error in
-                    if let error = error {
-                        debugPrint("❌ Diary 데이터 읽기 실패", error.localizedDescription)
-                        return
-                    }
-                    
-                    guard let documents = querySnapshot?.documents, !documents.isEmpty else {
-                        debugPrint("❌ Diary 데이터가 없습니다.")
-                        return
-                    }
-                    
-                    documents.forEach { document in
-                        document.reference.delete { error in
-                            if let error {
-                                debugPrint("❌ Diary 데이터 삭제 실패", error.localizedDescription)
-                            } else {
-                                debugPrint("✅ Diary 데이터 삭제 성공, 삭제한 데이터:", document)
-                            }
-                        }
-                    }
-                }
-            
-        case .schedule(id: let id):
-            let collection = db.collection(type.typeName)
-            
-            collection.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: id)
-                .getDocuments { querySnapshot, error in
-                    if let error = error {
-                        debugPrint("❌ Schedule 데이터 읽기 실패", error.localizedDescription)
-                        return
-                    }
-                    
-                    guard let documents = querySnapshot?.documents, !documents.isEmpty else {
-                        debugPrint("❌ Schedule 데이터가 없습니다.")
-                        return
-                    }
-                    
-                    documents.forEach { document in
-                        document.reference.delete { error in
-                            if let error {
-                                debugPrint("❌ Schedule 데이터 삭제 실패", error.localizedDescription)
-                            } else {
-                                debugPrint("✅ Schedule 데이터 삭제 성공, 삭제한 데이터:", document)
-                            }
-                        }
-                    }
-                }
-
+            return Disposables.create()
         }
     }
 }
