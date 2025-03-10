@@ -12,6 +12,7 @@ import Firebase
 final class FirestoreManager {
     
     private let db = Firestore.firestore() // Firestore Database
+    private var alert = AlertManager(title: "알림", message: "", cancelTitle: "확인")
     
     static let shared = FirestoreManager()
     private init() {}
@@ -26,44 +27,51 @@ final class FirestoreManager {
             let userId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.userId) ?? ""
             let collection = db.collection(type.typeName).document(userId)
             
-            collection.setData(data.transform()) { error in
+            collection.setData(data.transform()) { [weak self] error in
                 if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 저장 실패")
+                    debugPrint("❌ User 데이터 저장 실패", error.localizedDescription)
+                    self?.alert.message = "데이터 저장에 실패했습니다."
+                    self?.alert.showAlert(.alert)
                 } else {
-                    debugPrint("✅ 데이터 저장 성공", data.transform().values)
+                    debugPrint("✅ User 데이터 저장 성공", data.transform().values)
                 }
             }
+            
         case .couple:
             let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) ?? ""
             let collection = db.collection(type.typeName).document(coupleId)
             
             collection.setData(data.transform()) { error in
                 if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 저장 실패")
+                    debugPrint("❌ Couple 데이터 저장 실패", error.localizedDescription)
                 } else {
-                    debugPrint("✅ 데이터 저장 성공", data.transform().values)
+                    debugPrint("✅ Couple 데이터 저장 성공", data.transform().values)
                 }
             }
+            
         case .diary:
-            let diaryId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.diaryId) ?? ""
-            let collection = db.collection(type.typeName).document(diaryId)
+            let collection = db.collection(type.typeName)
             
-            collection.setData(data.transform()) { error in
+            collection.addDocument(data: data.transform()) { [weak self] error in
                 if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 저장 실패")
+                    debugPrint("❌ Diary 데이터 저장 실패", error.localizedDescription)
+                    self?.alert.message = "다이어리 저장에 실패했습니다."
+                    self?.alert.showAlert(.alert)
                 } else {
-                    debugPrint("✅ 데이터 저장 성공", data.transform().values)
+                    debugPrint("✅ Diary 데이터 저장 성공", data.transform().values)
                 }
             }
-        case .schedule:
-            let scheduleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.scheduleId) ?? ""
-            let collection = db.collection(type.typeName).document(scheduleId)
             
-            collection.setData(data.transform()) { error in
+        case .schedule:
+            let collection = db.collection(type.typeName)
+            
+            collection.addDocument(data: data.transform()) { [weak self] error in
                 if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 저장 실패")
+                    debugPrint("❌ Schedule 데이터 저장 실패", error.localizedDescription)
+                    self?.alert.message = "일정 저장에 실패했습니다."
+                    self?.alert.showAlert(.alert)
                 } else {
-                    debugPrint("✅ 데이터 저장 성공", data.transform().values)
+                    debugPrint("✅ Schedule 데이터 저장 성공", data.transform().values)
                 }
             }
         }
@@ -183,9 +191,9 @@ final class FirestoreManager {
             
             collection.delete { error in
                 if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 삭제 실패")
+                    debugPrint("❌ User 데이터 삭제 실패", error.localizedDescription)
                 } else {
-                    debugPrint("✅ 데이터 삭제 성공")
+                    debugPrint("✅ User 데이터 삭제 성공")
                 }
             }
             
@@ -195,35 +203,63 @@ final class FirestoreManager {
             
             collection.delete { error in
                 if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 삭제 실패")
+                    debugPrint("❌ Couple 데이터 삭제 실패", error.localizedDescription)
                 } else {
-                    debugPrint("✅ 데이터 삭제 성공")
+                    debugPrint("✅ Couple 데이터 삭제 성공")
                 }
             }
             
-        case .diary:
-            let diaryId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.diaryId) ?? ""
-            let collection = db.collection(type.typeName).document(diaryId)
+        case .diary(id: let id):
+            let collection = db.collection(type.typeName)
             
-            collection.delete { error in
-                if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 삭제 실패")
-                } else {
-                    debugPrint("✅ 데이터 삭제 성공")
+            collection.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: id)
+                .getDocuments { querySnapshot, error in
+                    if let error = error {
+                        debugPrint("❌ Diary 데이터 읽기 실패", error.localizedDescription)
+                        return
+                    }
+                    
+                    guard let documents = querySnapshot?.documents, !documents.isEmpty else {
+                        debugPrint("❌ Diary 데이터가 없습니다.")
+                        return
+                    }
+                    
+                    documents.forEach { document in
+                        document.reference.delete { error in
+                            if let error {
+                                debugPrint("❌ Diary 데이터 삭제 실패", error.localizedDescription)
+                            } else {
+                                debugPrint("✅ Diary 데이터 삭제 성공, 삭제한 데이터:", document)
+                            }
+                        }
+                    }
                 }
-            }
             
-        case .schedule:
-            let scheduleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.scheduleId) ?? ""
-            let collection = db.collection(type.typeName).document(scheduleId)
+        case .schedule(id: let id):
+            let collection = db.collection(type.typeName)
             
-            collection.delete { error in
-                if let error {
-                    debugPrint(error.localizedDescription, "❌ 데이터 삭제 실패")
-                } else {
-                    debugPrint("✅ 데이터 삭제 성공")
+            collection.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: id)
+                .getDocuments { querySnapshot, error in
+                    if let error = error {
+                        debugPrint("❌ Schedule 데이터 읽기 실패", error.localizedDescription)
+                        return
+                    }
+                    
+                    guard let documents = querySnapshot?.documents, !documents.isEmpty else {
+                        debugPrint("❌ Schedule 데이터가 없습니다.")
+                        return
+                    }
+                    
+                    documents.forEach { document in
+                        document.reference.delete { error in
+                            if let error {
+                                debugPrint("❌ Schedule 데이터 삭제 실패", error.localizedDescription)
+                            } else {
+                                debugPrint("✅ Schedule 데이터 삭제 성공, 삭제한 데이터:", document)
+                            }
+                        }
+                    }
                 }
-            }
 
         }
     }
