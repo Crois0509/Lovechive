@@ -26,12 +26,7 @@ final class MainPageViewController: UIViewController {
         setupUI()
         fetchTrigger.accept(())
     }
-    
-    override func viewWillLayoutSubviews() {
-        super.viewWillLayoutSubviews()
 
-        contentsView.updateTableViewSize()
-    }
 }
 
 private extension MainPageViewController {
@@ -70,11 +65,25 @@ private extension MainPageViewController {
             .bind(to: contentsView.planerView.planView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        output.sections
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, _ in
+                owner.contentsView.updateTableViewSize()
+            }.disposed(by: disposeBag)
+        
         output.latestDiaryRelay
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
             .drive { owner, data in
                 owner.contentsView.diaryView.configureView(content: data.content, date: data.createdAt, image: data.image)
+            }.disposed(by: disposeBag)
+        
+        output.dDayRelay
+            .withUnretained(self)
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { owner, data in
+                owner.contentsView.dDayView.configureDDayView(data.dDay)
             }.disposed(by: disposeBag)
     }
 }
