@@ -14,6 +14,7 @@ final class LogoView: UIImageView {
         
         image = .logo
         contentMode = .scaleAspectFit
+        backgroundColor = .clear
     }
     
     required init?(coder: NSCoder) {
