@@ -22,7 +22,6 @@ final class MainPageViewController: UIViewController {
     
     // MARK: - UI Components
     
-    private let logoView = LogoView()
     private let contentsView = MainPageScrollView()
         
     // MARK: - VC LifeCycle
@@ -48,20 +47,12 @@ private extension MainPageViewController {
     
     func configureSelf() {
         view.backgroundColor = .Personal.backgroundPink
-        [logoView, contentsView].forEach {
-            view.addSubview($0)
-        }
+        view.addSubview(contentsView)
     }
 
     func setupLayout() {
-        logoView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalTo(view.safeAreaLayoutGuide)
-            $0.height.equalTo(40)
-        }
-        
         contentsView.snp.makeConstraints {
-            $0.top.equalTo(logoView.snp.bottom).offset(16)
-            $0.bottom.horizontalEdges.equalToSuperview()
+            $0.edges.equalToSuperview()
         }
     }
     

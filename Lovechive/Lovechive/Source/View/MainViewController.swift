@@ -21,6 +21,8 @@ final class MainViewController: UIViewController {
     // MARK: - UI Components
     
     private let tabBarView = TabBarView()
+    private let logoView = LogoView()
+    private let backgroundView = UIView()
     private let currentPageViewController = PageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
 
     // MARK: - VC LifeCycle
@@ -44,6 +46,7 @@ final class MainViewController: UIViewController {
 private extension MainViewController {
     
     func setupUI() {
+        setupBackgroundView()
         configureSelf()
         setupLayout()
         setupChildViewController()
@@ -52,7 +55,7 @@ private extension MainViewController {
     
     func configureSelf() {
         view.backgroundColor = .white
-        [tabBarView].forEach {
+        [backgroundView, logoView, tabBarView].forEach {
             view.addSubview($0)
         }
     }
@@ -62,19 +65,36 @@ private extension MainViewController {
         addChild(currentPageViewController)
         view.addSubview(currentPageViewController.view)
         currentPageViewController.view.snp.makeConstraints {
-            $0.top.horizontalEdges.equalToSuperview()
+            $0.top.equalTo(logoView.snp.bottom).offset(16)
+            $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalTo(tabBarView.snp.top)
         }
         currentPageViewController.didMove(toParent: self)
         view.bringSubviewToFront(tabBarView)
+        view.bringSubviewToFront(logoView)
     }
     
     func setupLayout() {
+        backgroundView.snp.makeConstraints {
+            $0.top.horizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(64)
+        }
+        
+        logoView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(40)
+        }
+        
         tabBarView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
             $0.height.equalTo(64)
         }
+    }
+    
+    func setupBackgroundView() {
+        backgroundView.backgroundColor = .Personal.backgroundPink
     }
     
     /// 데이터 바인딩 메소드
