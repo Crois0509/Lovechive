@@ -63,7 +63,7 @@ private extension MainPageScrollView {
         }
         
         contentView.snp.makeConstraints {
-            $0.top.horizontalEdges.equalToSuperview()
+            $0.edges.equalToSuperview()
             $0.width.equalToSuperview()
         }
         
@@ -115,6 +115,7 @@ private extension MainPageScrollView {
             planerView.snp.updateConstraints {
                 $0.height.equalTo(tableHeight + 50)
             }
+            contentsScrollView.contentSize.height = 516
         }
     }
 
