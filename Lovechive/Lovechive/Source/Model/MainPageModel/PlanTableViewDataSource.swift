@@ -43,7 +43,7 @@ extension MainPageViewController: ScheduleTableSectionConfigurable {
         let dataSource = DataSource(animationConfiguration:
                                         AnimationConfiguration(insertAnimation: .fade,  // 삽입 시 애니메이션
                                                                reloadAnimation: .fade,  // 변경 시 애니메이션 없음
-                                                               deleteAnimation: .left   // 삭제 시 왼쪽으로 사라짐
+                                                               deleteAnimation: .fade   // 삭제 시 왼쪽으로 사라짐
             ), configureCell: { dataSource, tableView, indexPath, item in
             
             guard let cell = tableView.dequeueReusableCell(withIdentifier: AppConfig.PlanerView.cellId, for: indexPath) as? PlanViewCell else { return .init() }
@@ -64,7 +64,7 @@ extension CalendarViewController: ScheduleTableSectionConfigurable {
         let dataSource = DataSource(animationConfiguration:
                                         AnimationConfiguration(insertAnimation: .fade,  // 삽입 시 애니메이션
                                                                reloadAnimation: .fade,  // 변경 시 애니메이션 없음
-                                                               deleteAnimation: .left   // 삭제 시 왼쪽으로 사라짐
+                                                               deleteAnimation: .fade   // 삭제 시 왼쪽으로 사라짐
             ), configureCell: { dataSource, tableView, indexPath, item in
             
             guard let cell = tableView.dequeueReusableCell(withIdentifier: AppConfig.CalendarViewConfig.cellId, for: indexPath) as? ScheduleViewCell else { return .init() }
