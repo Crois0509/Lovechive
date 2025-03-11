@@ -22,7 +22,7 @@ final class PageViewController: UIPageViewController {
     
     private let pages: [UIViewController] = [
         MainPageViewController(),
-        TestCalendarViewController(),
+        CalendarViewController(),
         TestDiaryViewController(),
         TestSettingViewController()
     ]
@@ -90,12 +90,6 @@ extension Reactive where Base: PageViewController {
 
 // MARK: - TestViewControllers
 
-final class TestCalendarViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .blue
-    }
-}
 final class TestDiaryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
