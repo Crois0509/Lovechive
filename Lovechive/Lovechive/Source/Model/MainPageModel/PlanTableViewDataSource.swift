@@ -12,7 +12,7 @@ import RxDataSources
 import FirebaseFirestore
 
 /// 메인 페이지의 플래너 뷰 SectionModel
-struct PlanTableViewSection: AnimatableSectionModelType {
+struct ScheduleModelSection: AnimatableSectionModelType {
     typealias Identity = String
     typealias Item = ScheduleDataModel
     
@@ -25,7 +25,7 @@ struct PlanTableViewSection: AnimatableSectionModelType {
         self.items = items
     }
     
-    init(original: PlanTableViewSection, items: [Item]) {
+    init(original: ScheduleModelSection, items: [Item]) {
         self = original
         self.items = items
     }
@@ -33,15 +33,43 @@ struct PlanTableViewSection: AnimatableSectionModelType {
 
 // MARK: - MainPageViewController DataSource
 
-extension MainPageViewController {
-    typealias DataSource = RxTableViewSectionedAnimatedDataSource<PlanTableViewSection>
-    
+protocol ScheduleTableSectionConfigurable {
+    typealias DataSource = RxTableViewSectionedAnimatedDataSource<ScheduleModelSection>
+    var dataSource: DataSource { get }
+}
+
+extension MainPageViewController: ScheduleTableSectionConfigurable {
     var dataSource: DataSource {
-        let dataSource = DataSource(configureCell: { dataSource, tableView, indexPath, item in
+        let dataSource = DataSource(animationConfiguration:
+                                        AnimationConfiguration(insertAnimation: .fade,  // 삽입 시 애니메이션
+                                                               reloadAnimation: .fade,  // 변경 시 애니메이션 없음
+                                                               deleteAnimation: .left   // 삭제 시 왼쪽으로 사라짐
+            ), configureCell: { dataSource, tableView, indexPath, item in
             
             guard let cell = tableView.dequeueReusableCell(withIdentifier: AppConfig.PlanerView.cellId, for: indexPath) as? PlanViewCell else { return .init() }
             
             cell.configureCell(title: item.title, date: item.date)
+            cell.selectionStyle = .none
+            
+            return cell
+            
+        })
+        
+        return dataSource
+    }
+}
+
+extension CalendarViewController: ScheduleTableSectionConfigurable {
+    var dataSource: DataSource {
+        let dataSource = DataSource(animationConfiguration:
+                                        AnimationConfiguration(insertAnimation: .fade,  // 삽입 시 애니메이션
+                                                               reloadAnimation: .fade,  // 변경 시 애니메이션 없음
+                                                               deleteAnimation: .left   // 삭제 시 왼쪽으로 사라짐
+            ), configureCell: { dataSource, tableView, indexPath, item in
+            
+            guard let cell = tableView.dequeueReusableCell(withIdentifier: AppConfig.CalendarViewConfig.cellId, for: indexPath) as? ScheduleViewCell else { return .init() }
+            
+            cell.configureCell(time: item.date, title: item.title)
             cell.selectionStyle = .none
             
             return cell
