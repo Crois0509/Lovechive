@@ -29,4 +29,28 @@ extension Date {
         return formatter.string(from: self)
     }
     
+    func formattedDateToYM() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "yyyy년 M월"
+        
+        return formatter.string(from: self)
+    }
+    
+    func formattedDateToSchedule() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "M월 d일 일정"
+        
+        return formatter.string(from: self)
+    }
+    
+    func formattedDateToScheduleTime() -> String {
+        let formatter = DateFormatter()
+        formatter.locale = Locale(identifier: "ko_KR")
+        formatter.dateFormat = "a h시 m분"
+        
+        return formatter.string(from: self)
+    }
+    
 }
