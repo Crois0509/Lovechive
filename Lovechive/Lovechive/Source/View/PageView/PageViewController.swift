@@ -27,6 +27,8 @@ final class PageViewController: UIPageViewController {
         TestSettingViewController()
     ]
     
+    private var isScrolling: Bool = false
+    
     // MARK: - VC LifeCycle
     
     override func viewDidLoad() {
@@ -40,14 +42,21 @@ final class PageViewController: UIPageViewController {
     
     /// 현재 보여지는 페이지를 변경하는 메소드
     /// - Parameter state: 변경할 페이지의 state
-    func changePage(to state: TabBarButtonState) {
-        let index = Int(TabBarButtonState.allCases.firstIndex(of: state) ?? 0)
-        guard let currentVC = viewControllers?.first,
+    func changePage(to state: TabBarButtonState, _ completion: @escaping () -> Void) {
+        guard !isScrolling,
+              let index = TabBarButtonState.allCases.firstIndex(of: state),
+              index < pages.count,
+              let currentVC = viewControllers?.first,
               let currentIndex = pages.firstIndex(of: currentVC),
               index != currentIndex else { return }
         
+        isScrolling = true
+        
         let direction: UIPageViewController.NavigationDirection = (index > currentIndex) ? .forward : .reverse
-        setViewControllers([pages[index]], direction: direction, animated: true, completion: nil)
+        setViewControllers([pages[index]], direction: direction, animated: true) { completed in
+            self.isScrolling = false
+            completion()
+        }
     }
 }
 

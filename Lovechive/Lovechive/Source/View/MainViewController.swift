@@ -111,8 +111,9 @@ private extension MainViewController {
         output.changedCurretPage
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] state in
-                self?.tabBarView.changeButtonState(state: state)
-                self?.currentPageViewController.changePage(to: state)
+                self?.currentPageViewController.changePage(to: state) {
+                    self?.tabBarView.changeButtonState(state: state)
+                }
             }.disposed(by: disposeBag)
         
         // 페이지를 스와이프 했을 때 해당 페이지로 이동하는 이벤트
