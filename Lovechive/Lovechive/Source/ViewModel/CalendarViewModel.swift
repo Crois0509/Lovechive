@@ -5,7 +5,8 @@
 //  Created by 장상경 on 3/11/25.
 //
 
-import Foundation
+import UIKit
+import SnapKit
 import RxSwift
 import RxCocoa
 import FirebaseFirestore
@@ -90,6 +91,20 @@ final class CalendarViewModel: ViewModelType {
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] data in
                 self?.scheduleSection.accept(data)
+            }
+            .disposed(by: disposeBag)
+        
+        input.addButtonTapped
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { _ in
+                let vc = AppHelpers.getTopViewController()
+                let alert = LovechiveAlertViewController(type: .newSchedule)
+                vc?.addChild(alert)
+                vc?.view.addSubview(alert.view)
+                alert.view.snp.makeConstraints {
+                    $0.edges.equalToSuperview()
+                }
+                alert.didMove(toParent: vc)
             }
             .disposed(by: disposeBag)
         
