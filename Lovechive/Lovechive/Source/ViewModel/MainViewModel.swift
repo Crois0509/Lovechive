@@ -17,12 +17,10 @@ final class MainViewModel: ViewModelType {
         let secondButtonTapped: ControlEvent<Void>
         let thirdButtonTapped: ControlEvent<Void>
         let forthButtonTapped: ControlEvent<Void>
-        let changedPage: PublishRelay<Int>
     }
     
     struct Output {
         let changedCurretPage: PublishRelay<TabBarButtonState>
-        let scrollToPage: PublishRelay<TabBarButtonState>
     }
     
     private var disposeBag = DisposeBag()
@@ -59,15 +57,6 @@ final class MainViewModel: ViewModelType {
                 owner.changedCurretPage.accept(.setting)
             }.disposed(by: disposeBag)
         
-        input.changedPage
-            .asSignal(onErrorSignalWith: .empty())
-            .withUnretained(self)
-            .emit { owner, index in
-                let state = TabBarButtonState.allCases[index]
-                owner.scrollToPage.accept(state)
-            }.disposed(by: disposeBag)
-        
-        return Output(changedCurretPage: changedCurretPage,
-                      scrollToPage: scrollToPage)
+        return Output(changedCurretPage: changedCurretPage)
     }
 }
