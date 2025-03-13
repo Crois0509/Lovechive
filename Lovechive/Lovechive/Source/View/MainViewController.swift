@@ -76,7 +76,7 @@ private extension MainViewController {
         
         let selectedVC = pages[index]
         
-        UIView.transition(with: view, duration: 0.5, options: .transitionCrossDissolve) {
+        UIView.transition(with: view, duration: 0.3, options: .transitionCrossDissolve) {
             self.addChild(selectedVC)
             self.view.addSubview(selectedVC.view)
             
