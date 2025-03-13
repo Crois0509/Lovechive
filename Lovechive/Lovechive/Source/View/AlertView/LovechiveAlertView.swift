@@ -16,6 +16,13 @@ final class LovechiveAlertView: UIView {
     fileprivate let buttonView: AlertButtonStackView
     private lazy var sectionView = UICollectionView(frame: .zero, collectionViewLayout: createdCollectionViewLayout(items: 1))
     
+    private var disposeBag = DisposeBag()
+    
+    fileprivate let firstSectionTextFieldRelay = BehaviorRelay<String>(value: "")
+    fileprivate let secondSectionTextFieldRelay = BehaviorRelay<String>(value: "")
+    fileprivate let thirdSectionTextFieldRelay = BehaviorRelay<String>(value: "")
+    fileprivate let thirdSectionColorRelay = BehaviorRelay<String>(value: "")
+    
     private lazy var sections: [[UIView]] = [
         [AlertTextFieldView(type: .time, placeHolder: "시간 선택"), AlertTextFieldView(type: .limit(value: 20), placeHolder: "일정 설명")],
         [AlertTextFieldView(type: .limit(value: 10), placeHolder: "다이어리 제목"), AlertTextFieldView(type: .limit(value: 20), placeHolder: "다이어리 설명")],
@@ -54,6 +61,7 @@ private extension LovechiveAlertView {
         setupTitle()
         configureSelf()
         setupLayout()
+        bind()
     }
     
     func configureSelf() {
@@ -115,6 +123,19 @@ private extension LovechiveAlertView {
         return layout
     }
     
+    func bind() {
+        sections[currentSectionIndex].enumerated().forEach { [weak self] (index, section) in
+            guard let self else { return }
+            if let view = section as? AlertTextFieldView, index == 0 {
+                view.rx.editingTextField.bind(to: self.firstSectionTextFieldRelay).disposed(by: disposeBag)
+            } else if let view = section as? AlertTextFieldView, index == 1 {
+                view.rx.editingTextField.bind(to: self.secondSectionTextFieldRelay).disposed(by: disposeBag)
+            } else if let view = section as? AlertTextFieldView, index == 1 {
+                // 추후 구현
+            }
+        }
+    }
+    
 }
 
 extension LovechiveAlertView: UICollectionViewDataSource {
@@ -146,5 +167,21 @@ extension Reactive where Base: LovechiveAlertView {
     
     var activeButtonTapped: ControlEvent<Void> {
         return base.buttonView.rx.activeButtonTapped
+    }
+    
+    var firstSectionTextFieldRelay: BehaviorRelay<String> {
+        return base.firstSectionTextFieldRelay
+    }
+    
+    var secondSectionTextFieldRelay: BehaviorRelay<String> {
+        return base.secondSectionTextFieldRelay
+    }
+    
+    var thirdSectionTextFieldRelay: BehaviorRelay<String> {
+        return base.thirdSectionTextFieldRelay
+    }
+    
+    var thirdSectionColorRelay: BehaviorRelay<String> {
+        return base.thirdSectionColorRelay
     }
 }

@@ -74,7 +74,7 @@ extension CalendarViewController: ScheduleTableSectionConfigurable {
             
             return cell
             
-        })
+        }, canEditRowAtIndexPath: { _, _ in true })
         
         return dataSource
     }

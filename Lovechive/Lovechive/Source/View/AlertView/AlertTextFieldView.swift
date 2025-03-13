@@ -12,8 +12,13 @@ import RxCocoa
 
 final class AlertTextFieldView: UIView {
     
+    private var disposeBag = DisposeBag()
+    
+    private var currentType: AlertTextFieldModel
+    
     fileprivate let textField = UITextField()
-    fileprivate let extraView: UIView
+    private let datePicker = UIDatePicker()
+    private let extraView: UIView
     
     init(type: AlertTextFieldModel, placeHolder: String) {
         switch type {
@@ -22,9 +27,9 @@ final class AlertTextFieldView: UIView {
         case .time, .calendar:
             extraView = UIButton()
         }
+        currentType = type
         
         super.init(frame: .zero)
-        setupExtraView(type: type)
         textField.setPlaceholder(title: placeHolder, color: .Gray.secondary)
         setupUI()
     }
@@ -38,9 +43,11 @@ final class AlertTextFieldView: UIView {
 private extension AlertTextFieldView {
     
     func setupUI() {
+        setupExtraView()
         setuptextField()
         configrueSelf()
         setupLayout()
+        bind()
     }
     
     func configrueSelf() {
@@ -70,8 +77,8 @@ private extension AlertTextFieldView {
         }
     }
     
-    func setupExtraView(type: AlertTextFieldModel) {
-        switch type {
+    func setupExtraView() {
+        switch currentType {
         case .limit(value: let value):
             guard let label = extraView as? UILabel else { return }
             label.text = "0/\(value)" // 기본 값
@@ -85,12 +92,14 @@ private extension AlertTextFieldView {
 
         case .time, .calendar:
             guard let button = extraView as? UIButton else { return }
-            button.setImage(type.buttonImage, for: .normal)
+            button.setImage(currentType.buttonImage, for: .normal)
             button.backgroundColor = .clear
             button.imageView?.contentMode = .scaleAspectFit
             button.setContentHuggingPriority(.required, for: .horizontal)
 
-            textField.isUserInteractionEnabled = false
+//            textField.isUserInteractionEnabled = false
+//            textField.isEnabled = false
+            setupDatePicker()
         }
     }
     
@@ -111,10 +120,92 @@ private extension AlertTextFieldView {
         textField.layer.borderColor = UIColor.Gray.secondary.cgColor
     }
     
+    func mappingLimitText(_ view: UILabel, _ text: String) -> String {
+        let slice = view.text?.split(separator: "/")
+        let currentText = text.count
+        let limit = "\(currentText)/\(slice?.last ?? "")"
+        
+        return limit
+    }
+    
+    func checkInputLimit(_ input: String, _ view: UILabel) -> String {
+        guard let limit = Int(view.text?.split(separator: "/").last ?? ""),
+              input.count > limit
+        else { return input }
+        
+        let text = String(input.prefix(limit))
+        
+        HapticManager.notification(type: .warning)
+        
+        return text
+    }
+    
+    func setupDatePicker() {
+        switch currentType {
+        case .limit: break
+        case .time:
+            datePicker.datePickerMode = .time
+            datePicker.preferredDatePickerStyle = .wheels
+        case .calendar:
+            datePicker.datePickerMode = .date
+            datePicker.preferredDatePickerStyle = .wheels
+        }
+        
+        let toolbar = UIToolbar()
+        let doneButton = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(dismissDatePicker))
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        toolbar.setItems([flexibleSpace, doneButton], animated: false)
+        toolbar.sizeToFit()
+        
+        textField.inputView = datePicker
+        textField.inputAccessoryView = toolbar
+        textField.inputAssistantItem.leadingBarButtonGroups = []
+        textField.inputAssistantItem.trailingBarButtonGroups = []
+    }
+    
+    @objc func dismissDatePicker() {
+        var date: String = ""
+        
+        switch currentType {
+        case .limit: break
+        case .time:
+            date = datePicker.date.formattedDateToScheduleTime()
+        case .calendar:
+            date = datePicker.date.formattedDate()
+        }
+        
+        textField.text = date
+        textField.resignFirstResponder()
+    }
+    
+    func bind() {
+        if let button = extraView as? UIButton {
+            button.rx.tap
+                .withUnretained(self)
+                .asSignal(onErrorSignalWith: .empty())
+                .emit { owner, _ in
+                    owner.textField.becomeFirstResponder()
+                }
+                .disposed(by: disposeBag)
+            
+        } else if let label = extraView as? UILabel {
+            textField.rx.text.orEmpty
+                .distinctUntilChanged()
+                .withUnretained(self)
+                .map { owner, text in owner.checkInputLimit(text, label) }
+                .asDriver(onErrorDriveWith: .empty())
+                .drive { [weak self] text in
+                    self?.textField.text = text
+                    label.text = self?.mappingLimitText(label, text)
+                }
+                .disposed(by: disposeBag)
+        }
+    }
+    
 }
 
 extension Reactive where Base: AlertTextFieldView {
-    var editingTextField: ControlProperty<String?> {
-        base.textField.rx.text
+    var editingTextField: ControlProperty<String> {
+        base.textField.rx.text.orEmpty
     }
 }

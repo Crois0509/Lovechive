@@ -13,14 +13,16 @@ import RxCocoa
 final class LovechiveAlertViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
+    fileprivate let dataSavedRelay = PublishRelay<Void>()
     
-    private let viewModel = LovechiveAlertViewModel()
+    private let viewModel: LovechiveAlertViewModel
     
-    private let alertView: LovechiveAlertView
+    private(set) var alertView: LovechiveAlertView
     private let dim = UIView()
     
     init(type: AlertTypes) {
         alertView = .init(type: type)
+        viewModel = .init(type: type)
         super.init(nibName: nil, bundle: nil)
     }
     
@@ -50,6 +52,7 @@ final class LovechiveAlertViewController: UIViewController {
         UIView.animate(withDuration: 0.3) {
             self.dim.alpha = 0
             self.alertView.frame.origin.y = self.view.frame.maxY + 50
+            self.view.endEditing(true)
         } completion: { _ in
             completion()
         }
@@ -101,7 +104,9 @@ private extension LovechiveAlertViewController {
     
     func bind() {
         let input = LovechiveAlertViewModel.Input(cancelButtonTapped: alertView.rx.cancelButtonTapped,
-                                                  activeButtonTapped: alertView.rx.activeButtonTapped
+                                                  activeButtonTapped: alertView.rx.activeButtonTapped,
+                                                  scheduleTimeRelay: alertView.rx.firstSectionTextFieldRelay,
+                                                  scheduleTitleRelay: alertView.rx.secondSectionTextFieldRelay
         )
         
         let output = viewModel.transform(input: input)
@@ -113,6 +118,16 @@ private extension LovechiveAlertViewController {
                 owner.alertView.updateSectionViewSize()
             }
             .disposed(by: disposeBag)
+        
+        output.dataSaved
+            .bind(to: dataSavedRelay)
+            .disposed(by: disposeBag)
     }
     
+}
+
+extension Reactive where Base: LovechiveAlertViewController {
+    var dataSavedRelay: PublishRelay<Void> {
+        base.dataSavedRelay
+    }
 }
