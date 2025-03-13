@@ -30,6 +30,7 @@ final class LovechiveAlertViewModel: ViewModelType {
     private var scheduleTime: String?
     private var scheduleTitle: String?
     private var selectedDate: String?
+    private var dataId: String?
     
     private var isKeyboardVisible: Bool = false
     
@@ -39,8 +40,9 @@ final class LovechiveAlertViewModel: ViewModelType {
         switch type {
         case .newSchedule(date: let date):
             selectedDate = date.formattedDate()
-        case .editSchedule(date: let date):
-            selectedDate = date.formattedDate()
+        case .editSchedule(data: let data):
+            selectedDate = data.date.formattedDate()
+            dataId = data.id
         case .newDiary, .editDiary, .editMyPage: break
         }
     }
@@ -147,7 +149,8 @@ final class LovechiveAlertViewModel: ViewModelType {
     }
     
     private func mappingScheduleData(title: String, date: Date) -> ScheduleDataModel {
-        return ScheduleDataModel(id: UUID().uuidString, title: title, coupleId: umd.coupleId, date: date, createdBy: umd.userId)
+        let id = dataId ?? UUID().uuidString
+        return ScheduleDataModel(id: id, title: title, coupleId: umd.coupleId, date: date, createdBy: umd.userId)
     }
     
     private func saveScheduleData(_ data: ScheduleDataModel) -> Single<Void> {

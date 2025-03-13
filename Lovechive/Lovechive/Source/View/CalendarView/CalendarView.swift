@@ -36,6 +36,8 @@ final class CalendarView: UIView {
     func changeCurrentPage(_ date: Date) {
         calendar.scrollEnabled = true
         calendar.setCurrentPage(date, animated: true)
+        calendar.select(date)
+        selectedDate.accept(date)
         calendar.scrollEnabled = false
     }
 }

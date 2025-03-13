@@ -38,6 +38,11 @@ final class AlertTextFieldView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func configureTextField(_ text: String) {
+        textField.text = text
+        textField.sendActions(for: .valueChanged)
+    }
+    
 }
 
 private extension AlertTextFieldView {

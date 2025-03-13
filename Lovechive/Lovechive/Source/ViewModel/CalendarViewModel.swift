@@ -20,6 +20,7 @@ final class CalendarViewModel: ViewModelType {
         let addButtonTapped: ControlEvent<Void>
         let selectedDate: BehaviorRelay<Date>
         let tableViewItemDelted: ControlEvent<IndexPath>
+        let tableViewItemEdited: ControlEvent<IndexPath>
     }
     
     struct Output {
@@ -111,7 +112,21 @@ final class CalendarViewModel: ViewModelType {
         input.addButtonTapped
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.showAlertView()
+                owner.showAlertView(type: .newSchedule(date: owner.selectedDate.value))
+            }
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { _ in
+                input.fetchTrigger.accept(())
+            }
+            .disposed(by: disposeBag)
+        
+        input.tableViewItemEdited
+            .withUnretained(self)
+            .map { owner, indexPath in
+                owner.searchItemId(indexPath)
+            }
+            .flatMap { [weak self] item in
+                self!.showAlertView(type: .editSchedule(data: item))
             }
             .asSignal(onErrorSignalWith: .empty())
             .emit { _ in
@@ -122,18 +137,7 @@ final class CalendarViewModel: ViewModelType {
         input.tableViewItemDelted
             .withUnretained(self)
             .map { owner, indexPath in
-                let section = owner.sections.filter {
-                    Calendar.current.isDate($0.items.first?.date ?? Date(), inSameDayAs: owner.selectedDate.value)
-                }.first
-                
-                let index = owner.sections.firstIndex { sectionData in
-                    sectionData.identity == section?.identity
-                }
-                
-                guard let index else { return "0" }
-                
-                let item = owner.sections[index].items.remove(at: indexPath.row)
-                return item.id
+                owner.searchItemId(indexPath).id
             }
             .flatMap {
                 FirestoreManager.shared.deleteFromFirestore(type: .schedule(id: $0))
@@ -210,9 +214,9 @@ final class CalendarViewModel: ViewModelType {
         return ScheduleModelSection(items: data)
     }
     
-    private func showAlertView() -> PublishRelay<Void> {
+    private func showAlertView(type: AlertTypes) -> PublishRelay<Void> {
         let vc = AppHelpers.getTopViewController()
-        let alert = LovechiveAlertViewController(type: .newSchedule(date: selectedDate.value))
+        let alert = LovechiveAlertViewController(type: type)
         vc?.addChild(alert)
         vc?.view.addSubview(alert.view)
         alert.view.snp.makeConstraints {
@@ -221,5 +225,19 @@ final class CalendarViewModel: ViewModelType {
         alert.didMove(toParent: vc)
         
         return alert.rx.dataSavedRelay
+    }
+    
+    private func searchItemId(_ indexPath: IndexPath) -> ScheduleDataModel {
+        let section = sections.filter {
+            Calendar.current.isDate($0.items.first?.date ?? Date(), inSameDayAs: selectedDate.value)
+        }.first
+        
+        let index = sections.firstIndex { sectionData in
+            sectionData.identity == section?.identity
+        }
+                
+        let item = sections[index ?? 0].items.remove(at: indexPath.row)
+        
+        return item
     }
 }

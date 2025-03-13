@@ -30,6 +30,7 @@ final class LovechiveAlertView: UIView {
     ]
     
     private var currentSectionIndex: Int
+    private var currentType: FirestoreModelProtocol?
     
     init(type: AlertTypes) {
         buttonView = .init(aletType: type)
@@ -38,6 +39,7 @@ final class LovechiveAlertView: UIView {
         
         titleView.text = type.alertTitle
         sectionView.setCollectionViewLayout(createdCollectionViewLayout(items: sections[currentSectionIndex].count), animated: false)
+        editData(type: type)
         setupUI()
     }
     
@@ -123,6 +125,23 @@ private extension LovechiveAlertView {
         return layout
     }
     
+    func editData(type: AlertTypes) {
+        switch type {
+        case .newSchedule, .newDiary: break
+        case .editSchedule(data: let data):
+            let section = sections[0]
+            guard let firstView = section[0] as? AlertTextFieldView,
+                  let secondView = section[1] as? AlertTextFieldView
+            else { return }
+            
+            firstView.configureTextField(data.date.formattedDateToScheduleTime())
+            secondView.configureTextField(data.title)
+            
+        case .editDiary: break
+        case .editMyPage: break
+        }
+    }
+        
     func bind() {
         sections[currentSectionIndex].enumerated().forEach { [weak self] (index, section) in
             guard let self else { return }

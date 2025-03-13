@@ -71,7 +71,8 @@ private extension CalendarViewController {
                                             nextButtonTapped: headerView.rx.nextButtonTapped,
                                             addButtonTapped: scheduleView.rx.addButtonTapped,
                                             selectedDate: calendarView.rx.selectedDate,
-                                            tableViewItemDelted: scheduleView.scheduleTableView.rx.itemDeleted
+                                            tableViewItemDelted: scheduleView.scheduleTableView.rx.itemDeleted,
+                                            tableViewItemEdited: scheduleView.scheduleTableView.rx.itemSelected
         )
         
         let output = viewModel.transform(input: input)

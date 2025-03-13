@@ -9,7 +9,7 @@ import Foundation
 
 enum AlertTypes {
     case newSchedule(date: Date)
-    case editSchedule(date: Date)
+    case editSchedule(data: ScheduleDataModel)
     case newDiary
     case editDiary
     case editMyPage
