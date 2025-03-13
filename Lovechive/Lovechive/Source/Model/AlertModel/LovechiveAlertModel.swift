@@ -8,8 +8,8 @@
 import Foundation
 
 enum AlertTypes {
-    case newSchedule
-    case editSchedule
+    case newSchedule(date: Date)
+    case editSchedule(date: Date)
     case newDiary
     case editDiary
     case editMyPage
