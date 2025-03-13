@@ -19,6 +19,7 @@ final class CalendarViewModel: ViewModelType {
         let nextButtonTapped: ControlEvent<Void>
         let addButtonTapped: ControlEvent<Void>
         let selectedDate: BehaviorRelay<Date>
+        let tableViewItemDelted: ControlEvent<IndexPath>
     }
     
     struct Output {
@@ -29,6 +30,9 @@ final class CalendarViewModel: ViewModelType {
     }
     
     private var disposeBag = DisposeBag()
+    
+    private var sections: [ScheduleModelSection] = []
+    private var queryDatas: [QueryDocumentSnapshot] = []
     
     private let changeCurrentDatePage = BehaviorRelay<Date>(value: Date())
     private let selectedDate = BehaviorRelay<Date>(value: Date())
@@ -44,11 +48,24 @@ final class CalendarViewModel: ViewModelType {
             }
             .map { [weak self] data in
                 guard let self else { return [Date]() }
-                return mappingScheduleDataToEventDates(data)
+                return self.mappingScheduleDataToEventDates(data)
             }
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] dates in
                 self?.eventsRelay.accept(dates)
+            }
+            .disposed(by: disposeBag)
+        
+        eventsRelay
+            .withUnretained(self)
+            .compactMap { owner, data in
+                return owner.filteredToDayDateToScheduleSection(owner.eventsRelay.value, owner.queryDatas)
+            }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] datas in
+                guard let self else { return }
+                self.sections = datas
+                self.selectedDate.accept(self.selectedDate.value)
             }
             .disposed(by: disposeBag)
         
@@ -80,11 +97,8 @@ final class CalendarViewModel: ViewModelType {
         
         selectedDate
             .withUnretained(self)
-            .flatMap { owner, _ in owner.fetchDate() }
-            .map { [weak self] query in
-                guard let self else { return [ScheduleModelSection]() }
-                let date = self.selectedDate.value
-                let data = self.filteredToDayDateToScheduleSection(date, query)
+            .map { owner, date in
+                let data = owner.filteredSection(date)
                 
                 return [data]
             }
@@ -95,16 +109,38 @@ final class CalendarViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         input.addButtonTapped
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.showAlertView()
+            }
             .asSignal(onErrorSignalWith: .empty())
             .emit { _ in
-                let vc = AppHelpers.getTopViewController()
-                let alert = LovechiveAlertViewController(type: .newSchedule)
-                vc?.addChild(alert)
-                vc?.view.addSubview(alert.view)
-                alert.view.snp.makeConstraints {
-                    $0.edges.equalToSuperview()
+                input.fetchTrigger.accept(())
+            }
+            .disposed(by: disposeBag)
+        
+        input.tableViewItemDelted
+            .withUnretained(self)
+            .map { owner, indexPath in
+                let section = owner.sections.filter {
+                    Calendar.current.isDate($0.items.first?.date ?? Date(), inSameDayAs: owner.selectedDate.value)
+                }.first
+                
+                let index = owner.sections.firstIndex { sectionData in
+                    sectionData.identity == section?.identity
                 }
-                alert.didMove(toParent: vc)
+                
+                guard let index else { return "0" }
+                
+                let item = owner.sections[index].items.remove(at: indexPath.row)
+                return item.id
+            }
+            .flatMap {
+                FirestoreManager.shared.deleteFromFirestore(type: .schedule(id: $0))
+            }
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { _ in
+                input.fetchTrigger.accept(())
             }
             .disposed(by: disposeBag)
         
@@ -118,14 +154,16 @@ final class CalendarViewModel: ViewModelType {
         return FirestoreManager.shared.readFromFirestore(type: .schedule(id: ""))
     }
     
-    private func filteredToDayDateToScheduleSection(_ date: Date, _ query: [QueryDocumentSnapshot]) -> ScheduleModelSection {
-        let filteredData = query.filter {
-            let dataDate = ($0.data()[AppConfig.SchedulesModel.date] as? Timestamp)?.dateValue() ?? Date()
+    private func filteredToDayDateToScheduleSection(_ dates: [Date], _ query: [QueryDocumentSnapshot]) -> [ScheduleModelSection] {
+        let filteredData = query.filter { item in
+            let itemDate = (item.data()[AppConfig.SchedulesModel.date] as? Timestamp)?.dateValue() ?? Date()
             
-            return Calendar.current.isDate(date, inSameDayAs: dataDate)
+            return dates.contains { date in
+                Calendar.current.isDate(date, inSameDayAs: itemDate)
+            }
         }.map {
             ScheduleDataModel(
-                id: $0.data()[AppConfig.SchedulesModel.id] as? String ?? "",
+                id: $0.data()[AppConfig.SchedulesModel.id] as? String ?? UUID().uuidString,
                 title: $0.data()[AppConfig.SchedulesModel.title] as? String ?? "",
                 coupleId: $0.data()[AppConfig.SchedulesModel.coupleId] as? String ?? "",
                 date: ($0.data()[AppConfig.SchedulesModel.date] as? Timestamp)?.dateValue() ?? Date(),
@@ -134,19 +172,54 @@ final class CalendarViewModel: ViewModelType {
         }.sorted(by: {
             $0.date < $1.date
         })
+            
+        let groupedDate = Dictionary(grouping: filteredData) { item in
+            return Calendar.current.startOfDay(for: item.date)
+        }
         
-        let section = ScheduleModelSection(items: filteredData)
-        
-        return section
+        let sections = groupedDate.values.map {
+            ScheduleModelSection(items: $0)
+        }.sorted(by: {
+            $0.items.first?.date ?? Date() < $1.items.first?.date ?? Date()
+        })
+            
+        return sections
     }
     
     private func mappingScheduleDataToEventDates(_ query: [QueryDocumentSnapshot]) -> [Date] {
+        queryDatas = query
+        
         let dates = query.map { data in
             let date = (data.data()[AppConfig.SchedulesModel.date] as? Timestamp)?.dateValue() ?? Date()
             
             return date
+        }.filter { [weak self] date in
+            Calendar.current.isDate(self!.changeCurrentDatePage.value, equalTo: date, toGranularity: .month)
         }
         
         return dates
+    }
+    
+    private func filteredSection(_ date: Date) -> ScheduleModelSection {
+        let data = sections.flatMap { section in
+            section.items.filter {
+                Calendar.current.isDate($0.date, inSameDayAs: date)
+            }
+        }
+        
+        return ScheduleModelSection(items: data)
+    }
+    
+    private func showAlertView() -> PublishRelay<Void> {
+        let vc = AppHelpers.getTopViewController()
+        let alert = LovechiveAlertViewController(type: .newSchedule(date: selectedDate.value))
+        vc?.addChild(alert)
+        vc?.view.addSubview(alert.view)
+        alert.view.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
+        alert.didMove(toParent: vc)
+        
+        return alert.rx.dataSavedRelay
     }
 }

@@ -70,7 +70,8 @@ private extension CalendarViewController {
                                             previousButtonTapped: headerView.rx.previousButtonTapped,
                                             nextButtonTapped: headerView.rx.nextButtonTapped,
                                             addButtonTapped: scheduleView.rx.addButtonTapped,
-                                            selectedDate: calendarView.rx.selectedDate
+                                            selectedDate: calendarView.rx.selectedDate,
+                                            tableViewItemDelted: scheduleView.scheduleTableView.rx.itemDeleted
         )
         
         let output = viewModel.transform(input: input)
@@ -89,6 +90,7 @@ private extension CalendarViewController {
             .drive { owner, date in
                 owner.calendarView.changeCurrentPage(date)
                 owner.headerView.configureHeaderView(date)
+                owner.fetchTrigger.accept(())
             }
             .disposed(by: disposeBag)
         
@@ -110,13 +112,14 @@ private extension CalendarViewController {
             .drive { owner, data in
                 let isEmpty = data.first?.items.isEmpty ?? true
                 owner.scheduleView.updateTableViewSize(isEmpty)
-                if !isEmpty {
+                
+                if isEmpty {
                     owner.scheduleView.snp.updateConstraints {
-                        $0.height.equalTo(self.scheduleView.scheduleTableView.contentSize.height + 60)
+                        $0.height.equalTo(100)
                     }
                 } else {
                     owner.scheduleView.snp.updateConstraints {
-                        $0.height.equalTo(100)
+                        $0.height.equalTo(owner.scheduleView.scheduleTableView.contentSize.height + 60)
                     }
                 }
             }
