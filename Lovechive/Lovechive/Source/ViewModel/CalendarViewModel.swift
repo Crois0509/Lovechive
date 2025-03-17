@@ -19,7 +19,7 @@ final class CalendarViewModel: ViewModelType {
         let nextButtonTapped: ControlEvent<Void>
         let addButtonTapped: ControlEvent<Void>
         let selectedDate: BehaviorRelay<Date>
-        let tableViewItemDelted: ControlEvent<IndexPath>
+        let tableViewItemDeleted: ControlEvent<IndexPath>
         let tableViewItemEdited: ControlEvent<IndexPath>
     }
     
@@ -134,7 +134,7 @@ final class CalendarViewModel: ViewModelType {
             }
             .disposed(by: disposeBag)
         
-        input.tableViewItemDelted
+        input.tableViewItemDeleted
             .withUnretained(self)
             .map { owner, indexPath in
                 owner.searchItemId(indexPath).id

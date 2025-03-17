@@ -71,7 +71,7 @@ private extension CalendarViewController {
                                             nextButtonTapped: headerView.rx.nextButtonTapped,
                                             addButtonTapped: scheduleView.rx.addButtonTapped,
                                             selectedDate: calendarView.rx.selectedDate,
-                                            tableViewItemDelted: scheduleView.scheduleTableView.rx.itemDeleted,
+                                            tableViewItemDeleted: scheduleView.scheduleTableView.rx.itemDeleted,
                                             tableViewItemEdited: scheduleView.scheduleTableView.rx.itemSelected
         )
         
