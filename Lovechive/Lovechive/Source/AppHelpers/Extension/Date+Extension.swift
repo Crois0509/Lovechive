@@ -9,22 +9,40 @@ import Foundation
 
 extension Date {
     
-    /// Date를 String 타입으로 변환시키는 메소드
-    /// - Returns: String 타입의 날짜
-    func formattedDate() -> String {
-        let formatter = DateFormatter()
-        formatter.locale = Locale(identifier: "ko_KR")
-        formatter.dateFormat = "yyyy년 M월 d일"
+    /// Date 타입의 formtter 타입 정의
+    enum DateFormatType {
+        case yearMonthDay
+        case yearMonthDayHourMinute
+        case yearMonth
+        case monthDay
+        case hourMinute
+        case fullTime
         
-        return formatter.string(from: self)
+        var dateFormat: String {
+            switch self {
+            case .yearMonthDay:
+                return "yyyy년 M월 d일"
+            case .yearMonthDayHourMinute:
+                return "yyyy.M.d(E) a h시 m분"
+            case .yearMonth:
+                return "yyyy년 M월"
+            case .monthDay:
+                return "M월 d일 일정"
+            case .hourMinute:
+                return "a h시 m분"
+            case .fullTime:
+                return "yyyy년 M월 d일 a h시 m분"
+            }
+        }
     }
     
-    /// Date를 String 타입으로 변환시키는 메소드
-    /// - Returns: String 타입의 날짜, 시간
-    func formattedDateAndTime() -> String {
+    /// Date 타입의 데이터를 String 타입으로 변환시키는 메소드
+    /// - Parameter type: 변경시킬 Date 타입
+    /// - Returns: 변환된 String 타입
+    func formattedDateToString(_ type: DateFormatType) -> String {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")
-        formatter.dateFormat = "yyyy.M.d(E) a h시 m분"
+        formatter.dateFormat = type.dateFormat
         
         return formatter.string(from: self)
     }

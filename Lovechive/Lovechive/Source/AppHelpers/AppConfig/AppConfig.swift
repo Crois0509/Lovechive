@@ -63,4 +63,15 @@ enum AppConfig {
         static let info: String = "아직 일정이 추가되지 않았어요"
         static let cellId: String = "PlanViewCell"
     }
+    
+    // MARK: - CalendarView에서 사용할 String 데이터
+    
+    enum CalendarViewConfig {
+        static let cellId: String = "ScheduleViewCell"
+        static let headerDate: String = "2000년 1월"
+        static let cellDate: String = "오전 0시"
+        static let cellTitle: String = "새로운 일정"
+        static let title: String = "1월 1일 일정"
+        static let info: String = "아직 일정이 없습니다."
+    }
 }

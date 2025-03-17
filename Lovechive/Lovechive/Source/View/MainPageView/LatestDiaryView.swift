@@ -38,7 +38,7 @@ final class LatestDiaryView: UIView {
     ///   - image: 일기의 이미지 경로
     func configureView(content: String, date: Date, image: String) {
         contentView.text = content
-        dateView.text = date.formattedDateAndTime()
+        dateView.text = date.formattedDateToString(.yearMonthDayHourMinute)
         imageView.image = ImageManager.shared.loadImage(path: image) == nil ? .no : ImageManager.shared.loadImage(path: image)
     }
     

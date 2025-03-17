@@ -18,10 +18,21 @@ final class MainViewController: UIViewController {
     private let viewModel = MainViewModel()
     private var disposeBag = DisposeBag()
     
+    // MARK: - Properties
+    
+    private let pages: [UIViewController] = [
+        MainPageViewController(),
+        CalendarViewController(),
+        TestDiaryViewController(),
+        TestSettingViewController()
+    ]
+    
     // MARK: - UI Components
     
     private let tabBarView = TabBarView()
-    private let currentPageViewController = PageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
+    private let logoView = LogoView()
+    private let backgroundView = UIView()
+    private var currentPageViewController: UIViewController?
 
     // MARK: - VC LifeCycle
     
@@ -44,32 +55,59 @@ final class MainViewController: UIViewController {
 private extension MainViewController {
     
     func setupUI() {
+        setupBackgroundView()
         configureSelf()
         setupLayout()
-        setupChildViewController()
+        setupChildViewController(0)
         bind()
     }
     
     func configureSelf() {
         view.backgroundColor = .white
-        [tabBarView].forEach {
+        [backgroundView, logoView, tabBarView].forEach {
             view.addSubview($0)
         }
     }
     
     /// 서브 뷰 컨트롤러를 설정하는 메소드
-    func setupChildViewController() {
-        addChild(currentPageViewController)
-        view.addSubview(currentPageViewController.view)
-        currentPageViewController.view.snp.makeConstraints {
-            $0.top.horizontalEdges.equalToSuperview()
-            $0.bottom.equalTo(tabBarView.snp.top)
+    func setupChildViewController(_ index: Int) {
+        if let currentVC = self.currentPageViewController {
+            currentVC.view.removeFromSuperview()
+            currentVC.removeFromParent()
         }
-        currentPageViewController.didMove(toParent: self)
-        view.bringSubviewToFront(tabBarView)
+        
+        let selectedVC = pages[index]
+        
+        UIView.transition(with: view, duration: 0.3, options: .transitionCrossDissolve) {
+            self.addChild(selectedVC)
+            self.view.addSubview(selectedVC.view)
+            
+            selectedVC.view.snp.makeConstraints {
+                $0.top.equalTo(self.logoView.snp.bottom).offset(16)
+                $0.horizontalEdges.equalToSuperview()
+                $0.bottom.equalTo(self.tabBarView.snp.top)
+            }
+            
+            selectedVC.didMove(toParent: self)
+            self.currentPageViewController = selectedVC
+            
+            self.view.bringSubviewToFront(self.tabBarView)
+            self.view.bringSubviewToFront(self.logoView)
+        }
     }
     
     func setupLayout() {
+        backgroundView.snp.makeConstraints {
+            $0.top.horizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(64)
+        }
+        
+        logoView.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.horizontalEdges.equalToSuperview()
+            $0.height.equalTo(40)
+        }
+        
         tabBarView.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview()
             $0.bottom.equalTo(view.safeAreaLayoutGuide)
@@ -77,13 +115,17 @@ private extension MainViewController {
         }
     }
     
+    func setupBackgroundView() {
+        backgroundView.backgroundColor = .Personal.backgroundPink
+    }
+    
     /// 데이터 바인딩 메소드
     func bind() {
         let input = MainViewModel.Input(firstButtonTapped: tabBarView.rx.firstButtonTapped,
                                         secondButtonTapped: tabBarView.rx.secondButtonTapped,
                                         thirdButtonTapped: tabBarView.rx.thirdButtonTapped,
-                                        forthButtonTapped: tabBarView.rx.forthButtonTapped,
-                                        changedPage: currentPageViewController.rx.currentPage)
+                                        forthButtonTapped: tabBarView.rx.forthButtonTapped
+        )
         
         let output = viewModel.transform(input: input)
         
@@ -91,15 +133,9 @@ private extension MainViewController {
         output.changedCurretPage
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] state in
-                self?.tabBarView.changeButtonState(state: state)
-                self?.currentPageViewController.changePage(to: state)
-            }.disposed(by: disposeBag)
-        
-        // 페이지를 스와이프 했을 때 해당 페이지로 이동하는 이벤트
-        output.scrollToPage
-            .asDriver(onErrorDriveWith: .empty())
-            .drive { [weak self] state in
-                self?.tabBarView.changeButtonState(state: state)
+                guard let self, let index = TabBarButtonState.allCases.firstIndex(of: state) else { return }
+                self.setupChildViewController(index)
+                self.tabBarView.changeButtonState(state: state)
             }.disposed(by: disposeBag)
     }
 }

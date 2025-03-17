@@ -12,7 +12,7 @@ struct UserDefaultsManager {
     
     var userId: String {
         guard let id = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.userId) else {
-            return ""
+            return "0"
         }
         
         return id
@@ -20,7 +20,7 @@ struct UserDefaultsManager {
     
     var coupleId: String {
         guard let id = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId) else {
-            return ""
+            return "0"
         }
         
         return id

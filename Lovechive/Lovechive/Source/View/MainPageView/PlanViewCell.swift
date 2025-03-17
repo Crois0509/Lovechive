@@ -42,7 +42,7 @@ final class PlanViewCell: UITableViewCell {
     ///   - date: 일정의 Date
     func configureCell(title: String, date: Date) {
         titleView.text = title
-        dateView.text = date.formattedDateAndTime()
+        dateView.text = date.formattedDateToString(.yearMonthDayHourMinute)
     }
 }
 
