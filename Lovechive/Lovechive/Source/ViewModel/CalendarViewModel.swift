@@ -34,6 +34,7 @@ final class CalendarViewModel: ViewModelType {
     
     private var sections: [ScheduleModelSection] = []
     private var queryDatas: [QueryDocumentSnapshot] = []
+    private let confirmAlert = AlertManager(title: "경고", message: "정말 삭제하시겠습니까?", cancelTitle: "취소", destructiveTitle: "삭제")
     
     private let changeCurrentDatePage = BehaviorRelay<Date>(value: Date())
     private let selectedDate = BehaviorRelay<Date>(value: Date())
@@ -136,8 +137,12 @@ final class CalendarViewModel: ViewModelType {
         
         input.tableViewItemDeleted
             .withUnretained(self)
-            .map { owner, indexPath in
-                owner.searchItemId(indexPath).id
+            .flatMapLatest { owner, indexPath -> Observable<String> in
+                let itemId = owner.searchItemId(indexPath).id
+                
+                return owner.confirmAlert.showAlert(.alert)
+                    .filter { $0 }
+                    .map { _ in itemId }
             }
             .flatMap {
                 FirestoreManager.shared.deleteFromFirestore(type: .schedule(id: $0))
@@ -236,7 +241,7 @@ final class CalendarViewModel: ViewModelType {
             sectionData.identity == section?.identity
         }
                 
-        let item = sections[index ?? 0].items.remove(at: indexPath.row)
+        let item = sections[index ?? 0].items[indexPath.row]
         
         return item
     }
