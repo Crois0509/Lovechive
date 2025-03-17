@@ -39,9 +39,9 @@ final class LovechiveAlertViewModel: ViewModelType {
     init(type: AlertTypes) {
         switch type {
         case .newSchedule(date: let date):
-            selectedDate = date.formattedDate()
+            selectedDate = date.formattedDateToString(.yearMonthDay)
         case .editSchedule(data: let data):
-            selectedDate = data.date.formattedDate()
+            selectedDate = data.date.formattedDateToString(.yearMonthDay)
             dataId = data.id
         case .newDiary, .editDiary, .editMyPage: break
         }

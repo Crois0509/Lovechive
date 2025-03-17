@@ -174,9 +174,9 @@ private extension AlertTextFieldView {
         switch currentType {
         case .limit: break
         case .time:
-            date = datePicker.date.formattedDateToScheduleTime()
+            date = datePicker.date.formattedDateToString(.hourMinute)
         case .calendar:
-            date = datePicker.date.formattedDate()
+            date = datePicker.date.formattedDateToString(.yearMonthDay)
         }
         
         textField.text = date

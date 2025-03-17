@@ -134,7 +134,7 @@ private extension LovechiveAlertView {
                   let secondView = section[1] as? AlertTextFieldView
             else { return }
             
-            firstView.configureTextField(data.date.formattedDateToScheduleTime())
+            firstView.configureTextField(data.date.formattedDateToString(.hourMinute))
             secondView.configureTextField(data.title)
             
         case .editDiary: break

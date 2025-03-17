@@ -30,7 +30,7 @@ final class ScheduleViewCell: UITableViewCell {
     }
     
     func configureCell(time: Date, title: String) {
-        timeLabel.text = time.formattedDateToScheduleTime()
+        timeLabel.text = time.formattedDateToString(.hourMinute)
         titleLabel.text = title
     }
     

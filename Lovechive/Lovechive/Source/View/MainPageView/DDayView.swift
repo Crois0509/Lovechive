@@ -36,7 +36,7 @@ final class DDayView: UIView {
     func configureDDayView(_ date: Date) {
         let dDay = Calendar.current.dateComponents([.day], from: date, to: Date()).day
         dDayView.text = "D + \(dDay ?? 0)"
-        infoLabel.text = date.formattedDate()
+        infoLabel.text = "\(date.formattedDateToString(.yearMonthDay))부터"
     }
     
 }

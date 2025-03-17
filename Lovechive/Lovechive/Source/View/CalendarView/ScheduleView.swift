@@ -28,7 +28,7 @@ final class ScheduleView: UIView {
     }
     
     func configureTitleDate(_ date: Date) {
-        titleView.text = date.formattedDateToSchedule()
+        titleView.text = date.formattedDateToString(.yearMonthDayHourMinute)
     }
     
     func updateTableViewSize(_ isEmpty: Bool) {

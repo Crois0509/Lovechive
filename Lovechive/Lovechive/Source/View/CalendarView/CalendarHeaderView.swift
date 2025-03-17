@@ -28,7 +28,7 @@ final class CalendarHeaderView: UIView {
     }
     
     func configureHeaderView(_ date: Date) {
-        dateTitle.text = date.formattedDateToYM()
+        dateTitle.text = date.formattedDateToString(.yearMonth)
     }
 }
 
