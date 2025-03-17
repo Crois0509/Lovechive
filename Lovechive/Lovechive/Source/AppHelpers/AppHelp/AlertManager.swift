@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import RxSwift
 
 /**
  프로젝트 전역에서 사용할 Alert 객체
@@ -24,7 +25,6 @@ struct AlertManager {
     var cancelTitle: String
     var activeTitle: String?
     var destructiveTitle: String?
-    let completion: (() -> Void)?
     
     // 가장 기본적인 형태의 Alert
     // cancel 버튼만 보유
@@ -38,7 +38,6 @@ struct AlertManager {
         self.cancelTitle = cancelTitle
         self.activeTitle = nil
         self.destructiveTitle = nil
-        self.completion = nil
     }
     
     // 2개의 선택지를 제공하는 Alert
@@ -47,14 +46,12 @@ struct AlertManager {
     init(title: String,
          message: String,
          cancelTitle: String,
-         activeTitle: String?,
-         completion: (() -> Void)?
+         activeTitle: String?
     ) {
         self.title = title
         self.message = message
         self.cancelTitle = cancelTitle
         self.activeTitle = activeTitle
-        self.completion = completion
         self.destructiveTitle = nil
     }
     
@@ -64,14 +61,12 @@ struct AlertManager {
     init(title: String,
          message: String,
          cancelTitle: String,
-         destructiveTitle: String?,
-         completion: (() -> Void)?
+         destructiveTitle: String?
     ) {
         self.title = title
         self.message = message
         self.cancelTitle = cancelTitle
         self.destructiveTitle = destructiveTitle
-        self.completion = completion
         self.activeTitle = nil
     }
     
@@ -79,22 +74,37 @@ struct AlertManager {
     /// - Parameters:
     ///   - view: Alert을 present 할 뷰 컨트롤러
     ///   - style: AlertViewController Style
-    func showAlert(_ style: UIAlertController.Style) {
-        guard let view = AppHelpers.getTopViewController() else { return }
-        let alert = UIAlertController(title: self.title, message: self.message, preferredStyle: style)
-        alert.addAction(UIAlertAction(title: self.cancelTitle, style: .cancel))
-        
-        if let activeTitle {
-            alert.addAction(UIAlertAction(title: activeTitle, style: .default) { [weak view] _ in
-                completion?()
+    func showAlert(_ style: UIAlertController.Style) -> Observable<Bool> {
+        return Observable.create { observer in
+            guard let view = AppHelpers.getTopViewController() else { return Disposables.create() }
+            
+            let alert = UIAlertController(title: self.title, message: self.message, preferredStyle: style)
+            
+            alert.addAction(UIAlertAction(title: self.cancelTitle, style: .cancel) { _ in
+                observer.onNext(false)
+                observer.onCompleted()
             })
-        } else if let destructiveTitle {
-            alert.addAction(UIAlertAction(title: destructiveTitle, style: .destructive) { [weak view] _ in
-                completion?()
-            })
+            
+            if let activeTitle {
+                alert.addAction(UIAlertAction(title: activeTitle, style: .default) { [weak view] _ in
+                    observer.onNext(true)
+                    observer.onCompleted()
+                })
+            } else if let destructiveTitle {
+                alert.addAction(UIAlertAction(title: destructiveTitle, style: .destructive) { [weak view] _ in
+                    observer.onNext(true)
+                    observer.onCompleted()
+                })
+            }
+            
+            DispatchQueue.main.async {
+                view.present(alert, animated: true)
+            }
+            
+            return Disposables.create {
+                alert.dismiss(animated: true)
+            }
         }
-        
-        view.present(alert, animated: true)
     }
     
 }

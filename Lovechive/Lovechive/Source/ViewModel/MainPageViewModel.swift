@@ -18,14 +18,14 @@ final class MainPageViewModel: ViewModelType {
     }
     
     struct Output {
-        let sections: BehaviorRelay<[PlanTableViewSection]>
+        let sections: BehaviorRelay<[ScheduleModelSection]>
         let latestDiaryRelay: PublishRelay<DiaryDataModel>
         let dDayRelay: PublishRelay<CoupleDataModel>
     }
     
     private var disposeBag = DisposeBag()
     
-    private let sections = BehaviorRelay<[PlanTableViewSection]>(value: [])
+    private let sections = BehaviorRelay<[ScheduleModelSection]>(value: [])
     private let latestDiaryRelay = PublishRelay<DiaryDataModel>()
     private let dDayRelay = PublishRelay<CoupleDataModel>()
     
@@ -36,7 +36,7 @@ final class MainPageViewModel: ViewModelType {
                 owner.fetchData(type: .schedule(id: ""))
             }
             .map { [weak self] data in
-                guard let self else { return PlanTableViewSection.init(items: []) }
+                guard let self else { return ScheduleModelSection.init(items: []) }
                 return self.mappingQueryDataToSectionData(data)
             }
             .asDriver(onErrorDriveWith: .empty())
@@ -93,7 +93,7 @@ final class MainPageViewModel: ViewModelType {
     /// Query 데이터를 PlanTableViewSection 타입으로 변환하는 메소드
     /// - Parameter data: Query 데이터
     /// - Returns: 변환된 PlanTableViewSection 데이터
-    private func mappingQueryDataToSectionData(_ data: [QueryDocumentSnapshot]) -> PlanTableViewSection {
+    private func mappingQueryDataToSectionData(_ data: [QueryDocumentSnapshot]) -> ScheduleModelSection {
         let filteredData = data.filter {
             let date = ($0.data()[AppConfig.SchedulesModel.date] as? Timestamp)?.dateValue() ?? Date()
             
@@ -112,7 +112,7 @@ final class MainPageViewModel: ViewModelType {
             $0.date < $1.date
         }).prefix(3))
         
-        let section = PlanTableViewSection(items: sortedData)
+        let section = ScheduleModelSection(items: sortedData)
         
         return section
     }
