@@ -7,6 +7,7 @@
 
 import Foundation
 
+/// 커스텀 Alert뷰의 상태를 정의하는 모델
 enum AlertTypes {
     case newSchedule(date: Date)
     case editSchedule(data: ScheduleDataModel)
@@ -14,6 +15,7 @@ enum AlertTypes {
     case editDiary
     case editMyPage
     
+    /// Alert의 타이틀 뷰 텍스트
     var alertTitle: String {
         switch self {
         case .newSchedule:
@@ -29,6 +31,7 @@ enum AlertTypes {
         }
     }
     
+    /// Alert의 active 버튼 타이틀
     var alertActiveButtonTitle: String {
         switch self {
         case .newDiary, .newSchedule:
@@ -40,6 +43,7 @@ enum AlertTypes {
         }
     }
     
+    /// Alert의 타입에 따른 인덱스
     var typeIndex: Int {
         switch self {
         case .newSchedule, .editSchedule:

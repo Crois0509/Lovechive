@@ -10,11 +10,16 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 커스텀 Alert 뷰
 final class LovechiveAlertView: UIView {
         
+    // MARK: - UI Components
+    
     private let titleView = UILabel()
     fileprivate let buttonView: AlertButtonStackView
     private lazy var sectionView = UICollectionView(frame: .zero, collectionViewLayout: createdCollectionViewLayout(items: 1))
+    
+    // MARK: - Rx Properties
     
     private var disposeBag = DisposeBag()
     
@@ -23,6 +28,8 @@ final class LovechiveAlertView: UIView {
     fileprivate let thirdSectionTextFieldRelay = BehaviorRelay<String>(value: "")
     fileprivate let thirdSectionColorRelay = BehaviorRelay<String>(value: "")
     
+    // MARK: - Properties
+    
     private lazy var sections: [[UIView]] = [
         [AlertTextFieldView(type: .time, placeHolder: "시간 선택"), AlertTextFieldView(type: .limit(value: 20), placeHolder: "일정 설명")],
         [AlertTextFieldView(type: .limit(value: 10), placeHolder: "다이어리 제목"), AlertTextFieldView(type: .limit(value: 20), placeHolder: "다이어리 설명")],
@@ -30,7 +37,8 @@ final class LovechiveAlertView: UIView {
     ]
     
     private var currentSectionIndex: Int
-    private var currentType: FirestoreModelProtocol?
+    
+    // MARK: - Initializer
     
     init(type: AlertTypes) {
         buttonView = .init(aletType: type)
@@ -47,6 +55,7 @@ final class LovechiveAlertView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 커스텀 Alert 뷰의 섹션 사이즈를 업데이트 하는 메소드
     func updateSectionViewSize() {
         let constraint: Int = currentSectionIndex == 2 ? 64 : 48
         sectionView.layoutIfNeeded()
@@ -54,7 +63,19 @@ final class LovechiveAlertView: UIView {
             $0.height.equalTo(constraint * self.sections[self.currentSectionIndex].count)
         }
     }
+    
+    /// 키보드를 등장 시키는 메소드
+    func showKeyboard() {
+        let indexPath = IndexPath(item: 0, section: 0)
+        guard let cell = sectionView.cellForItem(at: indexPath) as? AlertSectionCell,
+              let view = cell.subviews.last as? AlertTextFieldView
+        else { return }
+        
+        view.showKeyboard()
+    }
 }
+
+// MARK: - UI Setting Method
 
 private extension LovechiveAlertView {
     
@@ -149,13 +170,15 @@ private extension LovechiveAlertView {
                 view.rx.editingTextField.bind(to: self.firstSectionTextFieldRelay).disposed(by: disposeBag)
             } else if let view = section as? AlertTextFieldView, index == 1 {
                 view.rx.editingTextField.bind(to: self.secondSectionTextFieldRelay).disposed(by: disposeBag)
-            } else if let view = section as? AlertTextFieldView, index == 1 {
+            } else if let view = section as? AlertTextFieldView, index == 2 {
                 // 추후 구현
             }
         }
     }
     
 }
+
+// MARK: - UICollectionViewDataSource Method
 
 extension LovechiveAlertView: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
@@ -174,32 +197,42 @@ extension LovechiveAlertView: UICollectionViewDataSource {
     }
 }
 
+// MARK: - Reactive Extension
+
 extension Reactive where Base: LovechiveAlertView {
+    
+    /// 커스텀 Alert뷰의 서브뷰들이 모두 설정되었을 때 이벤트를 방출하는 옵저버블
     var layoutSubviewsEvent: Observable<Void> {
         return base.rx.methodInvoked(#selector(base.layoutSubviews))
             .map { _ in } // 반환값을 Void로 변환
     }
     
+    /// 취소 버튼의 탭 이벤트를 방출하는 옵저버블
     var cancelButtonTapped: ControlEvent<Void> {
         return base.buttonView.rx.cancelButtonTapped
     }
     
+    /// active 버튼의 탭 이벤트를 방출하는 옵저버블
     var activeButtonTapped: ControlEvent<Void> {
         return base.buttonView.rx.activeButtonTapped
     }
     
+    /// 첫 번째 섹션의 TextField 변경 이벤트를 방출하는 옵저버블
     var firstSectionTextFieldRelay: BehaviorRelay<String> {
         return base.firstSectionTextFieldRelay
     }
     
+    /// 두 번째 섹션의 TextField 변경 이벤트를 방출하는 옵저버블
     var secondSectionTextFieldRelay: BehaviorRelay<String> {
         return base.secondSectionTextFieldRelay
     }
     
+    /// 세 번째 섹션의 TextField 변경 이벤트를 방출하는 옵저버블
     var thirdSectionTextFieldRelay: BehaviorRelay<String> {
         return base.thirdSectionTextFieldRelay
     }
     
+    /// 세 번째 섹션의 색상 변경 이벤트를 방출하는 옵저버블
     var thirdSectionColorRelay: BehaviorRelay<String> {
         return base.thirdSectionColorRelay
     }

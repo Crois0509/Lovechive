@@ -10,11 +10,16 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 커스텀 Alert의 취소, active 버튼을 표현하는 뷰
 final class AlertButtonStackView: UIView {
+    
+    // MARK: - UI Components
     
     fileprivate lazy var cancelButton = createdButton(title: "취소", color: .Gray.naturalBlack, backColor: .clear)
     fileprivate lazy var activeButton = createdButton(title: "만들기", color: .white, backColor: .Personal.highlightPink)
         
+    // MARK: - Initializer
+    
     init(aletType: AlertTypes) {
         super.init(frame: .zero)
         
@@ -27,6 +32,8 @@ final class AlertButtonStackView: UIView {
     }
     
 }
+
+// MARK: - UI Setting Method
 
 private extension AlertButtonStackView {
     
@@ -69,11 +76,15 @@ private extension AlertButtonStackView {
     
 }
 
+// MARK: - Reactive Extension
+
 extension Reactive where Base: AlertButtonStackView {
+    /// 취소 버튼을 눌렀을 때 이벤트를 방출하는 옵저버블
     var cancelButtonTapped: ControlEvent<Void> {
         base.cancelButton.rx.tap
     }
     
+    /// active 버튼을 눌렀을 때 이벤트를 방출하는 옵저버블
     var activeButtonTapped: ControlEvent<Void> {
         base.activeButton.rx.tap
     }

@@ -10,15 +10,24 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 커스텀 Alert뷰의 공용 텍스트필드 정의
 final class AlertTextFieldView: UIView {
+    
+    // MARK: - Rx Properties
     
     private var disposeBag = DisposeBag()
     
+    // MARK: - Properties
+    
     private var currentType: AlertTextFieldModel
+    
+    // MARK: - UI Components
     
     fileprivate let textField = UITextField()
     private let datePicker = UIDatePicker()
     private let extraView: UIView
+    
+    // MARK: - Initializer
     
     init(type: AlertTextFieldModel, placeHolder: String) {
         switch type {
@@ -38,12 +47,21 @@ final class AlertTextFieldView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// TextField를 텍스트를 설정하는 메소드
+    /// - Parameter text: TextField에 넣을 텍스트
     func configureTextField(_ text: String) {
         textField.text = text
         textField.sendActions(for: .valueChanged)
     }
     
+    /// 키보드를 등장 시키는 메소드
+    func showKeyboard() {
+        textField.becomeFirstResponder()
+    }
+    
 }
+
+// MARK: - UI Setting Method
 
 private extension AlertTextFieldView {
     
@@ -102,8 +120,6 @@ private extension AlertTextFieldView {
             button.imageView?.contentMode = .scaleAspectFit
             button.setContentHuggingPriority(.required, for: .horizontal)
 
-//            textField.isUserInteractionEnabled = false
-//            textField.isEnabled = false
             setupDatePicker()
         }
     }
@@ -123,26 +139,6 @@ private extension AlertTextFieldView {
         textField.layer.cornerRadius = 8
         textField.layer.borderWidth = 1
         textField.layer.borderColor = UIColor.Gray.secondary.cgColor
-    }
-    
-    func mappingLimitText(_ view: UILabel, _ text: String) -> String {
-        let slice = view.text?.split(separator: "/")
-        let currentText = text.count
-        let limit = "\(currentText)/\(slice?.last ?? "")"
-        
-        return limit
-    }
-    
-    func checkInputLimit(_ input: String, _ view: UILabel) -> String {
-        guard let limit = Int(view.text?.split(separator: "/").last ?? ""),
-              input.count > limit
-        else { return input }
-        
-        let text = String(input.prefix(limit))
-        
-        HapticManager.notification(type: .warning)
-        
-        return text
     }
     
     func setupDatePicker() {
@@ -168,6 +164,7 @@ private extension AlertTextFieldView {
         textField.inputAssistantItem.trailingBarButtonGroups = []
     }
     
+    /// DatePicker 뷰를 닫는 메소드
     @objc func dismissDatePicker() {
         var date: String = ""
         
@@ -183,6 +180,41 @@ private extension AlertTextFieldView {
         textField.resignFirstResponder()
     }
     
+    /// TextField의 글자 수를 표현하는 메소드
+    /// - Parameters:
+    ///   - view: 글자수를 표현할 뷰
+    ///   - text: TextField의 텍스트
+    /// - Returns: 현재 글자 수/최대 글자 수
+    func mappingLimitText(_ view: UILabel, _ text: String) -> String {
+        let slice = view.text?.split(separator: "/")
+        let currentText = text.count
+        let limit = "\(currentText)/\(slice?.last ?? "")"
+        
+        return limit
+    }
+    
+    /// TextField의 글자 수가 제한 숫자보다 큰지 확인하는 메소드
+    /// - Parameters:
+    ///   - input: TextField의 텍스트
+    ///   - view: 최대 글자 수를 가진 뷰
+    /// - Returns: 최대 글자 수보다 작은 수의 텍스트
+    func checkInputLimit(_ input: String, _ view: UILabel) -> String {
+        guard let limit = Int(view.text?.split(separator: "/").last ?? ""),
+              input.count > limit
+        else {
+            view.textColor = .Gray.secondary
+            return input
+        }
+        
+        let text = String(input.prefix(limit))
+        view.textColor = .systemRed
+        
+        HapticDrawer.notification(type: .warning)
+        
+        return text
+    }
+    
+    /// 데이터 바인딩 메소드
     func bind() {
         if let button = extraView as? UIButton {
             button.rx.tap
@@ -209,7 +241,10 @@ private extension AlertTextFieldView {
     
 }
 
+// MARK: - Reactive Extension
+
 extension Reactive where Base: AlertTextFieldView {
+    /// TextField의 값이 변경되었을 때 이벤트를 방출하는 메소드
     var editingTextField: ControlProperty<String> {
         base.textField.rx.text.orEmpty
     }

@@ -7,6 +7,7 @@
 
 import UIKit
 
+/// 커스텀 Alert 뷰의 텍스트필드 상태를 정의하는 모델
 enum AlertTextFieldModel {
     case limit(value: Int)
     case time

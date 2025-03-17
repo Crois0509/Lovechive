@@ -9,6 +9,7 @@ import Foundation
 
 extension Date {
     
+    /// Date 타입의 formtter 타입 정의
     enum DateFormatType {
         case yearMonthDay
         case yearMonthDayHourMinute

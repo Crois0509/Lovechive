@@ -10,15 +10,24 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 커스텀 Alert 뷰 컨트롤러
 final class LovechiveAlertViewController: UIViewController {
+    
+    // MARK: - Rx Properties
     
     private var disposeBag = DisposeBag()
     fileprivate let dataSavedRelay = PublishRelay<Void>()
     
+    // MARK: - Properties
+    
     private let viewModel: LovechiveAlertViewModel
+    
+    // MARK: - UI Components
     
     private(set) var alertView: LovechiveAlertView
     private let dim = UIView()
+    
+    // MARK: - Initializer
     
     init(type: AlertTypes) {
         alertView = .init(type: type)
@@ -29,6 +38,8 @@ final class LovechiveAlertViewController: UIViewController {
     required init?(coder: NSCoder) {
         fatalError("init(coder:) has not been implemented")
     }
+    
+    // MARK: - LifeCycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -42,12 +53,15 @@ final class LovechiveAlertViewController: UIViewController {
         showAlertView()
     }
     
+    // 키보드 내리기 설정
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         
         self.view.endEditing(true)
     }
     
+    /// LovechiveAlertView를 화면에서 없애는 메소드
+    /// - Parameter completion: 뷰가 화면에서 없어진 뒤에 실행할 동작
     func dismissSelf(_ completion: @escaping () -> Void) {
         UIView.animate(withDuration: 0.3) {
             self.dim.alpha = 0
@@ -58,6 +72,8 @@ final class LovechiveAlertViewController: UIViewController {
         }
     }
 }
+
+// MARK: - UI Setting Method
 
 private extension LovechiveAlertViewController {
     
@@ -98,7 +114,7 @@ private extension LovechiveAlertViewController {
             self.dim.alpha = 0.25
             self.alertView.frame.origin.y = self.view.frame.midY
         } completion: { _ in
-            // 키보드 열기
+            self.alertView.showKeyboard()
         }
     }
     
@@ -126,7 +142,10 @@ private extension LovechiveAlertViewController {
     
 }
 
+// MARK: - Reactive Extension
+
 extension Reactive where Base: LovechiveAlertViewController {
+    /// 데이터 저장이 완료되면 이벤트를 방출하는 옵저버블
     var dataSavedRelay: PublishRelay<Void> {
         base.dataSavedRelay
     }

@@ -31,12 +31,15 @@ struct ScheduleModelSection: AnimatableSectionModelType {
     }
 }
 
-// MARK: - MainPageViewController DataSource
+// MARK: - Schedule DataSource Protocol
 
+/// Schedule 타입의 데이터소스 공용 프로토콜
 protocol ScheduleTableSectionConfigurable {
     typealias DataSource = RxTableViewSectionedAnimatedDataSource<ScheduleModelSection>
     var dataSource: DataSource { get }
 }
+
+// MARK: - MainPageViewController DataSource
 
 extension MainPageViewController: ScheduleTableSectionConfigurable {
     var dataSource: DataSource {
@@ -58,6 +61,8 @@ extension MainPageViewController: ScheduleTableSectionConfigurable {
         return dataSource
     }
 }
+
+// MARK: - CalendarViewController DataSource
 
 extension CalendarViewController: ScheduleTableSectionConfigurable {
     var dataSource: DataSource {

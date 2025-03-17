@@ -9,6 +9,8 @@ import Foundation
 
 extension String {
     
+    /// String 타입의 데이터를 Date 타입으로 변환하는 메소드
+    /// - Returns: Date 타입으로 변환 된 데이터(nil일 수도 있음)
     func formattedStringToDate() -> Date? {
         let formatter = DateFormatter()
         formatter.locale = Locale(identifier: "ko_KR")

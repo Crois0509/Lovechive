@@ -10,12 +10,17 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 캘린더 스케줄 뷰
 final class ScheduleView: UIView {
+    
+    // MARK: - UI Components
     
     private let titleView = UILabel()
     fileprivate let addButton = UIButton()
     private let infoLabel = UILabel()
     private(set) var scheduleTableView = UITableView()
+    
+    // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -27,10 +32,14 @@ final class ScheduleView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 타이틀을 설정하는 메소드
+    /// - Parameter date: 타이틀로 설정할 날짜 데이터
     func configureTitleDate(_ date: Date) {
-        titleView.text = date.formattedDateToString(.yearMonthDayHourMinute)
+        titleView.text = date.formattedDateToString(.monthDay)
     }
     
+    /// 스케줄뷰의 사이즈를 업데이트 하는 메소드
+    /// - Parameter isEmpty: 섹션 아이템의 존재 여부
     func updateTableViewSize(_ isEmpty: Bool) {
         if isEmpty {
             infoLabel.isHidden = false
@@ -45,6 +54,8 @@ final class ScheduleView: UIView {
         }
     }
 }
+
+// MARK: - UI Setting Method
 
 private extension ScheduleView {
     
@@ -125,7 +136,10 @@ private extension ScheduleView {
     
 }
 
+// MARK: - Reactive Extension
+
 extension Reactive where Base: ScheduleView {
+    /// 만들기 버튼의 탭 이벤트를 방출하는 옵저버블
     var addButtonTapped: ControlEvent<Void> {
         base.addButton.rx.tap
     }

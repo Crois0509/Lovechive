@@ -11,13 +11,22 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 캘린더 뷰
 final class CalendarView: UIView {
+    
+    // MARK: - Properties
     
     private var eventDates: [Date] = []
     
+    // MARK: - Rx Properties
+    
     fileprivate let selectedDate = BehaviorRelay<Date>(value: Date())
     
+    // MARK: - UI Components
+    
     private let calendar = FSCalendar()
+    
+    // MARK: - Initializer
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -28,11 +37,15 @@ final class CalendarView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 이벤트를 설정하는 메소드
+    /// - Parameter events: 이벤트가 담긴 Date 배열
     func setupEvents(_ events: [Date]) {
         eventDates = events
         calendar.reloadData()
     }
     
+    /// 현재 캘린더의 페이지를 변경하는 메소드
+    /// - Parameter date: 변경할 날짜
     func changeCurrentPage(_ date: Date) {
         calendar.scrollEnabled = true
         calendar.setCurrentPage(date, animated: true)
@@ -41,6 +54,8 @@ final class CalendarView: UIView {
         calendar.scrollEnabled = false
     }
 }
+
+// MARK: - UI Setting Method
 
 private extension CalendarView {
     
@@ -99,13 +114,19 @@ private extension CalendarView {
     
 }
 
+// MARK: - FSCalendarDelegate Method
+
 extension CalendarView: FSCalendarDelegate {
+    // 특정 날짜를 선택했을 때 발생하는 메소드
     func calendar(_ calendar: FSCalendar, didSelect date: Date, at monthPosition: FSCalendarMonthPosition) {
         selectedDate.accept(date)
     }
 }
 
+// MARK: - FSCalendarDataSource Method
+
 extension CalendarView: FSCalendarDataSource {
+    // 이벤트 UI를 설정하는 메소드
     func calendar(_ calendar: FSCalendar, numberOfEventsFor date: Date) -> Int {
         let events = eventDates.filter { Calendar.current.isDate($0, equalTo: date, toGranularity: .day) }
         
@@ -113,7 +134,10 @@ extension CalendarView: FSCalendarDataSource {
     }
 }
 
+// MARK: - Reactive Extension
+
 extension Reactive where Base: CalendarView {
+    /// 특정 날짜를 선택했을 때 날짜에 대한 이벤트를 방출하는 옵저버블
     var selectedDate: BehaviorRelay<Date> {
         base.selectedDate
     }

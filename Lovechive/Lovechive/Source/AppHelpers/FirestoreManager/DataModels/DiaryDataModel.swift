@@ -19,6 +19,7 @@ struct DiaryDataModel: FirestoreModelProtocol {
     
     func transform() -> [String : Any] {
         return [
+            AppConfig.DiariesModel.id: self.id,
             AppConfig.DiariesModel.author: self.author,
             AppConfig.DiariesModel.coupleId: self.coupleId,
             AppConfig.DiariesModel.content: self.content,

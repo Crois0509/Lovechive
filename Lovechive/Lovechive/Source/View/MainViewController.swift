@@ -18,6 +18,8 @@ final class MainViewController: UIViewController {
     private let viewModel = MainViewModel()
     private var disposeBag = DisposeBag()
     
+    // MARK: - Properties
+    
     private let pages: [UIViewController] = [
         MainPageViewController(),
         CalendarViewController(),

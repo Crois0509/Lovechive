@@ -8,10 +8,15 @@
 import UIKit
 import SnapKit
 
+/// 캘린더 스케줄뷰 커스텀 셀
 final class ScheduleViewCell: UITableViewCell {
+    
+    // MARK: - UI Components
     
     private lazy var timeLabel = createdLabel(title: AppConfig.CalendarViewConfig.cellDate, color: .Gray.unSelected, size: 14)
     private lazy var titleLabel = createdLabel(title: AppConfig.CalendarViewConfig.cellTitle, color: .Gray.naturalBlack, size: 16)
+    
+    // MARK: - Initializer
     
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
@@ -23,18 +28,25 @@ final class ScheduleViewCell: UITableViewCell {
         fatalError("init(coder:) has not been implemented")
     }
     
+    // 셀 재사용 옵션
     override func prepareForReuse() {
         super.prepareForReuse()
         
         reusedCell()
     }
     
+    /// 셀을 설정하는 메소드
+    /// - Parameters:
+    ///   - time: 설정할 시간
+    ///   - title: 설정할 타이틀
     func configureCell(time: Date, title: String) {
         timeLabel.text = time.formattedDateToString(.hourMinute)
         titleLabel.text = title
     }
     
 }
+
+// MARK: - UI Setting Method
 
 private extension ScheduleViewCell {
     

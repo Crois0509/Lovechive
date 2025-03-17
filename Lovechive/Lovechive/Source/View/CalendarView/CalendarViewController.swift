@@ -10,16 +10,25 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 캘린더 뷰 컨트롤러
 final class CalendarViewController: UIViewController {
+    
+    // MARK: - Rx Properties
     
     private var disposeBag = DisposeBag()
     private let fetchTrigger = PublishRelay<Void>()
     
+    // MARK: - Properties
+    
     private let viewModel = CalendarViewModel()
+    
+    // MARK: - UI Components
     
     private let headerView = CalendarHeaderView()
     private let calendarView = CalendarView()
     private let scheduleView = ScheduleView()
+    
+    // MARK: - LifeCycle
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,6 +38,8 @@ final class CalendarViewController: UIViewController {
     }
     
 }
+
+// MARK: - UI Setting Method
 
 private extension CalendarViewController {
     
@@ -77,6 +88,7 @@ private extension CalendarViewController {
         
         let output = viewModel.transform(input: input)
         
+        // 캘린더 이벤트 설정
         output.eventsRelay
             .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())
@@ -85,6 +97,7 @@ private extension CalendarViewController {
             }
             .disposed(by: disposeBag)
         
+        // 캘린더 페이지 변경
         output.changeCurrentDatePage
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
@@ -95,6 +108,7 @@ private extension CalendarViewController {
             }
             .disposed(by: disposeBag)
         
+        // 캘린더 스케줄 뷰 타이틀 변경
         output.selectedDate
             .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())
@@ -103,10 +117,12 @@ private extension CalendarViewController {
             }
             .disposed(by: disposeBag)
         
+        // 캘린더 스케줄 뷰 섹션 변경
         output.scheduleSection
             .bind(to: scheduleView.scheduleTableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        // 캘린더 스케줄 뷰 사이즈 변경
         output.scheduleSection
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
