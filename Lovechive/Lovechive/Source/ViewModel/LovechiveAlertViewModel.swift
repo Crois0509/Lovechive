@@ -40,6 +40,7 @@ final class LovechiveAlertViewModel: ViewModelMethodManager, ViewModelType {
     private var alertType: AlertTypes
     
     private let dataSaved = PublishRelay<Bool>()
+    private let keyboardHeight = BehaviorRelay<CGFloat>(value: 0)
     
     // MARK: - Initializer
     
@@ -107,23 +108,20 @@ final class LovechiveAlertViewModel: ViewModelMethodManager, ViewModelType {
             }
             .disposed(by: disposeBag)
         
-        NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
-            .distinctUntilChanged()
-            .map { _ in true }
-            .asSignal(onErrorSignalWith: .empty())
-            .withUnretained(self)
-            .emit { owner, isShow in
-                owner.showKeyboard(isShow)
-            }
+        RxKeyboard.instance.visibleHeight
+            .asObservable()
+            .bind(to: keyboardHeight)
             .disposed(by: disposeBag)
         
-        NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
+        keyboardHeight
+            .skip(1)
             .distinctUntilChanged()
-            .map { _ in false }
-            .asSignal(onErrorSignalWith: .empty())
+            .filter { $0 >= 0 }
+            .map { $0 != 0 }
             .withUnretained(self)
-            .emit { owner, isHide in
-                owner.showKeyboard(isHide)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, isShowKeyboard in
+                owner.showKeyboard(isShowKeyboard)
             }
             .disposed(by: disposeBag)
         

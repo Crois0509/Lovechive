@@ -56,7 +56,7 @@ class ViewModelMethodManager: AnyObject {
         if isTure && (alertY + alertSize) >= centerY {
             alert.alertView.frame.origin.y -= 100
         } else if !isTure {
-            alert.alertView.frame.origin.y = (alertY + alertSize)
+            alert.alertView.frame.origin.y = (centerY - alertSize)
         }
     }
     
