@@ -126,6 +126,7 @@ private extension AlertTextFieldView {
     }
     
     func setuptextField() {
+        textField.keyboardType = .default
         textField.font = .systemFont(ofSize: 14, weight: .regular)
         textField.textColor = .Gray.naturalBlack
         textField.borderStyle = .none
@@ -167,7 +168,7 @@ private extension AlertTextFieldView {
     
     func setupDatePickerCurrentDate() {
         switch currentType {
-        case .limit(value: let value): break
+        case .limit: break
         case .time:
             let date = textField.text?.formattedStringToDate(.hourMinute)
             datePicker.date = date ?? Date()
@@ -213,19 +214,21 @@ private extension AlertTextFieldView {
     ///   - view: 최대 글자 수를 가진 뷰
     /// - Returns: 최대 글자 수보다 작은 수의 텍스트
     func checkInputLimit(_ input: String, _ view: UILabel) -> String {
-        guard let limit = Int(view.text?.split(separator: "/").last ?? ""),
-              input.count > limit
-        else {
-            view.textColor = .Gray.secondary
-            return input
+        guard let text = view.text,
+              let limitString = text.split(separator: "/").last?.trimmingCharacters(in: .whitespaces),
+              let limit = Int(limitString)
+        else { return input }
+        
+        let isOverLimit = input.count >= limit
+        let trimmedInput = isOverLimit ? String(input.prefix(limit)) : input
+        
+        view.textColor = isOverLimit ? .systemRed : .Gray.secondary
+        
+        if isOverLimit {
+            HapticDrawer.notification(type: .warning)
         }
         
-        let text = String(input.prefix(limit))
-        view.textColor = .systemRed
-        
-        HapticDrawer.notification(type: .warning)
-        
-        return text
+        return trimmedInput
     }
     
     /// 데이터 바인딩 메소드
