@@ -141,8 +141,10 @@ final class MainPageViewModel: ViewModelType {
     /// - Returns: 변환된 CoupleDataModel 배열
     private func mappingQueryDataToUserData(_ data: [QueryDocumentSnapshot]) -> [CoupleDataModel] {
         let data = data.map {
-            CoupleDataModel(user1: $0.data()[AppConfig.CouplesModel.user1] as? String ?? "",
-                            user2: $0.data()[AppConfig.CouplesModel.user2] as? String ?? "",
+            CoupleDataModel(user1Id: $0.data()[AppConfig.CouplesModel.user1Id] as? String ?? "",
+                            user2Id: $0.data()[AppConfig.CouplesModel.user2Id] as? String ?? "",
+                            user1Name: $0.data()[AppConfig.CouplesModel.user1Name] as? String ?? "",
+                            user2Name: $0.data()[AppConfig.CouplesModel.user2Name] as? String ?? "",
                             dDay: ($0.data()[AppConfig.CouplesModel.dDay] as? Timestamp)?.dateValue() ?? Date()
             )
         }

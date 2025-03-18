@@ -116,8 +116,12 @@ final class CalendarViewModel: ViewModelType {
                 owner.showAlertView(type: .newSchedule(date: owner.selectedDate.value))
             }
             .asSignal(onErrorSignalWith: .empty())
-            .emit { _ in
-                input.fetchTrigger.accept(())
+            .emit { isSuccess in
+                if isSuccess {
+                    input.fetchTrigger.accept(())
+                } else {
+                    debugPrint("❌ 일정 추가 실패")
+                }
             }
             .disposed(by: disposeBag)
         
@@ -219,7 +223,7 @@ final class CalendarViewModel: ViewModelType {
         return ScheduleModelSection(items: data)
     }
     
-    private func showAlertView(type: AlertTypes) -> PublishRelay<Void> {
+    private func showAlertView(type: AlertTypes) -> PublishRelay<Bool> {
         let vc = AppHelpers.getTopViewController()
         let alert = LovechiveAlertViewController(type: type)
         vc?.addChild(alert)
