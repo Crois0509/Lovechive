@@ -24,7 +24,7 @@ final class PageViewController: UIPageViewController {
         MainPageViewController(),
         CalendarViewController(),
         TestDiaryViewController(),
-        TestSettingViewController()
+        SettingViewController()
     ]
     
     private var isScrolling: Bool = false
@@ -103,11 +103,5 @@ final class TestDiaryViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .yellow
-    }
-}
-final class TestSettingViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .green
     }
 }

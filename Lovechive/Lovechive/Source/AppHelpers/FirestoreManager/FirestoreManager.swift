@@ -22,7 +22,7 @@ final class FirestoreManager {
     /// - Parameters:
     ///   - data: 저장/업데이트 할 데이터
     ///   - type: 저장할 데이터 타입
-    func saveToFirestore(_ data: FirestoreModelProtocol, type: FirestoreDataTypes) -> Single<Void> {
+    func saveToFirestore(_ data: FirestoreModelProtocol, type: FirestoreDataTypes) -> Single<Bool> {
         return Single.create { single in
             let collectionRef = self.db.collection(type.typeName)
             var documentRef: DocumentReference
@@ -57,7 +57,7 @@ final class FirestoreManager {
                     single(.failure(error))
                 } else {
                     debugPrint("✅ \(type.typeName) 데이터 저장 성공: \(data.transform().values)")
-                    single(.success(()))
+                    single(.success(true))
                 }
             }
             

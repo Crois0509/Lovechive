@@ -11,7 +11,10 @@ import RxSwift
 import RxCocoa
 import FirebaseFirestore
 
-final class CalendarViewModel: ViewModelType {
+/// 캘린더뷰 뷰 모델
+final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
+    
+    // MARK: - Input & Output Type
     
     struct Input {
         let fetchTrigger: PublishRelay<Void>
@@ -30,6 +33,8 @@ final class CalendarViewModel: ViewModelType {
         let eventsRelay: BehaviorRelay<[Date]>
     }
     
+    // MARK: - Properties
+    
     private var disposeBag = DisposeBag()
     
     private var sections: [ScheduleModelSection] = []
@@ -41,12 +46,15 @@ final class CalendarViewModel: ViewModelType {
     private let scheduleSection = BehaviorRelay<[ScheduleModelSection]>(value: [])
     private let eventsRelay = BehaviorRelay<[Date]>(value: [])
     
+    /// input을 output으로 변환하는 메소드
+    /// - Parameter input: input 데이터
+    /// - Returns: output 데이터
     func transform(input: Input) -> Output {
         
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.fetchDate()
+                owner.fetchData(.schedule(id: ""))
             }
             .map { [weak self] data in
                 guard let self else { return [Date]() }
@@ -116,8 +124,12 @@ final class CalendarViewModel: ViewModelType {
                 owner.showAlertView(type: .newSchedule(date: owner.selectedDate.value))
             }
             .asSignal(onErrorSignalWith: .empty())
-            .emit { _ in
-                input.fetchTrigger.accept(())
+            .emit { isSuccess in
+                if isSuccess {
+                    input.fetchTrigger.accept(())
+                } else {
+                    debugPrint("❌ 일정 추가 실패")
+                }
             }
             .disposed(by: disposeBag)
         
@@ -158,12 +170,18 @@ final class CalendarViewModel: ViewModelType {
                       scheduleSection: scheduleSection,
                       eventsRelay: eventsRelay)
     }
+}
+
+// MARK: - ViewModel Private Method
+
+private extension CalendarViewModel {
     
-    private func fetchDate() -> Single<[QueryDocumentSnapshot]> {
-        return FirestoreManager.shared.readFromFirestore(type: .schedule(id: ""))
-    }
-    
-    private func filteredToDayDateToScheduleSection(_ dates: [Date], _ query: [QueryDocumentSnapshot]) -> [ScheduleModelSection] {
+    /// Schedule 데이터를 필터링 하는 메소드
+    /// - Parameters:
+    ///   - dates: 필터링 기준이 되는 Date 목록
+    ///   - query: 필터링할 데이터
+    /// - Returns: 필터링 된 Schedule 데이터 배열
+    func filteredToDayDateToScheduleSection(_ dates: [Date], _ query: [QueryDocumentSnapshot]) -> [ScheduleModelSection] {
         let filteredData = query.filter { item in
             let itemDate = (item.data()[AppConfig.SchedulesModel.date] as? Timestamp)?.dateValue() ?? Date()
             
@@ -181,7 +199,7 @@ final class CalendarViewModel: ViewModelType {
         }.sorted(by: {
             $0.date < $1.date
         })
-            
+        
         let groupedDate = Dictionary(grouping: filteredData) { item in
             return Calendar.current.startOfDay(for: item.date)
         }
@@ -191,11 +209,14 @@ final class CalendarViewModel: ViewModelType {
         }.sorted(by: {
             $0.items.first?.date ?? Date() < $1.items.first?.date ?? Date()
         })
-            
+        
         return sections
     }
     
-    private func mappingScheduleDataToEventDates(_ query: [QueryDocumentSnapshot]) -> [Date] {
+    /// Schedule 데이터를 Date의 배열 타입으로 변환하는 메소드
+    /// - Parameter query: 변환할 데이터
+    /// - Returns: 변환된 Date 배열
+    func mappingScheduleDataToEventDates(_ query: [QueryDocumentSnapshot]) -> [Date] {
         queryDatas = query
         
         let dates = query.map { data in
@@ -209,7 +230,10 @@ final class CalendarViewModel: ViewModelType {
         return dates
     }
     
-    private func filteredSection(_ date: Date) -> ScheduleModelSection {
+    /// 날짜를 기준으로 섹션 데이터를 필터링 하는 메소드
+    /// - Parameter date: 필터링 기준 날짜
+    /// - Returns: 필터링 된 Schedule 데이터
+    func filteredSection(_ date: Date) -> ScheduleModelSection {
         let data = sections.flatMap { section in
             section.items.filter {
                 Calendar.current.isDate($0.date, inSameDayAs: date)
@@ -219,20 +243,10 @@ final class CalendarViewModel: ViewModelType {
         return ScheduleModelSection(items: data)
     }
     
-    private func showAlertView(type: AlertTypes) -> PublishRelay<Void> {
-        let vc = AppHelpers.getTopViewController()
-        let alert = LovechiveAlertViewController(type: type)
-        vc?.addChild(alert)
-        vc?.view.addSubview(alert.view)
-        alert.view.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        alert.didMove(toParent: vc)
-        
-        return alert.rx.dataSavedRelay
-    }
-    
-    private func searchItemId(_ indexPath: IndexPath) -> ScheduleDataModel {
+    /// 특정 Schedule 데이터를 찾는 메소드
+    /// - Parameter indexPath: 찾을 데이터의 indexPath
+    /// - Returns: indexPath로 찾은 데이터
+    func searchItemId(_ indexPath: IndexPath) -> ScheduleDataModel {
         let section = sections.filter {
             Calendar.current.isDate($0.items.first?.date ?? Date(), inSameDayAs: selectedDate.value)
         }.first
@@ -240,7 +254,7 @@ final class CalendarViewModel: ViewModelType {
         let index = sections.firstIndex { sectionData in
             sectionData.identity == section?.identity
         }
-                
+        
         let item = sections[index ?? 0].items[indexPath.row]
         
         return item

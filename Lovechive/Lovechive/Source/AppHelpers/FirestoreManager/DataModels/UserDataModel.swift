@@ -10,6 +10,7 @@ import FirebaseFirestore
 
 /// Firestore의 users 컬렉션 데이터 모델
 struct UserDataModel: FirestoreModelProtocol {
+    let id: String
     let name: String
     let email: String
     let coupleId: String
@@ -18,6 +19,7 @@ struct UserDataModel: FirestoreModelProtocol {
     
     func transform() -> [String: Any] {
         return [
+            AppConfig.UserModel.id: self.id,
             AppConfig.UserModel.name: self.name,
             AppConfig.UserModel.email: self.email,
             AppConfig.UserModel.coupleId: self.coupleId,

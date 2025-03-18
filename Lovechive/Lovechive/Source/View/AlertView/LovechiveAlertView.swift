@@ -31,9 +31,21 @@ final class LovechiveAlertView: UIView {
     // MARK: - Properties
     
     private lazy var sections: [[UIView]] = [
-        [AlertTextFieldView(type: .time, placeHolder: "시간 선택"), AlertTextFieldView(type: .limit(value: 20), placeHolder: "일정 설명")],
-        [AlertTextFieldView(type: .limit(value: 10), placeHolder: "다이어리 제목"), AlertTextFieldView(type: .limit(value: 20), placeHolder: "다이어리 설명")],
-        []
+        [
+            AlertTextFieldView(type: .time, placeHolder: "시간 선택"),
+            AlertTextFieldView(type: .limit(value: 20), placeHolder: "일정 설명")
+        ],
+        
+        [
+            AlertTextFieldView(type: .limit(value: 10), placeHolder: "다이어리 제목"),
+            AlertTextFieldView(type: .limit(value: 20), placeHolder: "다이어리 설명")
+        ],
+        
+        [
+            AlertMyTextFieldView(.limit(value: 10), title: "이름", text: "이름을 입력해 주세요."),
+            AlertMyTextFieldView(.calendar, title: "생년월일", text: "날짜를 선택해 주세요."),
+            AlertMyTextFieldView(.calendar, title: "연애 기념일", text: "날짜를 선택해 주세요.")
+        ]
     ]
     
     private var currentSectionIndex: Int
@@ -57,7 +69,7 @@ final class LovechiveAlertView: UIView {
     
     /// 커스텀 Alert 뷰의 섹션 사이즈를 업데이트 하는 메소드
     func updateSectionViewSize() {
-        let constraint: Int = currentSectionIndex == 2 ? 64 : 48
+        let constraint: Int = currentSectionIndex == 2 ? 80 : 48
         sectionView.layoutIfNeeded()
         sectionView.snp.updateConstraints {
             $0.height.equalTo(constraint * self.sections[self.currentSectionIndex].count)
@@ -149,6 +161,7 @@ private extension LovechiveAlertView {
     func editData(type: AlertTypes) {
         switch type {
         case .newSchedule, .newDiary: break
+            
         case .editSchedule(data: let data):
             let section = sections[0]
             guard let firstView = section[0] as? AlertTextFieldView,
@@ -159,7 +172,17 @@ private extension LovechiveAlertView {
             secondView.configureTextField(data.title)
             
         case .editDiary: break
-        case .editMyPage: break
+            
+        case .editMyPage(user: let user, couple: let couple):
+            let section = sections[2]
+            guard let firstView = section[0] as? AlertMyTextFieldView,
+                  let secondView = section[1] as? AlertMyTextFieldView,
+                  let thirdView = section[2] as? AlertMyTextFieldView
+            else { return }
+            
+            firstView.configureTextField(user.name)
+            secondView.configureTextField(user.birthDay.formattedDateToString(.yearMonthDay))
+            thirdView.configureTextField(couple.dDay.formattedDateToString(.yearMonthDay))
         }
     }
         
@@ -172,6 +195,14 @@ private extension LovechiveAlertView {
                 view.rx.editingTextField.bind(to: self.secondSectionTextFieldRelay).disposed(by: disposeBag)
             } else if let view = section as? AlertTextFieldView, index == 2 {
                 // 추후 구현
+            }
+            
+            if let view = section as? AlertMyTextFieldView, index == 0 {
+                view.rx.editingTextField.bind(to: self.firstSectionTextFieldRelay).disposed(by: disposeBag)
+            } else if let view = section as? AlertMyTextFieldView, index == 1 {
+                view.rx.editingTextField.bind(to: self.secondSectionTextFieldRelay).disposed(by: disposeBag)
+            } else if let view = section as? AlertMyTextFieldView, index == 2 {
+                view.rx.editingTextField.bind(to: self.thirdSectionTextFieldRelay).disposed(by: disposeBag)
             }
         }
     }

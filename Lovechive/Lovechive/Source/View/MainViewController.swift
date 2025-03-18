@@ -24,7 +24,7 @@ final class MainViewController: UIViewController {
         MainPageViewController(),
         CalendarViewController(),
         TestDiaryViewController(),
-        TestSettingViewController()
+        SettingViewController()
     ]
     
     // MARK: - UI Components

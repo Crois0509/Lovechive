@@ -12,6 +12,8 @@ import RxCocoa
 /// 메인 뷰 컨트롤러의 비즈니스 로직을 담당하는 뷰 모델
 final class MainViewModel: ViewModelType {
     
+    // MARK: - Input & Output Type
+    
     struct Input {
         let firstButtonTapped: ControlEvent<Void>
         let secondButtonTapped: ControlEvent<Void>
@@ -23,11 +25,16 @@ final class MainViewModel: ViewModelType {
         let changedCurretPage: PublishRelay<TabBarButtonState>
     }
     
+    // MARK: - Properties
+    
     private var disposeBag = DisposeBag()
     
     private let changedCurretPage = PublishRelay<TabBarButtonState>()
     private let scrollToPage = PublishRelay<TabBarButtonState>()
     
+    /// input을 output으로 변환하는 메소드
+    /// - Parameter input: input 데이터
+    /// - Returns: output 데이터
     func transform(input: Input) -> Output {
         input.firstButtonTapped
             .asSignal(onErrorSignalWith: .empty())

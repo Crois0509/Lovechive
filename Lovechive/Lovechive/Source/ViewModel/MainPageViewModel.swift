@@ -11,7 +11,9 @@ import RxCocoa
 import FirebaseFirestore
 
 /// 메인 페이지 VC의 ViewModel
-final class MainPageViewModel: ViewModelType {
+final class MainPageViewModel: ViewModelMethodManager, ViewModelType {
+    
+    // MARK: - Input & Output Type
     
     struct Input {
         let fetchTrigger: PublishRelay<Void>
@@ -23,17 +25,22 @@ final class MainPageViewModel: ViewModelType {
         let dDayRelay: PublishRelay<CoupleDataModel>
     }
     
+    // MARK: - Properties
+    
     private var disposeBag = DisposeBag()
     
     private let sections = BehaviorRelay<[ScheduleModelSection]>(value: [])
     private let latestDiaryRelay = PublishRelay<DiaryDataModel>()
     private let dDayRelay = PublishRelay<CoupleDataModel>()
     
+    /// input을 output으로 변환하는 메소드
+    /// - Parameter input: input 데이터
+    /// - Returns: output 데이터
     func transform(input: Input) -> Output {
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { (owner, _) -> Single<[QueryDocumentSnapshot]> in
-                owner.fetchData(type: .schedule(id: ""))
+                owner.fetchData(.schedule(id: ""))
             }
             .map { [weak self] data in
                 guard let self else { return ScheduleModelSection.init(items: []) }
@@ -48,7 +55,7 @@ final class MainPageViewModel: ViewModelType {
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { (owner, _) -> Single<[QueryDocumentSnapshot]> in
-                owner.fetchData(type: .diary(id: ""))
+                owner.fetchData(.diary(id: ""))
             }
             .map { [weak self] data in
                 guard let self else { return [DiaryDataModel]() }
@@ -64,7 +71,7 @@ final class MainPageViewModel: ViewModelType {
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { (owner, _) -> Single<[QueryDocumentSnapshot]> in
-                owner.fetchData(type: .couple)
+                owner.fetchData(.couple)
             }
             .map { [weak self] data in
                 guard let self else { return [CoupleDataModel]() }
@@ -82,18 +89,16 @@ final class MainPageViewModel: ViewModelType {
                       dDayRelay: dDayRelay
         )
     }
-    
-    /// Firestore에서 데이터를 가져오는 메소드
-    /// - Parameter type: 가져올 데이터의 타입
-    /// - Returns: 가져온 데이터 목록
-    private func fetchData(type: FirestoreDataTypes) -> Single<[QueryDocumentSnapshot]> {
-        return FirestoreManager.shared.readFromFirestore(type: type)
-    }
+}
+
+// MARK: - ViewModel Private Method
+
+extension MainPageViewModel {
     
     /// Query 데이터를 PlanTableViewSection 타입으로 변환하는 메소드
     /// - Parameter data: Query 데이터
     /// - Returns: 변환된 PlanTableViewSection 데이터
-    private func mappingQueryDataToSectionData(_ data: [QueryDocumentSnapshot]) -> ScheduleModelSection {
+    func mappingQueryDataToSectionData(_ data: [QueryDocumentSnapshot]) -> ScheduleModelSection {
         let filteredData = data.filter {
             let date = ($0.data()[AppConfig.SchedulesModel.date] as? Timestamp)?.dateValue() ?? Date()
             
@@ -120,7 +125,7 @@ final class MainPageViewModel: ViewModelType {
     /// Query 데이터를 DiaryDataModel 타입으로 가공하는 메소드
     /// - Parameter data: Query 데이터
     /// - Returns: 변환된 DiaryDataModel 데이터 배열
-    private func mappingQueryDataToDiaryData(_ data: [QueryDocumentSnapshot]) -> [DiaryDataModel] {
+    func mappingQueryDataToDiaryData(_ data: [QueryDocumentSnapshot]) -> [DiaryDataModel] {
         let data = data.map {
             DiaryDataModel(id: $0.data()[AppConfig.DiariesModel.id] as? String ?? "",
                            author: $0.data()[AppConfig.DiariesModel.author] as? String ?? "",
@@ -139,10 +144,12 @@ final class MainPageViewModel: ViewModelType {
     /// Query 데이터를 CoupleDataModel 타입으로 가공하는 메소드
     /// - Parameter data: Query 데이터
     /// - Returns: 변환된 CoupleDataModel 배열
-    private func mappingQueryDataToUserData(_ data: [QueryDocumentSnapshot]) -> [CoupleDataModel] {
+    func mappingQueryDataToUserData(_ data: [QueryDocumentSnapshot]) -> [CoupleDataModel] {
         let data = data.map {
-            CoupleDataModel(user1: $0.data()[AppConfig.CouplesModel.user1] as? String ?? "",
-                            user2: $0.data()[AppConfig.CouplesModel.user2] as? String ?? "",
+            CoupleDataModel(user1Id: $0.data()[AppConfig.CouplesModel.user1Id] as? String ?? "",
+                            user2Id: $0.data()[AppConfig.CouplesModel.user2Id] as? String ?? "",
+                            user1Name: $0.data()[AppConfig.CouplesModel.user1Name] as? String ?? "",
+                            user2Name: $0.data()[AppConfig.CouplesModel.user2Name] as? String ?? "",
                             dDay: ($0.data()[AppConfig.CouplesModel.dDay] as? Timestamp)?.dateValue() ?? Date()
             )
         }
