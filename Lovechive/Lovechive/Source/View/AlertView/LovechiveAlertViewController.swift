@@ -16,7 +16,7 @@ final class LovechiveAlertViewController: UIViewController {
     // MARK: - Rx Properties
     
     private var disposeBag = DisposeBag()
-    fileprivate let dataSavedRelay = PublishRelay<Void>()
+    fileprivate let dataSavedRelay = PublishRelay<Bool>()
     
     // MARK: - Properties
     
@@ -121,8 +121,9 @@ private extension LovechiveAlertViewController {
     func bind() {
         let input = LovechiveAlertViewModel.Input(cancelButtonTapped: alertView.rx.cancelButtonTapped,
                                                   activeButtonTapped: alertView.rx.activeButtonTapped,
-                                                  scheduleTimeRelay: alertView.rx.firstSectionTextFieldRelay,
-                                                  scheduleTitleRelay: alertView.rx.secondSectionTextFieldRelay
+                                                  firstSectionRelay: alertView.rx.firstSectionTextFieldRelay,
+                                                  secondSectionRelay: alertView.rx.secondSectionTextFieldRelay,
+                                                  thirdSectionRelay: alertView.rx.thirdSectionTextFieldRelay
         )
         
         let output = viewModel.transform(input: input)
@@ -146,7 +147,7 @@ private extension LovechiveAlertViewController {
 
 extension Reactive where Base: LovechiveAlertViewController {
     /// 데이터 저장이 완료되면 이벤트를 방출하는 옵저버블
-    var dataSavedRelay: PublishRelay<Void> {
+    var dataSavedRelay: PublishRelay<Bool> {
         base.dataSavedRelay
     }
 }

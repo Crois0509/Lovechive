@@ -12,39 +12,32 @@ import RxKeyboard
 
 final class LovechiveAlertViewModel: ViewModelType {
     
+    struct Input {
+        let cancelButtonTapped: ControlEvent<Void>
+        let activeButtonTapped: ControlEvent<Void>
+        let firstSectionRelay: BehaviorRelay<String>
+        let secondSectionRelay: BehaviorRelay<String>
+        let thirdSectionRelay: BehaviorRelay<String>
+    }
+    
+    struct Output {
+        let dataSaved: PublishRelay<Bool>
+    }
+    
+    private var firstSectionData: String = ""
+    private var secondSectionData: String = ""
+    private var thirdSectionData: String = ""
+    
     private var disposeBag = DisposeBag()
     private let umd = UserDefaultsManager()
     private let alert = AlertManager.init(title: "경고", message: "모든 내용을 입력해 주세요!!", cancelTitle: "확인")
     
-    struct Input {
-        let cancelButtonTapped: ControlEvent<Void>
-        let activeButtonTapped: ControlEvent<Void>
-        let scheduleTimeRelay: BehaviorRelay<String>
-        let scheduleTitleRelay: BehaviorRelay<String>
-    }
+    private var alertType: AlertTypes
     
-    struct Output {
-        let dataSaved: PublishRelay<Void>
-    }
-    
-    private var scheduleTime: String?
-    private var scheduleTitle: String?
-    private var selectedDate: String?
-    private var dataId: String?
-    
-    private var isKeyboardVisible: Bool = false
-    
-    private let dataSaved = PublishRelay<Void>()
+    private let dataSaved = PublishRelay<Bool>()
     
     init(type: AlertTypes) {
-        switch type {
-        case .newSchedule(date: let date):
-            selectedDate = date.formattedDateToString(.yearMonthDay)
-        case .editSchedule(data: let data):
-            selectedDate = data.date.formattedDateToString(.yearMonthDay)
-            dataId = data.id
-        case .newDiary, .editDiary, .editMyPage: break
-        }
+        alertType = type
     }
     
     func transform(input: Input) -> Output {
@@ -59,49 +52,53 @@ final class LovechiveAlertViewModel: ViewModelType {
         
         input.activeButtonTapped
             .withUnretained(self)
-            .compactMap { owner, _ -> ScheduleDataModel? in
-                guard let title = owner.scheduleTitle, let date = owner.scheduleTime,
-                      let selectDate = date.formattedStringToDate(),
-                      !title.isEmpty
-                else {
-                    owner.alert.showAlert(.alert)
-                    return nil
-                }
+            .flatMapLatest { owner, _ -> Observable<[FirestoreModelProtocol]> in
+                let isEmpty = owner.checkEmpty()
                 
-                return owner.mappingScheduleData(title: title, date: selectDate)
-            }
-            .flatMap { [weak self] data -> Signal<Void> in
-                guard let self else {
-                    return .empty()
+                if isEmpty {
+                    return owner.alert.showAlert(.alert).map { _ in [] }.asObservable()
+                } else {
+                    return .just(owner.mappingData())
                 }
-                return self.saveScheduleData(data).asSignal(onErrorSignalWith: .empty())
             }
-            .asSignal(onErrorSignalWith: .empty())
-            .emit { [weak self] _ in
-                self?.dataSaved.accept(())
+            .filter { !$0.isEmpty }
+            .flatMapLatest { [weak self] data -> Single<Bool> in
+                guard let self else { return .just(false) }
+                return self.saveData(data)
+            }
+            .asDriver(onErrorJustReturn: false)
+            .drive { [weak self] isSuccess in
+                self?.dataSaved.accept(isSuccess)
                 self?.dismissAlertView()
             }
             .disposed(by: disposeBag)
         
-        input.scheduleTimeRelay
+        input.firstSectionRelay
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
             .drive { owner, text in
-                let selectDate = owner.selectedDate ?? ""
-                let date = selectDate + " " + text
-                owner.scheduleTime = date
+                owner.firstSectionData = text
             }
             .disposed(by: disposeBag)
         
-        input.scheduleTitleRelay
+        input.secondSectionRelay
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
             .drive { owner, text in
-                owner.scheduleTitle = text
+                owner.secondSectionData = text
+            }
+            .disposed(by: disposeBag)
+        
+        input.thirdSectionRelay
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, text in
+                owner.thirdSectionData = text
             }
             .disposed(by: disposeBag)
         
         NotificationCenter.default.rx.notification(UIResponder.keyboardWillShowNotification)
+            .distinctUntilChanged()
             .map { _ in true }
             .asSignal(onErrorSignalWith: .empty())
             .withUnretained(self)
@@ -109,8 +106,9 @@ final class LovechiveAlertViewModel: ViewModelType {
                 owner.showKeyboard(isShow)
             }
             .disposed(by: disposeBag)
-
+        
         NotificationCenter.default.rx.notification(UIResponder.keyboardWillHideNotification)
+            .distinctUntilChanged()
             .map { _ in false }
             .asSignal(onErrorSignalWith: .empty())
             .withUnretained(self)
@@ -121,8 +119,11 @@ final class LovechiveAlertViewModel: ViewModelType {
         
         return Output(dataSaved: dataSaved)
     }
+}
+
+private extension LovechiveAlertViewModel {
     
-    private func dismissAlertView() {
+    func dismissAlertView() {
         guard let topView = AppHelpers.getTopViewController() as? MainViewController,
               let alert = topView.children.last as? LovechiveAlertViewController
         else { return }
@@ -134,26 +135,99 @@ final class LovechiveAlertViewModel: ViewModelType {
         }
     }
     
-    private func showKeyboard(_ isTure: Bool) {
+    func showKeyboard(_ isTure: Bool) {
         guard let topView = AppHelpers.getTopViewController() as? MainViewController,
               let alert = topView.children.last as? LovechiveAlertViewController
         else { return }
         
-        if isTure && (alert.alertView.frame.origin.y < 300) {
-            alert.alertView.frame.origin.y = alert.alertView.frame.origin.y
-        } else if isTure && (alert.alertView.frame.origin.y > 300) {
+        let alertY = alert.alertView.frame.origin.y
+        let centerY = alert.view.frame.midY
+        let alertSize = alert.alertView.bounds.height / 2
+        
+        if isTure && (alertY + alertSize) >= centerY {
             alert.alertView.frame.origin.y -= 100
         } else if !isTure {
-            alert.alertView.frame.origin.y += 100
+            alert.alertView.frame.origin.y = (alertY + alertSize)
         }
     }
     
-    private func mappingScheduleData(title: String, date: Date) -> ScheduleDataModel {
-        let id = dataId ?? UUID().uuidString
-        return ScheduleDataModel(id: id, title: title, coupleId: umd.coupleId, date: date, createdBy: umd.userId)
+    func checkEmpty() -> Bool {
+        switch alertType {
+        case .newSchedule, .editSchedule:
+            return firstSectionData.isEmpty || secondSectionData.isEmpty
+            
+        default:
+            return firstSectionData.isEmpty || secondSectionData.isEmpty || thirdSectionData.isEmpty
+        }
     }
     
-    private func saveScheduleData(_ data: ScheduleDataModel) -> Single<Void> {
-        return FirestoreManager.shared.saveToFirestore(data, type: .schedule(id: data.id))
+    func mappingData() -> [FirestoreModelProtocol] {
+        switch alertType {
+        case .newSchedule(date: let date):
+            let scheduleDate = date.formattedDateToString(.yearMonthDay) + " " + firstSectionData
+            
+            let schedule = ScheduleDataModel(id: UUID().uuidString,
+                                             title: secondSectionData,
+                                             coupleId: umd.coupleId,
+                                             date: scheduleDate.formattedStringToDate(.fullTime),
+                                             createdBy: umd.userId)
+            
+            return [schedule]
+            
+        case .editSchedule(data: let data):
+            let scheduleDate = data.date.formattedDateToString(.yearMonthDay) + " " + firstSectionData
+            
+            let schedule = ScheduleDataModel(id: data.id,
+                                             title: secondSectionData,
+                                             coupleId: data.coupleId,
+                                             date: scheduleDate.formattedStringToDate(.fullTime),
+                                             createdBy: data.createdBy)
+            
+            return [schedule]
+            
+        case .editMyPage(user: let user, couple: let couple):
+            let userData = UserDataModel(id: user.id,
+                                         name: firstSectionData,
+                                         email: user.email,
+                                         coupleId: user.coupleId,
+                                         birthDay: secondSectionData.formattedStringToDate(.yearMonthDay),
+                                         createdAt: user.createdAt)
+            
+            let user1Name = couple.user1Id == user.id ? firstSectionData : couple.user1Name
+            let user2Name = couple.user2Id == user.id ? firstSectionData : couple.user2Name
+            
+            let coupleData = CoupleDataModel(user1Id: couple.user1Id,
+                                             user2Id: couple.user2Id,
+                                             user1Name: user1Name,
+                                             user2Name: user2Name,
+                                             dDay: thirdSectionData.formattedStringToDate(.yearMonthDay))
+            
+            return [userData, coupleData]
+            
+        case .newDiary, .editDiary: return []
+            
+        }
+    }
+    
+    func saveData(_ data: [FirestoreModelProtocol]) -> Single<Bool> {
+        switch alertType {
+        case .newSchedule, .editSchedule:
+            guard let scheduleData = data.first as? ScheduleDataModel else { return .error(NSError(domain: "타입 변환 실패", code: 0)) }
+            
+            return FirestoreManager.shared.saveToFirestore(scheduleData, type: .schedule(id: scheduleData.id))
+            
+        case .newDiary, .editDiary: return .just(false)
+            
+        case .editMyPage:
+            guard let userData = data.first as? UserDataModel,
+                  let coupleData = data.last as? CoupleDataModel
+            else { return .error(NSError(domain: "타입 변환 실패", code: 0)) }
+            
+            let saveUser = FirestoreManager.shared.saveToFirestore(userData, type: .user)
+            let saveCouple = FirestoreManager.shared.saveToFirestore(coupleData, type: .couple)
+            
+            return Single.zip(saveUser, saveCouple).map { $0.0 && $0.1 }
+            
+        }
     }
 }
