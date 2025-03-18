@@ -10,7 +10,10 @@ import RxSwift
 import RxCocoa
 import RxKeyboard
 
+/// 커스텀 Alert 뷰 뷰 모델
 final class LovechiveAlertViewModel: ViewModelType {
+    
+    // MARK: - Input & Output Type
     
     struct Input {
         let cancelButtonTapped: ControlEvent<Void>
@@ -24,6 +27,8 @@ final class LovechiveAlertViewModel: ViewModelType {
         let dataSaved: PublishRelay<Bool>
     }
     
+    // MARK: - Properties
+    
     private var firstSectionData: String = ""
     private var secondSectionData: String = ""
     private var thirdSectionData: String = ""
@@ -36,10 +41,15 @@ final class LovechiveAlertViewModel: ViewModelType {
     
     private let dataSaved = PublishRelay<Bool>()
     
+    // MARK: - Initializer
+    
     init(type: AlertTypes) {
         alertType = type
     }
     
+    /// input을 output으로 변환하는 메소드
+    /// - Parameter input: input 데이터
+    /// - Returns: output 데이터
     func transform(input: Input) -> Output {
         
         input.cancelButtonTapped
@@ -121,8 +131,11 @@ final class LovechiveAlertViewModel: ViewModelType {
     }
 }
 
+// MARK: - ViewModel Private Method
+
 private extension LovechiveAlertViewModel {
     
+    /// 커스텀 Alert 뷰를 dismiss 시키는 메소드
     func dismissAlertView() {
         guard let topView = AppHelpers.getTopViewController() as? MainViewController,
               let alert = topView.children.last as? LovechiveAlertViewController
@@ -135,6 +148,8 @@ private extension LovechiveAlertViewModel {
         }
     }
     
+    /// 키보드의 유무에 따라 커스텀 Alert 뷰의 위치를 변화 시키는 메소드
+    /// - Parameter isTure: 키보드의 존재 유무
     func showKeyboard(_ isTure: Bool) {
         guard let topView = AppHelpers.getTopViewController() as? MainViewController,
               let alert = topView.children.last as? LovechiveAlertViewController
@@ -151,6 +166,8 @@ private extension LovechiveAlertViewModel {
         }
     }
     
+    /// 데이터가 비어있는지 체크하는 메소드
+    /// - Returns: 데이터의 존재 유무
     func checkEmpty() -> Bool {
         switch alertType {
         case .newSchedule, .editSchedule:
@@ -161,6 +178,8 @@ private extension LovechiveAlertViewModel {
         }
     }
     
+    /// 데이터를 FirestoreModelProtocol 타입으로 변환하는 메소드
+    /// - Returns: 변환된 FirestoreModelProtocol의 배열
     func mappingData() -> [FirestoreModelProtocol] {
         switch alertType {
         case .newSchedule(date: let date):
@@ -209,6 +228,9 @@ private extension LovechiveAlertViewModel {
         }
     }
     
+    /// FirestoreModelProtocol 데이터를 Firestore에 저장하는 메소드
+    /// - Parameter data: 저장할 FirestoreModelProtocol 타입 데이터
+    /// - Returns: 데이터 저장 성공 여부를 담은 옵저버블
     func saveData(_ data: [FirestoreModelProtocol]) -> Single<Bool> {
         switch alertType {
         case .newSchedule, .editSchedule:

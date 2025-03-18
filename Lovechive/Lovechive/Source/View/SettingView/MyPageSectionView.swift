@@ -8,10 +8,15 @@
 import UIKit
 import SnapKit
 
+/// 내 프로필 섹션 뷰
 final class MyPageSectionView: UIView {
+    
+    // MARK: -  UI Components
     
     private lazy var titleView = createdLabel(AppConfig.SettingConfig.nameT, color: .Personal.highlightPink, alignment: .left)
     private lazy var contentView = createdLabel(AppConfig.SettingConfig.name, color: .Gray.naturalBlack, alignment: .right)
+    
+    // MARK: - Initializer
     
     init(title: String, content: String) {
         super.init(frame: .zero)
@@ -25,11 +30,15 @@ final class MyPageSectionView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 섹션뷰를 설정하는 메소드
+    /// - Parameter text: 텍스트필드에 입력할 텍스트
     func configureSection(_ text: String) {
         contentView.text = text
     }
     
 }
+
+// MARK: - UI Setting Method
 
 private extension MyPageSectionView {
     

@@ -10,10 +10,15 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// MyPage 뷰에서 사용할 커스텀 텍스트필드 뷰
 final class AlertMyTextFieldView: UIView {
+    
+    // MARK: -  UI Components
     
     private let titleView = UILabel()
     fileprivate let textField: AlertTextFieldView
+    
+    // MARK: - Initializer
     
     init(_ style: AlertTextFieldModel, title: String, text: String) {
         textField = AlertTextFieldView(type: style, placeHolder: text)
@@ -28,10 +33,14 @@ final class AlertMyTextFieldView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 텍스트필드를 설정하는 메소드
+    /// - Parameter text: 텍스트필드에 입력할 텍스트
     func configureTextField(_ text: String) {
         textField.configureTextField(text)
     }
 }
+
+// MARK: - UI Setting Method
 
 private extension AlertMyTextFieldView {
     

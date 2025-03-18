@@ -79,10 +79,12 @@ private extension SettingViewController {
         
         let output = viewModel.transform(input: input)
         
+        // 설정 뷰 섹션 설정
         output.sections
             .bind(to: settingView.tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        // 마이 페이지 데이터 입력
         output.myPageDataRelay
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
@@ -91,6 +93,7 @@ private extension SettingViewController {
             }
             .disposed(by: disposeBag)
         
+        // 설정뷰 아이템 선택시 이벤트
         settingView.tableView.rx.itemSelected
             .asSignal(onErrorSignalWith: .empty())
             .withUnretained(self)

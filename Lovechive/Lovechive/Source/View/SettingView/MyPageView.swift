@@ -10,7 +10,10 @@ import SnapKit
 import RxSwift
 import RxCocoa
 
+/// 마이 페이지 뷰
 final class MyPageView: UIView {
+    
+    // MARK: -  UI Components
     
     private let titleView = UILabel()
     fileprivate let editButton = UIButton()
@@ -22,6 +25,8 @@ final class MyPageView: UIView {
     
     private let sectionStackView = UIStackView()
     
+    // MARK: - Initializer
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -32,6 +37,8 @@ final class MyPageView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    /// 마이 페이지를 설정하는 메소드
+    /// - Parameter data: 마이 페이지 데이터
     func configureMyPage(_ data: MyPageDataModel) {
         firstSection.configureSection(data.name)
         secondSection.configureSection(data.lover)
@@ -39,6 +46,8 @@ final class MyPageView: UIView {
         forthSection.configureSection(data.anniversary.formattedDateToString(.yearMonthDay))
     }
 }
+
+// MARK: - UI Setting Method
 
 private extension MyPageView {
     
@@ -104,7 +113,10 @@ private extension MyPageView {
     
 }
 
+// MARK: - Reactive Extension
+
 extension Reactive where Base: MyPageView {
+    /// 편집 버튼의 탭 이벤트를 방출하는 옵저버블
     var editButtonTapped: ControlEvent<Void> {
         base.editButton.rx.tap
     }

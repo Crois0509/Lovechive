@@ -10,7 +10,10 @@ import FirebaseFirestore
 import RxSwift
 import RxCocoa
 
+/// 설정 뷰 뷰 모델
 final class SettingViewModel: ViewModelType {
+    
+    // MARK: - Input & Output Type
     
     struct Input {
         let fetchTrigger: PublishRelay<Void>
@@ -21,6 +24,8 @@ final class SettingViewModel: ViewModelType {
         let sections: BehaviorRelay<[SetTableSection]>
         let myPageDataRelay: Observable<MyPageDataModel>
     }
+    
+    // MARK: - Properties
     
     private var disposeBag = DisposeBag()
     
@@ -40,9 +45,13 @@ final class SettingViewModel: ViewModelType {
             .asObservable()
     }
     
+    /// input을 output으로 변환하는 메소드
+    /// - Parameter input: input 데이터
+    /// - Returns: output 데이터
     func transform(input: Input) -> Output {
         
         input.fetchTrigger
+            .take(1)
             .withUnretained(self)
             .map { owner, _ in
                 SetTableSection(items: owner.defaultSettingModels)
@@ -104,12 +113,23 @@ final class SettingViewModel: ViewModelType {
                       myPageDataRelay: myPageDataRelay
         )
     }
+}
+
+// MARK: - ViewModel Private Method
+
+private extension SettingViewModel {
     
-    private func fetchData(_ type: FirestoreDataTypes) -> Single<[QueryDocumentSnapshot]> {
+    /// Firestore에서 데이터를 불러오는 메소드
+    /// - Parameter type: 불러올 데이터 타입
+    /// - Returns: 불러온 데이터 파일의 스냅샷 배열
+    func fetchData(_ type: FirestoreDataTypes) -> Single<[QueryDocumentSnapshot]> {
         FirestoreManager.shared.readFromFirestore(type: type)
     }
     
-    private func mappingUserData(_ query: [QueryDocumentSnapshot]) -> UserDataModel? {
+    /// 스냅샷 데이터를 UserDataModel 타입으로 변환하는 메소드
+    /// - Parameter query: 스냅샷 데이터
+    /// - Returns: 변환된 UserDataModel 데이터
+    func mappingUserData(_ query: [QueryDocumentSnapshot]) -> UserDataModel? {
         guard let user = query.first else { return nil }
         
         return UserDataModel(id: user.data()[AppConfig.UserModel.id] as? String ?? "",
@@ -121,7 +141,10 @@ final class SettingViewModel: ViewModelType {
         )
     }
     
-    private func mappingCoupleData(_ query: [QueryDocumentSnapshot]) -> CoupleDataModel? {
+    /// 스냅샷 데이터를 CoupleDataModel 타입으로 변환하는 메소드
+    /// - Parameter query: 스냅샷 데이터
+    /// - Returns: 변환된 CoupleDataModel 데이터
+    func mappingCoupleData(_ query: [QueryDocumentSnapshot]) -> CoupleDataModel? {
         guard let couple = query.first else { return nil }
         
         return CoupleDataModel(user1Id: couple.data()[AppConfig.CouplesModel.user1Id] as? String ?? "",
@@ -132,7 +155,10 @@ final class SettingViewModel: ViewModelType {
         )
     }
     
-    private func showAlertView(type: AlertTypes) -> PublishRelay<Bool> {
+    /// 커스텀 Alert 뷰를 호출하는 메소드
+    /// - Parameter type: 호출할 Alert의 타입
+    /// - Returns: 데이터 저장 성공 여부를 담은 옵저버블
+    func showAlertView(type: AlertTypes) -> PublishRelay<Bool> {
         let vc = AppHelpers.getTopViewController()
         let alert = LovechiveAlertViewController(type: type)
         vc?.addChild(alert)
@@ -146,7 +172,7 @@ final class SettingViewModel: ViewModelType {
     }
 }
 
-// MARK: - SettingTableCellModel Private Method
+// MARK: - SettingTableCellModel
 
 private extension SettingViewModel {
     
@@ -191,6 +217,9 @@ private extension SettingViewModel {
         ]
     }
     
+    /// UILabel을 설정하는 메소드
+    /// - Parameter text: Label Text
+    /// - Returns: UILabel
     func setupLabel(_ text: String) -> UILabel {
         let label = UILabel()
         label.text = text
@@ -212,20 +241,11 @@ private extension SettingViewModel {
                 toggleSwitch.isOn = isOn
             }
         }
-
+        
         toggleSwitch.thumbTintColor = .white
         toggleSwitch.onTintColor = .Personal.highlightPink
         
         return toggleSwitch
-    }
-    
-    func setupNotificationPermission() {
-        
-    }
-    
-    /// 문의 기능을 Alert으로 구현한 메소드
-    func inquiry() {
-        debugPrint(#function)
     }
     
     /// 앱스토어 링크로 이동하는 메소드
@@ -241,8 +261,5 @@ private extension SettingViewModel {
         
         debugPrint("앱스토어 이동")
     }
-    
-    func showOnboarding() {
-        debugPrint(#function)
-    }
+
 }
