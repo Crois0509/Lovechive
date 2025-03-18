@@ -11,7 +11,7 @@ import RxCocoa
 import RxKeyboard
 
 /// 커스텀 Alert 뷰 뷰 모델
-final class LovechiveAlertViewModel: ViewModelType {
+final class LovechiveAlertViewModel: ViewModelMethodManager, ViewModelType {
     
     // MARK: - Input & Output Type
     
@@ -74,7 +74,7 @@ final class LovechiveAlertViewModel: ViewModelType {
             .filter { !$0.isEmpty }
             .flatMapLatest { [weak self] data -> Single<Bool> in
                 guard let self else { return .just(false) }
-                return self.saveData(data)
+                return self.saveData(data, self.alertType)
             }
             .asDriver(onErrorJustReturn: false)
             .drive { [weak self] isSuccess in
@@ -135,37 +135,6 @@ final class LovechiveAlertViewModel: ViewModelType {
 
 private extension LovechiveAlertViewModel {
     
-    /// 커스텀 Alert 뷰를 dismiss 시키는 메소드
-    func dismissAlertView() {
-        guard let topView = AppHelpers.getTopViewController() as? MainViewController,
-              let alert = topView.children.last as? LovechiveAlertViewController
-        else { return }
-        
-        alert.dismissSelf {
-            alert.view.snp.removeConstraints()
-            alert.view.removeFromSuperview()
-            alert.removeFromParent()
-        }
-    }
-    
-    /// 키보드의 유무에 따라 커스텀 Alert 뷰의 위치를 변화 시키는 메소드
-    /// - Parameter isTure: 키보드의 존재 유무
-    func showKeyboard(_ isTure: Bool) {
-        guard let topView = AppHelpers.getTopViewController() as? MainViewController,
-              let alert = topView.children.last as? LovechiveAlertViewController
-        else { return }
-        
-        let alertY = alert.alertView.frame.origin.y
-        let centerY = alert.view.frame.midY
-        let alertSize = alert.alertView.bounds.height / 2
-        
-        if isTure && (alertY + alertSize) >= centerY {
-            alert.alertView.frame.origin.y -= 100
-        } else if !isTure {
-            alert.alertView.frame.origin.y = (alertY + alertSize)
-        }
-    }
-    
     /// 데이터가 비어있는지 체크하는 메소드
     /// - Returns: 데이터의 존재 유무
     func checkEmpty() -> Bool {
@@ -224,31 +193,6 @@ private extension LovechiveAlertViewModel {
             return [userData, coupleData]
             
         case .newDiary, .editDiary: return []
-            
-        }
-    }
-    
-    /// FirestoreModelProtocol 데이터를 Firestore에 저장하는 메소드
-    /// - Parameter data: 저장할 FirestoreModelProtocol 타입 데이터
-    /// - Returns: 데이터 저장 성공 여부를 담은 옵저버블
-    func saveData(_ data: [FirestoreModelProtocol]) -> Single<Bool> {
-        switch alertType {
-        case .newSchedule, .editSchedule:
-            guard let scheduleData = data.first as? ScheduleDataModel else { return .error(NSError(domain: "❌ 타입 변환 실패", code: 0)) }
-            
-            return FirestoreManager.shared.saveToFirestore(scheduleData, type: .schedule(id: scheduleData.id))
-            
-        case .newDiary, .editDiary: return .just(false)
-            
-        case .editMyPage:
-            guard let userData = data.first as? UserDataModel,
-                  let coupleData = data.last as? CoupleDataModel
-            else { return .error(NSError(domain: "❌ 타입 변환 실패", code: 0)) }
-            
-            let saveUser = FirestoreManager.shared.saveToFirestore(userData, type: .user)
-            let saveCouple = FirestoreManager.shared.saveToFirestore(coupleData, type: .couple)
-            
-            return Single.zip(saveUser, saveCouple).map { $0.0 && $0.1 }
             
         }
     }

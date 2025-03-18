@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 
 /// 설정 뷰 뷰 모델
-final class SettingViewModel: ViewModelType {
+final class SettingViewModel: ViewModelMethodManager, ViewModelType {
     
     // MARK: - Input & Output Type
     
@@ -119,13 +119,6 @@ final class SettingViewModel: ViewModelType {
 
 private extension SettingViewModel {
     
-    /// Firestore에서 데이터를 불러오는 메소드
-    /// - Parameter type: 불러올 데이터 타입
-    /// - Returns: 불러온 데이터 파일의 스냅샷 배열
-    func fetchData(_ type: FirestoreDataTypes) -> Single<[QueryDocumentSnapshot]> {
-        FirestoreManager.shared.readFromFirestore(type: type)
-    }
-    
     /// 스냅샷 데이터를 UserDataModel 타입으로 변환하는 메소드
     /// - Parameter query: 스냅샷 데이터
     /// - Returns: 변환된 UserDataModel 데이터
@@ -153,22 +146,6 @@ private extension SettingViewModel {
                                user2Name: couple.data()[AppConfig.CouplesModel.user2Name] as? String ?? "",
                                dDay: (couple.data()[AppConfig.CouplesModel.dDay] as? Timestamp)?.dateValue() ?? Date()
         )
-    }
-    
-    /// 커스텀 Alert 뷰를 호출하는 메소드
-    /// - Parameter type: 호출할 Alert의 타입
-    /// - Returns: 데이터 저장 성공 여부를 담은 옵저버블
-    func showAlertView(type: AlertTypes) -> PublishRelay<Bool> {
-        let vc = AppHelpers.getTopViewController()
-        let alert = LovechiveAlertViewController(type: type)
-        vc?.addChild(alert)
-        vc?.view.addSubview(alert.view)
-        alert.view.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        alert.didMove(toParent: vc)
-        
-        return alert.rx.dataSavedRelay
     }
 }
 

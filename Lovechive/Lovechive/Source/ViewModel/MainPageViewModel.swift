@@ -11,7 +11,7 @@ import RxCocoa
 import FirebaseFirestore
 
 /// 메인 페이지 VC의 ViewModel
-final class MainPageViewModel: ViewModelType {
+final class MainPageViewModel: ViewModelMethodManager, ViewModelType {
     
     // MARK: - Input & Output Type
     
@@ -40,7 +40,7 @@ final class MainPageViewModel: ViewModelType {
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { (owner, _) -> Single<[QueryDocumentSnapshot]> in
-                owner.fetchData(type: .schedule(id: ""))
+                owner.fetchData(.schedule(id: ""))
             }
             .map { [weak self] data in
                 guard let self else { return ScheduleModelSection.init(items: []) }
@@ -55,7 +55,7 @@ final class MainPageViewModel: ViewModelType {
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { (owner, _) -> Single<[QueryDocumentSnapshot]> in
-                owner.fetchData(type: .diary(id: ""))
+                owner.fetchData(.diary(id: ""))
             }
             .map { [weak self] data in
                 guard let self else { return [DiaryDataModel]() }
@@ -71,7 +71,7 @@ final class MainPageViewModel: ViewModelType {
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { (owner, _) -> Single<[QueryDocumentSnapshot]> in
-                owner.fetchData(type: .couple)
+                owner.fetchData(.couple)
             }
             .map { [weak self] data in
                 guard let self else { return [CoupleDataModel]() }
@@ -94,12 +94,6 @@ final class MainPageViewModel: ViewModelType {
 // MARK: - ViewModel Private Method
 
 extension MainPageViewModel {
-    /// Firestore에서 데이터를 가져오는 메소드
-    /// - Parameter type: 가져올 데이터의 타입
-    /// - Returns: 가져온 데이터 목록
-    func fetchData(type: FirestoreDataTypes) -> Single<[QueryDocumentSnapshot]> {
-        return FirestoreManager.shared.readFromFirestore(type: type)
-    }
     
     /// Query 데이터를 PlanTableViewSection 타입으로 변환하는 메소드
     /// - Parameter data: Query 데이터

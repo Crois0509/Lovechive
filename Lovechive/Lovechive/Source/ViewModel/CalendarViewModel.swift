@@ -12,7 +12,7 @@ import RxCocoa
 import FirebaseFirestore
 
 /// 캘린더뷰 뷰 모델
-final class CalendarViewModel: ViewModelType {
+final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
     
     // MARK: - Input & Output Type
     
@@ -54,7 +54,7 @@ final class CalendarViewModel: ViewModelType {
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.fetchDate()
+                owner.fetchData(.schedule(id: ""))
             }
             .map { [weak self] data in
                 guard let self else { return [Date]() }
@@ -175,11 +175,6 @@ final class CalendarViewModel: ViewModelType {
 // MARK: - ViewModel Private Method
 
 private extension CalendarViewModel {
-    /// Firestore에서 데이터를 가져오는 메소드
-    /// - Returns: Schedule 타입의 데이터 옵저버블
-    func fetchDate() -> Single<[QueryDocumentSnapshot]> {
-        return FirestoreManager.shared.readFromFirestore(type: .schedule(id: ""))
-    }
     
     /// Schedule 데이터를 필터링 하는 메소드
     /// - Parameters:
@@ -246,22 +241,6 @@ private extension CalendarViewModel {
         }
         
         return ScheduleModelSection(items: data)
-    }
-    
-    /// 커스텀 Alert 뷰를 호출하는 메소드
-    /// - Parameter type: 호출할 Alert의 타입
-    /// - Returns: 데이터 저장 성공 여부를 담은 옵저버블
-    func showAlertView(type: AlertTypes) -> PublishRelay<Bool> {
-        let vc = AppHelpers.getTopViewController()
-        let alert = LovechiveAlertViewController(type: type)
-        vc?.addChild(alert)
-        vc?.view.addSubview(alert.view)
-        alert.view.snp.makeConstraints {
-            $0.edges.equalToSuperview()
-        }
-        alert.didMove(toParent: vc)
-        
-        return alert.rx.dataSavedRelay
     }
     
     /// 특정 Schedule 데이터를 찾는 메소드
