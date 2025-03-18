@@ -154,38 +154,38 @@ private extension SettingViewModel {
     var defaultSettingModels: [SettingTableCellModel] {
         return [
             SettingTableCellModel(
-                title: "알림 설정",
+                title: AppConfig.SettingConfig.alarm,
                 extraView: setupSwitch(),
                 action: nil
             ),
             
             SettingTableCellModel(
-                title: "개인정보처리방침",
+                title: AppConfig.SettingConfig.privacy,
                 extraView: setupLabel(">"),
                 action: nil
             ),
             
             SettingTableCellModel(
-                title: "사용 방법",
+                title: AppConfig.SettingConfig.playInfo,
                 extraView: setupLabel(">"),
                 action: nil
             ),
             
             SettingTableCellModel(
-                title: "앱 리뷰 남기기",
+                title: AppConfig.SettingConfig.review,
                 extraView: setupLabel(">"),
                 action: moveAppstore
             ),
             
             SettingTableCellModel(
-                title: "버그 제보 / 문의",
+                title: AppConfig.SettingConfig.bug,
                 extraView: setupLabel(">"),
                 action: nil
             ),
             
             SettingTableCellModel(
-                title: "앱 버전",
-                extraView: setupLabel(Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"),
+                title: AppConfig.SettingConfig.versionInfo,
+                extraView: setupLabel(AppConfig.SettingConfig.version),
                 action: nil
             )
         ]
@@ -230,7 +230,7 @@ private extension SettingViewModel {
     
     /// 앱스토어 링크로 이동하는 메소드
     func moveAppstore() {
-        let appUrl = "itms-apps://apps.apple.com/app/id6741835898" // TODO: 추후 id 수정 필요
+        let appUrl = AppConfig.SettingConfig.appstoreLink // TODO: 추후 id 수정 필요
         if let url = URL(string: appUrl), UIApplication.shared.canOpenURL(url) {
             if #available(iOS 10.0, *) {
                 UIApplication.shared.open(url, options: [:], completionHandler: nil)

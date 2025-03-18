@@ -15,10 +15,10 @@ final class MyPageView: UIView {
     private let titleView = UILabel()
     fileprivate let editButton = UIButton()
     
-    private let firstSection = MyPageSectionView(title: "이름", content: "김남주")
-    private let secondSection = MyPageSectionView(title: "연인", content: "김여주")
-    private let thirdSection = MyPageSectionView(title: "생년월일", content: "2000.01.01")
-    private let forthSection = MyPageSectionView(title: "연애 기념일", content: "2024.01.29")
+    private let firstSection = MyPageSectionView(title: AppConfig.SettingConfig.nameT, content: AppConfig.SettingConfig.name)
+    private let secondSection = MyPageSectionView(title: AppConfig.SettingConfig.loverT, content: AppConfig.SettingConfig.lover)
+    private let thirdSection = MyPageSectionView(title: AppConfig.SettingConfig.birth, content: AppConfig.SettingConfig.birthD)
+    private let forthSection = MyPageSectionView(title: AppConfig.SettingConfig.anni, content: AppConfig.SettingConfig.anniV)
     
     private let sectionStackView = UIStackView()
     
@@ -77,7 +77,7 @@ private extension MyPageView {
     }
     
     func setupLabel() {
-        titleView.text = "내 정보"
+        titleView.text = AppConfig.SettingConfig.myInfo
         titleView.font = .systemFont(ofSize: 16, weight: .bold)
         titleView.textColor = .Personal.highlightPink
         titleView.numberOfLines = 1
@@ -86,7 +86,7 @@ private extension MyPageView {
     }
     
     func setupButton() {
-        editButton.setTitle("편집", for: .normal)
+        editButton.setTitle(AppConfig.SettingConfig.edit, for: .normal)
         editButton.setTitleColor(.Personal.highlightPink, for: .normal)
         editButton.titleLabel?.font = .systemFont(ofSize: 12, weight: .regular)
         editButton.backgroundColor = .clear

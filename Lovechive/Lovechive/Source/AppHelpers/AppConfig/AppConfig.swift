@@ -19,8 +19,10 @@ enum AppConfig {
     
     enum CouplesModel {
         static let dDay: String = "dDay"
-        static let user1: String = "user1"
-        static let user2: String = "user2"
+        static let user1Id: String = "user1Id"
+        static let user2Id: String = "user2Id"
+        static let user1Name: String = "user1Name"
+        static let user2Name: String = "user2Name"
     }
     
     enum DiariesModel {
@@ -41,6 +43,7 @@ enum AppConfig {
     }
     
     enum UserModel {
+        static let id: String = "id"
         static let name: String = "name"
         static let email: String = "email"
         static let coupleId: String = "coupleId"
@@ -73,5 +76,29 @@ enum AppConfig {
         static let cellTitle: String = "새로운 일정"
         static let title: String = "1월 1일 일정"
         static let info: String = "아직 일정이 없습니다."
+    }
+    
+    // MARK: - SettingView에서 사용할 String 데이터
+    enum SettingConfig {
+        static let cellId = "SetTableViewCell"
+        static let nameT = "이름"
+        static let name = "김남주"
+        static let loverT = "연인"
+        static let lover = "김여주"
+        static let birth = "생년월일"
+        static let birthD = "2000년 1월 1일"
+        static let anni = "연애 기념일"
+        static let anniV = "2024년 1월 29일"
+        static let myInfo = "내 정보"
+        static let edit = "편집"
+        
+        static let alarm = "알림 설정"
+        static let privacy = "개인정보처리방침"
+        static let playInfo = "사용 방법"
+        static let review = "앱 리뷰 남기기"
+        static let bug = "버그 제보 / 문의"
+        static let versionInfo = "앱 버전"
+        static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
+        static let appstoreLink = "itms-apps://apps.apple.com/app/id6741835898"
     }
 }

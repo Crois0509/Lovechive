@@ -10,8 +10,8 @@ import SnapKit
 
 final class MyPageSectionView: UIView {
     
-    private lazy var titleView = createdLabel("이름", color: .Personal.highlightPink, alignment: .left)
-    private lazy var contentView = createdLabel("김남주", color: .Gray.naturalBlack, alignment: .right)
+    private lazy var titleView = createdLabel(AppConfig.SettingConfig.nameT, color: .Personal.highlightPink, alignment: .left)
+    private lazy var contentView = createdLabel(AppConfig.SettingConfig.name, color: .Gray.naturalBlack, alignment: .right)
     
     init(title: String, content: String) {
         super.init(frame: .zero)

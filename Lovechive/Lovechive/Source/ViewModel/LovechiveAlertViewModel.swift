@@ -212,7 +212,7 @@ private extension LovechiveAlertViewModel {
     func saveData(_ data: [FirestoreModelProtocol]) -> Single<Bool> {
         switch alertType {
         case .newSchedule, .editSchedule:
-            guard let scheduleData = data.first as? ScheduleDataModel else { return .error(NSError(domain: "타입 변환 실패", code: 0)) }
+            guard let scheduleData = data.first as? ScheduleDataModel else { return .error(NSError(domain: "❌ 타입 변환 실패", code: 0)) }
             
             return FirestoreManager.shared.saveToFirestore(scheduleData, type: .schedule(id: scheduleData.id))
             
@@ -221,7 +221,7 @@ private extension LovechiveAlertViewModel {
         case .editMyPage:
             guard let userData = data.first as? UserDataModel,
                   let coupleData = data.last as? CoupleDataModel
-            else { return .error(NSError(domain: "타입 변환 실패", code: 0)) }
+            else { return .error(NSError(domain: "❌ 타입 변환 실패", code: 0)) }
             
             let saveUser = FirestoreManager.shared.saveToFirestore(userData, type: .user)
             let saveCouple = FirestoreManager.shared.saveToFirestore(coupleData, type: .couple)
