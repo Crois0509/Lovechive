@@ -52,6 +52,7 @@ final class AlertTextFieldView: UIView {
     func configureTextField(_ text: String) {
         textField.text = text
         textField.sendActions(for: .valueChanged)
+        setupDatePickerCurrentDate()
     }
     
     /// 키보드를 등장 시키는 메소드
@@ -162,6 +163,19 @@ private extension AlertTextFieldView {
         textField.inputAccessoryView = toolbar
         textField.inputAssistantItem.leadingBarButtonGroups = []
         textField.inputAssistantItem.trailingBarButtonGroups = []
+    }
+    
+    func setupDatePickerCurrentDate() {
+        switch currentType {
+        case .limit(value: let value): break
+        case .time:
+            let date = textField.text?.formattedStringToDate(.hourMinute)
+            datePicker.date = date ?? Date()
+            
+        case .calendar:
+            let date = textField.text?.formattedStringToDate(.yearMonthDay)
+            datePicker.date = date ?? Date()
+        }
     }
     
     /// DatePicker 뷰를 닫는 메소드
