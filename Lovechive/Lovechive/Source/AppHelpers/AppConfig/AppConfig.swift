@@ -70,7 +70,7 @@ enum AppConfig {
     
     enum PlanerView {
         static let title: String = "다가오는 일정"
-        static let info: String = "아직 일정이 추가되지 않았어요"
+        static let info: String = "다가오는 일정이 없어요."
         static let cellId: String = "PlanViewCell"
     }
     
@@ -119,5 +119,6 @@ enum AppConfig {
     
     enum DiaryConfig {
         static let cellId = "DiaryListCell"
+        static let infoMessage = "아직 다이어리가 없습니다.\n다이어리를 만들어 연인과 공유해 보세요!"
     }
 }

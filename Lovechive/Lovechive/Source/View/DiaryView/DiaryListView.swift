@@ -86,7 +86,7 @@ private extension DiaryListView {
     }
     
     func setupInfoView() {
-        infoView.text = "아직 다이어리가 없습니다.\n다이어리를 만들어 연인과 공유해 보세요!"
+        infoView.text = AppConfig.DiaryConfig.infoMessage
         infoView.font = .myoyaFont(24)
         infoView.textColor = .Gray.unSelected
         infoView.numberOfLines = 2
