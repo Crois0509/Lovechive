@@ -29,6 +29,8 @@ final class MainPageViewModel: ViewModelMethodManager, ViewModelType {
     
     private var disposeBag = DisposeBag()
     
+    private let umd = UserDefaultsManager()
+    
     private let sections = BehaviorRelay<[ScheduleModelSection]>(value: [])
     private let latestDiaryRelay = PublishRelay<DiaryDataModel>()
     private let dDayRelay = PublishRelay<CoupleDataModel>()
@@ -55,7 +57,7 @@ final class MainPageViewModel: ViewModelMethodManager, ViewModelType {
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { (owner, _) -> Single<[QueryDocumentSnapshot]> in
-                owner.fetchData(.diary(id: ""))
+                owner.fetchDiaryData(owner.umd.diaryId)
             }
             .map { [weak self] data in
                 guard let self else { return [DiaryDataModel]() }
@@ -128,12 +130,11 @@ extension MainPageViewModel {
     func mappingQueryDataToDiaryData(_ data: [QueryDocumentSnapshot]) -> [DiaryDataModel] {
         let data = data.map {
             DiaryDataModel(id: $0.data()[AppConfig.DiariesModel.id] as? String ?? "",
-                           author: $0.data()[AppConfig.DiariesModel.author] as? String ?? "",
-                           coupleId: $0.data()[AppConfig.DiariesModel.coupleId] as? String ?? "",
+                           title: $0.data()[AppConfig.DiariesModel.title] as? String ?? "",
                            content: $0.data()[AppConfig.DiariesModel.content] as? String ?? "",
                            image: $0.data()[AppConfig.DiariesModel.image] as? String ?? "",
-                           createdAt: ($0.data()[AppConfig.DiariesModel.createdAt] as? Timestamp)?.dateValue() ?? Date()
-            )
+                           createdAt: ($0.data()[AppConfig.DiariesModel.createdAt] as? Timestamp)?.dateValue() ?? Date(),
+                           createdBy: $0.data()[AppConfig.DiariesModel.createdBy] as? String ?? "")
         }.sorted(by: {
             $0.createdAt < $1.createdAt
         })
