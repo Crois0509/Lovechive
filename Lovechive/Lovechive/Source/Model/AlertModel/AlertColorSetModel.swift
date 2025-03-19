@@ -24,4 +24,19 @@ enum AlertColorSetModel: CaseIterable {
             return UIColor.Diary.yellow
         }
     }
+    
+    var sendColorName: String {
+        switch self {
+        case .pink:
+            return "personalColor/pointPink"
+        case .purple:
+            return "diaryColor/purple"
+        case .blue:
+            return "diaryColor/blue"
+        case .green:
+            return "diaryColor/green"
+        case .yellow:
+            return "diaryColor/yellow"
+        }
+    }
 }
