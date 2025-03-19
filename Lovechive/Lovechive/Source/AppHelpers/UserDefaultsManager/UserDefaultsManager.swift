@@ -26,6 +26,14 @@ struct UserDefaultsManager {
         return id
     }
     
+    var diaryId: String {
+        guard let id = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.diaryId) else {
+            return "0"
+        }
+        
+        return id
+    }
+    
     /// UserDefaults에 데이터를 저장하는 메소드
     /// - Parameter data: 저장할 데이터
     func saveToUserDefaults<T>(_ data: T, forKey key: String) {
