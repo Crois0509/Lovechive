@@ -18,6 +18,31 @@ final class FirestoreManager {
     static let shared = FirestoreManager()
     private init() {}
     
+    func fetchDiaries(_ id: String) -> Single<[QueryDocumentSnapshot]> {
+        return Single.create { single in
+            let coupleDocumentRef = self.db.collection("diaries").document(id)
+            
+            coupleDocumentRef.collection("Diaries").getDocuments { querySnapshot, error in
+                if let error = error {
+                    debugPrint("❌ Diary 데이터 불러오기 실패: \(error.localizedDescription)")
+                    single(.failure(error))
+                    return
+                }
+                
+                guard let documents = querySnapshot?.documents, !documents.isEmpty else {
+                    debugPrint("❌ Diary 데이터 없음")
+                    single(.success([]))  // 문서가 없으면 빈 배열 반환
+                    return
+                }
+                
+                debugPrint("✅ Diary 데이터 불러오기 성공, count: \(documents.count)")
+                single(.success(documents))
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
     /// Firestore에 저장/업데이트를 실행하는 메소드
     /// - Parameters:
     ///   - data: 저장/업데이트 할 데이터
@@ -36,12 +61,11 @@ final class FirestoreManager {
                 let coupleId = self.udm.coupleId
                 documentRef = collectionRef.document(coupleId)
                 
-            case .diary(collection: let collection, diaryId: let diaryId):
-                let coupleId = self.udm.coupleId
-                if !diaryId.isEmpty {
-                    documentRef = collectionRef.document(coupleId).collection(collection).document(diaryId)
+            case .diary(id: let id):
+                if !id.isEmpty {
+                    documentRef = collectionRef.document(id)
                 } else {
-                    documentRef = collectionRef.document(coupleId).collection(collection).document()
+                    documentRef = collectionRef.document()
                 }
                 
             case .schedule(id: let id):
@@ -84,7 +108,11 @@ final class FirestoreManager {
                 let coupleId = self.udm.coupleId
                 query = collectionRef.whereField(FieldPath.documentID(), isEqualTo: coupleId)
                 
-            case .diary, .schedule:
+            case .diary:
+                let coupleId = self.udm.coupleId
+                query = collectionRef.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: coupleId)
+                
+            case .schedule:
                 let coupleId = self.udm.coupleId
                 query = collectionRef.whereField(AppConfig.UserDefaultsConfig.coupleId, isEqualTo: coupleId)
             }
@@ -124,12 +152,11 @@ final class FirestoreManager {
                 let coupleId = self.udm.coupleId
                 documentRef = collectionRef.document(coupleId)
                 
-            case .diary(collection: let collection, diaryId: let diaryId):
-                let coupleId = self.udm.coupleId
-                if !diaryId.isEmpty {
-                    documentRef = collectionRef.document(coupleId).collection(collection).document(diaryId)
+            case .diary(id: let id):
+                if !id.isEmpty {
+                    documentRef = collectionRef.document(id)
                 } else {
-                    documentRef = collectionRef.document(coupleId).collection(collection).document()
+                    documentRef = collectionRef.document()
                 }
                 
             case .schedule(id: let id):

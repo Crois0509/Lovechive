@@ -11,7 +11,7 @@ import Foundation
 enum FirestoreDataTypes {
     case user
     case couple
-    case diary(collection: String, diaryId: String)
+    case diary(id: String)
     case schedule(id: String)
     
     var typeName: String {
