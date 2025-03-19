@@ -26,10 +26,9 @@ enum AppConfig {
     }
     
     enum DiariesModel {
-        static let id: String = "id"
-        static let author: String = "author"
+        static let title: String = "title"
+        static let createdBy: String = "createdBy"
         static let content: String = "content"
-        static let coupleId: String = "coupleId"
         static let createdAt: String = "createdAt"
         static let image: String = "image"
     }

@@ -36,11 +36,12 @@ final class FirestoreManager {
                 let coupleId = self.udm.coupleId
                 documentRef = collectionRef.document(coupleId)
                 
-            case .diary(id: let id):
-                if !id.isEmpty {
-                    documentRef = collectionRef.document(id)
+            case .diary(collection: let collection, diaryId: let diaryId):
+                let coupleId = self.udm.coupleId
+                if !diaryId.isEmpty {
+                    documentRef = collectionRef.document(coupleId).collection(collection).document(diaryId)
                 } else {
-                    documentRef = collectionRef.document()
+                    documentRef = collectionRef.document(coupleId).collection(collection).document()
                 }
                 
             case .schedule(id: let id):
@@ -123,11 +124,12 @@ final class FirestoreManager {
                 let coupleId = self.udm.coupleId
                 documentRef = collectionRef.document(coupleId)
                 
-            case .diary(id: let id):
-                if !id.isEmpty {
-                    documentRef = collectionRef.document(id)
+            case .diary(collection: let collection, diaryId: let diaryId):
+                let coupleId = self.udm.coupleId
+                if !diaryId.isEmpty {
+                    documentRef = collectionRef.document(coupleId).collection(collection).document(diaryId)
                 } else {
-                    documentRef = collectionRef.document()
+                    documentRef = collectionRef.document(coupleId).collection(collection).document()
                 }
                 
             case .schedule(id: let id):
