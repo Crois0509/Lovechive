@@ -5,7 +5,7 @@
 //  Created by 장상경 on 3/13/25.
 //
 
-import Foundation
+import UIKit
 
 extension String {
     
@@ -34,6 +34,10 @@ extension String {
         formatter.dateFormat = type.stringFormat
         
         return formatter.date(from: self) ?? Date()
+    }
+    
+    var transStringToColor: UIColor? {
+        return UIColor(named: self)
     }
     
 }
