@@ -45,6 +45,14 @@ private extension DiaryViewController {
             .bind(to: diaryListView.collectionView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        output.sections
+            .asDriver(onErrorJustReturn: [])
+            .drive { [weak self] items in
+                let itemIsEmpty = items.isEmpty
+                self?.diaryListView.setInfoLabelHidden(itemIsEmpty)
+            }
+            .disposed(by: disposeBag)
+        
         output.pushDiaryView
             .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())

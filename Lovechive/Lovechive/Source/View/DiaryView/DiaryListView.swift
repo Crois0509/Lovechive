@@ -14,6 +14,7 @@ final class DiaryListView: UIView {
     
     private(set) lazy var collectionView = UICollectionView(frame: .zero, collectionViewLayout: createdLayout())
     fileprivate let addButton = FloatingButton()
+    private let infoView = UILabel()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -25,6 +26,10 @@ final class DiaryListView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func setInfoLabelHidden(_ itemIsEmpty: Bool) {
+        infoView.isHidden = !itemIsEmpty
+    }
+    
 }
 
 // MARK: - UI Setting Method
@@ -32,6 +37,7 @@ final class DiaryListView: UIView {
 private extension DiaryListView {
     
     func setupUI() {
+        setupInfoView()
         setupCollectionView()
         configureSelf()
         setupLayout()
@@ -39,7 +45,7 @@ private extension DiaryListView {
     
     func configureSelf() {
         backgroundColor = .clear
-        [collectionView, addButton].forEach {
+        [collectionView, infoView, addButton].forEach {
             addSubview($0)
         }
     }
@@ -48,6 +54,10 @@ private extension DiaryListView {
         collectionView.snp.makeConstraints {
             $0.verticalEdges.equalToSuperview()
             $0.horizontalEdges.equalToSuperview().inset(16)
+        }
+        
+        infoView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
         }
         
         addButton.snp.makeConstraints {
@@ -73,6 +83,15 @@ private extension DiaryListView {
         let layout = UICollectionViewCompositionalLayout(section: section)
         
         return layout
+    }
+    
+    func setupInfoView() {
+        infoView.text = "아직 다이어리가 없습니다.\n다이어리를 만들어 연인과 공유해 보세요!"
+        infoView.font = .myoyaFont(24)
+        infoView.textColor = .Gray.unSelected
+        infoView.numberOfLines = 2
+        infoView.textAlignment = .center
+        infoView.backgroundColor = .clear
     }
     
     func setupCollectionView() {
