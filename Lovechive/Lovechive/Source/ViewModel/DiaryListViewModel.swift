@@ -70,7 +70,6 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
                 self?.pushDiaryView.accept(data)
             }
             .disposed(by: disposeBag)
-            
         
         input.diaryAddButtonTapped
             .withUnretained(self)
@@ -99,7 +98,8 @@ private extension DiaryListViewModel {
     /// - Returns: 변환된 DiaryListSection 데이터 배열
     func mappingQueryDataToDiaryListData(_ data: [QueryDocumentSnapshot]) -> DiaryListSection {
         let data = data.compactMap { data -> DiaryListDataModel? in
-            let item = DiaryListDataModel(diaryId: data.data()[AppConfig.DiariesModel.diaryId] as? String ?? "",
+            let item = DiaryListDataModel(coupleId: data.data()[AppConfig.DiariesModel.coupleId] as? String ?? "",
+                                          diaryId: data.data()[AppConfig.DiariesModel.diaryId] as? String ?? "",
                                           diaryTitle: data.data()[AppConfig.DiariesModel.diaryTitle] as? String ?? "",
                                           diarySubTitle: data.data()[AppConfig.DiariesModel.diarySubTitle] as? String ?? "",
                                           diaryColor: data.data()[AppConfig.DiariesModel.diaryColor] as? String ?? "",
