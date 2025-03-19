@@ -23,7 +23,7 @@ final class MainViewController: UIViewController {
     private let pages: [UIViewController] = [
         MainPageViewController(),
         CalendarViewController(),
-        TestDiaryViewController(),
+        DiaryViewController(),
         SettingViewController()
     ]
     

@@ -23,7 +23,7 @@ final class PageViewController: UIPageViewController {
     private let pages: [UIViewController] = [
         MainPageViewController(),
         CalendarViewController(),
-        TestDiaryViewController(),
+        DiaryViewController(),
         SettingViewController()
     ]
     
@@ -94,14 +94,5 @@ extension Reactive where Base: PageViewController {
     // 현재 페이지 인덱스를 이벤트로 전달
     var currentPage: PublishRelay<Int> {
         base.currentPageIndex
-    }
-}
-
-// MARK: - TestViewControllers
-
-final class TestDiaryViewController: UIViewController {
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        view.backgroundColor = .yellow
     }
 }
