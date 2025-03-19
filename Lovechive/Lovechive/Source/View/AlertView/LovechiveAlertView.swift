@@ -26,7 +26,6 @@ final class LovechiveAlertView: UIView {
     fileprivate let firstSectionTextFieldRelay = BehaviorRelay<String>(value: "")
     fileprivate let secondSectionTextFieldRelay = BehaviorRelay<String>(value: "")
     fileprivate let thirdSectionTextFieldRelay = BehaviorRelay<String>(value: "")
-    fileprivate let thirdSectionColorRelay = BehaviorRelay<String>(value: "")
     
     // MARK: - Properties
     
@@ -194,8 +193,14 @@ private extension LovechiveAlertView {
                 view.rx.editingTextField.bind(to: self.firstSectionTextFieldRelay).disposed(by: disposeBag)
             } else if let view = section as? AlertTextFieldView, index == 1 {
                 view.rx.editingTextField.bind(to: self.secondSectionTextFieldRelay).disposed(by: disposeBag)
-            } else if let view = section as? AlertTextFieldView, index == 2 {
-                // 추후 구현
+            } else if let view = section as? AlertColorSelectView , index == 2 {
+                view.rx.colorButtonTapped
+                    .map { index -> String in
+                        let color = AlertColorSetModel.allCases[index]
+                        return color.sendColorName
+                    }
+                    .bind(to: self.thirdSectionTextFieldRelay)
+                    .disposed(by: disposeBag)
             }
             
             if let view = section as? AlertMyTextFieldView, index == 0 {
@@ -262,10 +267,5 @@ extension Reactive where Base: LovechiveAlertView {
     /// 세 번째 섹션의 TextField 변경 이벤트를 방출하는 옵저버블
     var thirdSectionTextFieldRelay: BehaviorRelay<String> {
         return base.thirdSectionTextFieldRelay
-    }
-    
-    /// 세 번째 섹션의 색상 변경 이벤트를 방출하는 옵저버블
-    var thirdSectionColorRelay: BehaviorRelay<String> {
-        return base.thirdSectionColorRelay
     }
 }
