@@ -67,6 +67,10 @@ class ViewModelMethodManager: AnyObject {
         FirestoreManager.shared.readFromFirestore(type: type)
     }
     
+    func fetchDiaryData(_ id: String) -> Single<[QueryDocumentSnapshot]> {
+        FirestoreManager.shared.fetchDiaries(id)
+    }
+    
     /// FirestoreModelProtocol 데이터를 Firestore에 저장하는 메소드
     /// - Parameter data: 저장할 FirestoreModelProtocol 타입 데이터
     /// - Returns: 데이터 저장 성공 여부를 담은 옵저버블
