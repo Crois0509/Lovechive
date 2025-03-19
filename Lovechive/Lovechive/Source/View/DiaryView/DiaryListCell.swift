@@ -98,7 +98,6 @@ private extension DiaryListCell {
     }
     
     func reusedCell() {
-        icon.image = nil
         titleView.text = ""
         subTitleView.text = ""
     }
