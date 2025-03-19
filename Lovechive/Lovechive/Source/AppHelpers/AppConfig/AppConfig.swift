@@ -13,6 +13,7 @@ enum AppConfig {
     enum UserDefaultsConfig {
         static let userId: String = "userId"
         static let coupleId: String = "coupleId"
+        static let diaryId: String = "diaryId"
     }
     
     // MARK: - FirestoreModel에서 사용할 String 데이터
@@ -26,6 +27,13 @@ enum AppConfig {
     }
     
     enum DiariesModel {
+        static let diaryTitle: String = "diaryTitle"
+        static let diaryId: String = "diaryId"
+        static let diarySubTitle: String = "diarySubTitle"
+        static let diaryColor: String = "diaryColor"
+        static let diaryCreatedAt: String = "diaryCreatedAt"
+        
+        static let id: String = "id"
         static let title: String = "title"
         static let createdBy: String = "createdBy"
         static let content: String = "content"
@@ -99,5 +107,17 @@ enum AppConfig {
         static let versionInfo = "앱 버전"
         static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         static let appstoreLink = "itms-apps://apps.apple.com/app/id6741835898"
+    }
+    
+    // MARK: - Lovechive Alert에서 쓰일 String 데이터
+    
+    enum LovechiveAlertConfig {
+        static let AlertSectionCell = "AlertSectionCell"
+    }
+    
+    // MARK: - DiaryView에서 쓰일 String 데이터
+    
+    enum DiaryConfig {
+        static let cellId = "DiaryListCell"
     }
 }
