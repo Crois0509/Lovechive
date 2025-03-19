@@ -38,7 +38,8 @@ final class LovechiveAlertView: UIView {
         
         [
             AlertTextFieldView(type: .limit(value: 10), placeHolder: "다이어리 제목"),
-            AlertTextFieldView(type: .limit(value: 20), placeHolder: "다이어리 설명")
+            AlertTextFieldView(type: .limit(value: 20), placeHolder: "다이어리 설명"),
+            AlertColorSelectView()
         ],
         
         [
@@ -140,7 +141,7 @@ private extension LovechiveAlertView {
         sectionView.showsHorizontalScrollIndicator = false
         sectionView.showsVerticalScrollIndicator = false
         sectionView.dataSource = self
-        sectionView.register(AlertSectionCell.self, forCellWithReuseIdentifier: "AlertSectionCell")
+        sectionView.register(AlertSectionCell.self, forCellWithReuseIdentifier: AppConfig.LovechiveAlertConfig.AlertSectionCell)
     }
     
     func createdCollectionViewLayout(items: Int) -> UICollectionViewLayout {
@@ -217,7 +218,7 @@ extension LovechiveAlertView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AlertSectionCell", for: indexPath) as? AlertSectionCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AppConfig.LovechiveAlertConfig.AlertSectionCell, for: indexPath) as? AlertSectionCell else {
             return UICollectionViewCell()
         }
         
