@@ -32,6 +32,7 @@ enum AppConfig {
         static let diarySubTitle: String = "diarySubTitle"
         static let diaryColor: String = "diaryColor"
         static let diaryCreatedAt: String = "diaryCreatedAt"
+        static let coupleId: String = "coupleId"
         
         static let id: String = "id"
         static let title: String = "title"

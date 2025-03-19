@@ -17,6 +17,7 @@ struct DiaryListDataModel: FirestoreModelProtocol, IdentifiableType, Equatable {
         return self.diaryId
     }
     
+    let coupleId: String
     let diaryId: String
     let diaryTitle: String
     let diarySubTitle: String
@@ -29,6 +30,7 @@ struct DiaryListDataModel: FirestoreModelProtocol, IdentifiableType, Equatable {
     
     func transform() -> [String : Any] {
         return [
+            AppConfig.DiariesModel.coupleId: self.coupleId,
             AppConfig.DiariesModel.diaryId: self.diaryId,
             AppConfig.DiariesModel.diaryTitle: self.diaryTitle,
             AppConfig.DiariesModel.diarySubTitle: self.diarySubTitle,
