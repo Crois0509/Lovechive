@@ -81,7 +81,12 @@ class ViewModelMethodManager: AnyObject {
             
             return FirestoreManager.shared.saveToFirestore(scheduleData, type: .schedule(id: scheduleData.id))
             
-        case .newDiary, .editDiary: return .just(false)
+        case .newDiary:
+            guard let diaryData = data.first as? DiaryListDataModel else { return .error(NSError(domain: "❌ 타입 변환 실패", code: 0)) }
+            
+            return FirestoreManager.shared.saveToFirestore(diaryData, type: .diary(id: diaryData.diaryId))
+            
+        case .editDiary: return .just(false)
             
         case .editMyPage:
             guard let userData = data.first as? UserDataModel,

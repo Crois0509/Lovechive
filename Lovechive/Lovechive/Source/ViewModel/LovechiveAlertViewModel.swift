@@ -190,8 +190,17 @@ private extension LovechiveAlertViewModel {
             
             return [userData, coupleData]
             
-        case .newDiary, .editDiary: return []
+        case .newDiary:
+            let diaryData = DiaryListDataModel(coupleId: umd.coupleId,
+                                               diaryId: UUID().uuidString,
+                                               diaryTitle: firstSectionData,
+                                               diarySubTitle: secondSectionData,
+                                               diaryColor: thirdSectionData,
+                                               diaryCreatedAt: Date())
             
+            return [diaryData]
+            
+        case .editDiary: return []
         }
     }
 }
