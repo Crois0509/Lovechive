@@ -12,6 +12,7 @@ extension String {
     enum StringFormatType {
         case fullTime
         case yearMonthDay
+        case yearMonth
         case hourMinute
         
         var stringFormat: String {
@@ -20,6 +21,8 @@ extension String {
                 return "yyyy년 M월 d일 a h시 m분"
             case .yearMonthDay:
                 return "yyyy년 M월 d일"
+            case .yearMonth:
+                return "yyyy년 M월"
             case .hourMinute:
                 return "a h시 m분"
             }
