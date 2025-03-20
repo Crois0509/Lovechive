@@ -10,6 +10,8 @@ import SnapKit
 
 final class FloatingButton: UIButton {
     
+    private let plusIcon = UIImageView()
+    
     override init(frame: CGRect) {
         super.init(frame: frame)
         
@@ -28,8 +30,19 @@ final class FloatingButton: UIButton {
     
     private func setupUI() {
         backgroundColor = .Personal.highlightPink
-        setImage(UIImage(systemName: "plus"), for: .normal)
         tintColor = .white
+        addSubview(plusIcon)
+        setupIcon()
+    }
+    
+    private func setupIcon() {
+        plusIcon.image = .Icon.plus
+        plusIcon.contentMode = .scaleAspectFit
+        
+        plusIcon.snp.makeConstraints {
+            $0.width.height.equalTo(40)
+            $0.center.equalToSuperview()
+        }
     }
     
     private func setupLayer() {
