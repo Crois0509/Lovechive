@@ -12,6 +12,7 @@ import RxCocoa
 import FirebaseFirestore
 
 final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
+    typealias DiaryInfo = (title: String, id: String)
     
     struct Input {
         let fetchTrigger: PublishRelay<Void>
@@ -21,13 +22,13 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
     
     struct Output {
         let sections: BehaviorRelay<[DiaryListSection]>
-        let pushDiaryView: PublishRelay<[DiaryDataModel]>
+        let pushDiaryView: PublishRelay<DiaryInfo>
     }
     
     private var disposeBag = DisposeBag()
     
     private let sections = BehaviorRelay<[DiaryListSection]>(value: [])
-    private let pushDiaryView = PublishRelay<[DiaryDataModel]>()
+    private let pushDiaryView = PublishRelay<DiaryInfo>()
     private let itemIndexRelay = PublishRelay<Int>()
     
     func transform(input: Input) -> Output {
@@ -53,21 +54,14 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
             .disposed(by: disposeBag)
         
         itemIndexRelay
-            .distinctUntilChanged()
             .withUnretained(self)
-            .compactMap { owner, index -> String? in
-                return owner.searchItemId(index)
+            .compactMap { owner, index -> DiaryInfo? in
+                guard let data = owner.searchItemId(index) else { return nil }
+                return (data.diaryTitle, data.diaryId)
             }
-            .flatMap { [weak self] id -> Single<[QueryDocumentSnapshot]> in
-                guard let self else { return .just([]) }
-                return self.fetchDiaryData(id)
-            }
-            .compactMap { [weak self] query -> [DiaryDataModel]? in
-                self?.mappingQueryDataToDiaryData(query)
-            }
-            .asSignal(onErrorJustReturn: [])
-            .emit { [weak self] data in
-                self?.pushDiaryView.accept(data)
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { [weak self] diaryInfo in
+                self?.pushDiaryView.accept(diaryInfo)
             }
             .disposed(by: disposeBag)
         
@@ -87,7 +81,8 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
             .disposed(by: disposeBag)
         
         return Output(sections: sections,
-                      pushDiaryView: pushDiaryView)
+                      pushDiaryView: pushDiaryView
+        )
     }
 }
 
@@ -137,14 +132,14 @@ private extension DiaryListViewModel {
         return data
     }
     
-    func searchItemId(_ index: Int) -> String? {
+    func searchItemId(_ index: Int) -> DiaryListDataModel? {
         guard let items = sections.value.first?.items,
               index < items.count
         else { return nil }
         
         let item = items[index]
         
-        return item.diaryId
+        return item
     }
     
 }
