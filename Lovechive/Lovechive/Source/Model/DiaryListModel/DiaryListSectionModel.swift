@@ -33,7 +33,7 @@ struct DiaryListSection: AnimatableSectionModelType {
 
 // MARK: - DiaryViewController DataSource
 
-extension DiaryViewController {
+extension DiaryListViewController {
     typealias DataSource = RxCollectionViewSectionedAnimatedDataSource<DiaryListSection>
     
     var dataSource: DataSource {
