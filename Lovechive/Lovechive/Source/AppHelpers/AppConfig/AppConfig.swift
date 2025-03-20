@@ -121,5 +121,7 @@ enum AppConfig {
     enum DiaryConfig {
         static let cellId = "DiaryListCell"
         static let infoMessage = "아직 다이어리가 없습니다.\n다이어리를 만들어 연인과 공유해 보세요!"
+        static let tableCellId = "DiaryTableCell"
+        static let collectionCellId = "collectionCellId"
     }
 }
