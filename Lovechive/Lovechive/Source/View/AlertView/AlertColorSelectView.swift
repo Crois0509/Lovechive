@@ -27,6 +27,17 @@ final class AlertColorSelectView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func configureColor(_ colorName: String) {
+        let index = AlertColorSetModel.allCases.enumerated().map { index, model in
+            if model.sendColorName == colorName {
+                return index
+            } else {
+                return -1
+            }
+        }.filter { $0 != -1 }.first ?? 0
+        
+        colorButtonTapped.accept(index)
+    }
 }
 
 // MARK: - UI Setting Method
