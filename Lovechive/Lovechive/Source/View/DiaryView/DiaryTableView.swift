@@ -37,7 +37,7 @@ private extension DiaryTableView {
     }
     
     func configureSelf() {
-        backgroundColor = .clear
+        backgroundColor = .Personal.backgroundPink
         addSubview(tableView)
     }
     
