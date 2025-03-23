@@ -58,8 +58,15 @@ private extension DiaryListViewController {
             .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())
             .emit { owner, diaryInfo in
-                debugPrint("\(diaryInfo.title) 선택 됨")
-                let diaryVC = DiaryViewController(diaryInfo.title, diaryInfo.id)
+                debugPrint("\(diaryInfo.diaryTitle) 선택 됨")
+                
+                let diaryVC = DiaryViewController(diaryInfo)
+                let dismissSignal = diaryVC.rx.deallocated
+                
+                diaryVC.rx.updateDiaryData.take(until: dismissSignal)
+                    .bind(to: self.fetchTrigger)
+                    .disposed(by: self.disposeBag)
+                
                 owner.navigationController?.pushViewController(diaryVC, animated: true)
             }
             .disposed(by: disposeBag)
