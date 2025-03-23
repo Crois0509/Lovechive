@@ -37,7 +37,7 @@ final class LovechiveAlertView: UIView {
         
         [
             AlertTextFieldView(type: .limit(value: 10), placeHolder: "다이어리 제목"),
-            AlertTextFieldView(type: .limit(value: 20), placeHolder: "다이어리 설명"),
+            AlertTextFieldView(type: .limit(value: 15), placeHolder: "다이어리 설명"),
             AlertColorSelectView()
         ],
         
@@ -171,7 +171,16 @@ private extension LovechiveAlertView {
             firstView.configureTextField(data.date.formattedDateToString(.hourMinute))
             secondView.configureTextField(data.title)
             
-        case .editDiary: break
+        case .editDiary(data: let data):
+            let section = sections[1]
+            guard let firstView = section[0] as? AlertTextFieldView,
+                  let secondView = section[1] as? AlertTextFieldView,
+                  let thirdView = section[2] as? AlertColorSelectView
+            else { return }
+            
+            firstView.configureTextField(data.diaryTitle)
+            secondView.configureTextField(data.diarySubTitle)
+            thirdView.configureColor(data.diaryColor)
             
         case .editMyPage(user: let user, couple: let couple):
             let section = sections[2]
