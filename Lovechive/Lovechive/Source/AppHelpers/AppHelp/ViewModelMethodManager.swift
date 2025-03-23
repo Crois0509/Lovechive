@@ -17,10 +17,14 @@ class ViewModelMethodManager: AnyObject {
     /// - Parameter type: 호출할 Alert의 타입
     /// - Returns: 데이터 저장 성공 여부를 담은 옵저버블
     func showAlertView(type: AlertTypes) -> PublishRelay<Bool> {
-        let vc = AppHelpers.getTopViewController()
+        guard let vc = AppHelpers.getTopViewController(),
+              vc.children.last as? LovechiveAlertViewController == nil
+        else { return .init() }
+        
         let alert = LovechiveAlertViewController(type: type)
-        vc?.addChild(alert)
-        vc?.view.addSubview(alert.view)
+        
+        vc.addChild(alert)
+        vc.view.addSubview(alert.view)
         alert.view.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
@@ -31,7 +35,7 @@ class ViewModelMethodManager: AnyObject {
     
     /// 커스텀 Alert 뷰를 dismiss 시키는 메소드
     func dismissAlertView() {
-        guard let topView = AppHelpers.getTopViewController() as? MainViewController,
+        guard let topView = AppHelpers.getTopViewController(),
               let alert = topView.children.last as? LovechiveAlertViewController
         else { return }
         
@@ -81,13 +85,11 @@ class ViewModelMethodManager: AnyObject {
             
             return FirestoreManager.shared.saveToFirestore(scheduleData, type: .schedule(id: scheduleData.id))
             
-        case .newDiary:
+        case .newDiary, .editDiary:
             guard let diaryData = data.first as? DiaryListDataModel else { return .error(NSError(domain: "❌ 타입 변환 실패", code: 0)) }
             
             return FirestoreManager.shared.saveToFirestore(diaryData, type: .diary(id: diaryData.diaryId))
-            
-        case .editDiary: return .just(false)
-            
+                        
         case .editMyPage:
             guard let userData = data.first as? UserDataModel,
                   let coupleData = data.last as? CoupleDataModel
