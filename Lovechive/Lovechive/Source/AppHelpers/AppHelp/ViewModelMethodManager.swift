@@ -30,6 +30,9 @@ class ViewModelMethodManager: AnyObject {
         }
         alert.didMove(toParent: vc)
         
+        vc.navigationItem.rightBarButtonItem?.isEnabled = false
+        vc.navigationItem.hidesBackButton = true
+        
         return alert.rx.dataSavedRelay
     }
     
@@ -44,6 +47,9 @@ class ViewModelMethodManager: AnyObject {
             alert.view.removeFromSuperview()
             alert.removeFromParent()
         }
+        
+        topView.navigationItem.rightBarButtonItem?.isEnabled = true
+        topView.navigationItem.hidesBackButton = false
     }
     
     /// 키보드의 유무에 따라 커스텀 Alert 뷰의 위치를 변화 시키는 메소드

@@ -16,6 +16,7 @@ final class DiaryViewController: UIViewController {
     
     private let collectionView = DiaryCollectionView()
     private let tableView = DiaryTableView()
+    private let infoLabel = UILabel()
     private let addButton = FloatingButton()
     
     private var disposeBag = DisposeBag()
@@ -109,6 +110,7 @@ final class DiaryViewController: UIViewController {
 private extension DiaryViewController {
     
     func setupUI() {
+        setupInfoLabel()
         setupNavigationRightButton()
         configureSelf()
         setupLayout()
@@ -125,7 +127,7 @@ private extension DiaryViewController {
     func configureSelf() {
         view.backgroundColor = .Personal.backgroundPink
         navigationController?.navigationBar.tintColor = .Personal.deepPink
-        [tableView, collectionView, addButton].forEach {
+        [tableView, collectionView, infoLabel, addButton].forEach {
             view.addSubview($0)
         }
     }
@@ -141,6 +143,11 @@ private extension DiaryViewController {
             $0.bottom.horizontalEdges.equalToSuperview()
         }
         
+        infoLabel.snp.makeConstraints {
+            $0.top.equalTo(view.safeAreaLayoutGuide)
+            $0.bottom.horizontalEdges.equalToSuperview()
+        }
+        
         addButton.snp.makeConstraints {
             $0.trailing.equalToSuperview().inset(16)
             $0.bottom.equalToSuperview().inset(30)
@@ -150,6 +157,15 @@ private extension DiaryViewController {
     
     func setupNavigationRightButton() {
         navigationItem.rightBarButtonItem = UIBarButtonItem(image: .Icon.naviSettings, style: .done, target: self, action: nil)
+    }
+    
+    func setupInfoLabel() {
+        infoLabel.text = "아직 추가된 일기가 없습니다."
+        infoLabel.font = .myoyaFont(24)
+        infoLabel.textColor = .Gray.unSelected
+        infoLabel.numberOfLines = 2
+        infoLabel.textAlignment = .center
+        infoLabel.backgroundColor = .clear
     }
     
     func createdNavigationTitle(_ title: String) {
@@ -197,6 +213,17 @@ private extension DiaryViewController {
         
         output.sections
             .bind(to: collectionView.collectionView.rx.items(dataSource: collectionDataSource))
+            .disposed(by: disposeBag)
+        
+        output.sections
+            .asDriver(onErrorJustReturn: [])
+            .drive { [weak self] data in
+                guard let self else { return }
+                let isEmpty = data.isEmpty
+                self.infoLabel.isHidden = !isEmpty
+                self.tableView.isHidden = isEmpty
+                self.collectionView.isHidden = isEmpty
+            }
             .disposed(by: disposeBag)
         
         output.pushDiaryPage
