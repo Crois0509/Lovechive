@@ -12,7 +12,6 @@ import RxCocoa
 import FirebaseFirestore
 
 final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
-    typealias DiaryInfo = (title: String, id: String)
     
     struct Input {
         let fetchTrigger: PublishRelay<Void>
@@ -22,13 +21,13 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
     
     struct Output {
         let sections: BehaviorRelay<[DiaryListSection]>
-        let pushDiaryView: PublishRelay<DiaryInfo>
+        let pushDiaryView: PublishRelay<DiaryListDataModel>
     }
     
     private var disposeBag = DisposeBag()
     
     private let sections = BehaviorRelay<[DiaryListSection]>(value: [])
-    private let pushDiaryView = PublishRelay<DiaryInfo>()
+    private let pushDiaryView = PublishRelay<DiaryListDataModel>()
     private let itemIndexRelay = PublishRelay<Int>()
     
     func transform(input: Input) -> Output {
@@ -55,9 +54,9 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
         
         itemIndexRelay
             .withUnretained(self)
-            .compactMap { owner, index -> DiaryInfo? in
+            .compactMap { owner, index -> DiaryListDataModel? in
                 guard let data = owner.searchItemId(index) else { return nil }
-                return (data.diaryTitle, data.diaryId)
+                return data
             }
             .asSignal(onErrorSignalWith: .empty())
             .emit { [weak self] diaryInfo in
