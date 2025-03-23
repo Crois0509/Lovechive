@@ -12,7 +12,7 @@ enum AlertTypes {
     case newSchedule(date: Date)
     case editSchedule(data: ScheduleDataModel)
     case newDiary
-    case editDiary
+    case editDiary(data: DiaryListDataModel)
     case editMyPage(user: UserDataModel, couple: CoupleDataModel)
     
     /// Alert의 타이틀 뷰 텍스트
