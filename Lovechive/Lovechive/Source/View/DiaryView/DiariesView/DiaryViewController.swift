@@ -111,7 +111,6 @@ private extension DiaryViewController {
     
     func setupUI() {
         setupInfoLabel()
-        setupNavigationRightButton()
         configureSelf()
         setupLayout()
         bind()
@@ -126,7 +125,9 @@ private extension DiaryViewController {
     
     func configureSelf() {
         view.backgroundColor = .Personal.backgroundPink
+        navigationItem.title = ""
         navigationController?.navigationBar.tintColor = .Personal.deepPink
+        navigationItem.rightBarButtonItem = UIBarButtonItem(image: .Icon.naviSettings, style: .done, target: self, action: nil)
         [tableView, collectionView, infoLabel, addButton].forEach {
             view.addSubview($0)
         }
@@ -153,10 +154,6 @@ private extension DiaryViewController {
             $0.bottom.equalToSuperview().inset(30)
             $0.width.height.equalTo(72)
         }
-    }
-    
-    func setupNavigationRightButton() {
-        navigationItem.rightBarButtonItem = UIBarButtonItem(image: .Icon.naviSettings, style: .done, target: self, action: nil)
     }
     
     func setupInfoLabel() {
@@ -198,6 +195,7 @@ private extension DiaryViewController {
     func bind() {
         let input = DiaryViewModel.Input(fetchTrigger: fetchTrigger,
                                          settingButtonTapped: navigationItem.rightBarButtonItem!.rx.tap,
+                                         addButtonTapped: addButton.rx.tap,
                                          tableItemSelected: tableView.tableView.rx.itemSelected,
                                          collectionItemSelected: collectionView.collectionView.rx.itemSelected
         )
@@ -231,6 +229,26 @@ private extension DiaryViewController {
             .asSignal(onErrorSignalWith: .empty())
             .emit { owner, data in
                 debugPrint("다이어리 선택됨", data.title)
+                guard let titleView = owner.navigationItem.titleView as? UILabel,
+                      let title = titleView.text
+                else { return }
+                
+                let editDiaryVC = EditDiaryViewController(title)
+                editDiaryVC.configureDiary(data)
+                owner.navigationController?.pushViewController(editDiaryVC, animated: true)
+            }
+            .disposed(by: disposeBag)
+        
+        output.pushNewDiary
+            .withUnretained(self)
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { owner, _ in
+                guard let titleView = owner.navigationItem.titleView as? UILabel,
+                      let title = titleView.text
+                else { return }
+                
+                let editDiaryVC = EditDiaryViewController(title)
+                owner.navigationController?.pushViewController(editDiaryVC, animated: true)
             }
             .disposed(by: disposeBag)
         

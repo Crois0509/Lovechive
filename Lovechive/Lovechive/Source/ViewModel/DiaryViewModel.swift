@@ -15,6 +15,7 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
     struct Input {
         let fetchTrigger: PublishRelay<Void>
         let settingButtonTapped: ControlEvent<Void>
+        let addButtonTapped: ControlEvent<Void>
         let tableItemSelected: ControlEvent<IndexPath>
         let collectionItemSelected: ControlEvent<IndexPath>
     }
@@ -24,6 +25,7 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
         let pushDiaryPage: PublishRelay<DiaryDataModel>
         let sortMethodRelay: BehaviorRelay<DiaryState>
         let fetchDiaryTitle: PublishRelay<String>
+        let pushNewDiary: PublishRelay<Void>
     }
     
     private var disposeBag = DisposeBag()
@@ -34,6 +36,7 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
     private let pushDiaryPage = PublishRelay<DiaryDataModel>()
     private let sortMethodRelay = BehaviorRelay<DiaryState>(value: .table)
     private let fetchDiaryTitle = PublishRelay<String>()
+    private let pushNewDiary = PublishRelay<Void>()
     
     init(_ diaryData: DiaryListDataModel) {
         self.diaryId = diaryData.diaryId
@@ -90,10 +93,15 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
             }
             .disposed(by: disposeBag)
         
+        input.addButtonTapped
+            .bind(to: pushNewDiary)
+            .disposed(by: disposeBag)
+        
         return Output(sections: sections,
                       pushDiaryPage: pushDiaryPage,
                       sortMethodRelay: sortMethodRelay,
-                      fetchDiaryTitle: fetchDiaryTitle
+                      fetchDiaryTitle: fetchDiaryTitle,
+                      pushNewDiary: pushNewDiary
         )
     }
 }
