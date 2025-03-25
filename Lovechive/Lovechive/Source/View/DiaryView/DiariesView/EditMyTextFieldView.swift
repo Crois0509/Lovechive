@@ -72,7 +72,7 @@ private extension EditMyTextFieldView {
         textField.snp.makeConstraints {
             $0.top.equalTo(titleView.snp.bottom).offset(4)
             $0.horizontalEdges.equalToSuperview()
-            $0.height.equalTo(120)
+            $0.height.greaterThanOrEqualTo(120)
             $0.bottom.equalToSuperview()
         }
         

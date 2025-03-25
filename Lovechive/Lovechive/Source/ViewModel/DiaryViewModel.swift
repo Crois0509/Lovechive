@@ -22,10 +22,10 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
 
     struct Output {
         let sections: BehaviorRelay<[DiariesSection]>
-        let pushDiaryPage: PublishRelay<DiaryDataModel>
+        let pushDiaryPage: PublishRelay<(data: DiaryDataModel, id: String)>
         let sortMethodRelay: BehaviorRelay<DiaryState>
         let fetchDiaryTitle: PublishRelay<String>
-        let pushNewDiary: PublishRelay<Void>
+        let pushNewDiary: PublishRelay<String>
     }
     
     private var disposeBag = DisposeBag()
@@ -33,10 +33,10 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
     private var diaryData: DiaryListDataModel
     
     private let sections = BehaviorRelay<[DiariesSection]>(value: [])
-    private let pushDiaryPage = PublishRelay<DiaryDataModel>()
+    private let pushDiaryPage = PublishRelay<(data: DiaryDataModel, id: String)>()
     private let sortMethodRelay = BehaviorRelay<DiaryState>(value: .table)
     private let fetchDiaryTitle = PublishRelay<String>()
-    private let pushNewDiary = PublishRelay<Void>()
+    private let pushNewDiary = PublishRelay<String>()
     
     init(_ diaryData: DiaryListDataModel) {
         self.diaryId = diaryData.diaryId
@@ -65,6 +65,9 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
             .compactMap { owner, indexPath -> DiaryDataModel? in
                 owner.searchItem(indexPath)
             }
+            .compactMap { [weak self] data in
+                return (data, self!.diaryId)
+            }
             .asSignal(onErrorSignalWith: .empty())
             .emit { [weak self] data in
                 self?.pushDiaryPage.accept(data)
@@ -75,6 +78,9 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
             .withUnretained(self)
             .compactMap { owner, indexPath -> DiaryDataModel? in
                 owner.searchItem(indexPath)
+            }
+            .compactMap { [weak self] data in
+                return (data, self!.diaryId)
             }
             .asSignal(onErrorSignalWith: .empty())
             .emit { [weak self] data in
@@ -94,6 +100,8 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
             .disposed(by: disposeBag)
         
         input.addButtonTapped
+            .withUnretained(self)
+            .map { owner, _ -> String in owner.diaryId }
             .bind(to: pushNewDiary)
             .disposed(by: disposeBag)
         
