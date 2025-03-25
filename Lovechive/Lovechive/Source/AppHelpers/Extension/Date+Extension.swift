@@ -16,6 +16,7 @@ extension Date {
         case yearMonth
         case monthDay
         case hourMinute
+        case day
         case fullTime
         
         var dateFormat: String {
@@ -30,6 +31,8 @@ extension Date {
                 return "M월 d일 일정"
             case .hourMinute:
                 return "a h시 m분"
+            case .day:
+                return "d일"
             case .fullTime:
                 return "yyyy년 M월 d일 a h시 m분"
             }

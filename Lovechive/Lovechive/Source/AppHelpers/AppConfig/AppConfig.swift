@@ -13,6 +13,7 @@ enum AppConfig {
     enum UserDefaultsConfig {
         static let userId: String = "userId"
         static let coupleId: String = "coupleId"
+        static let diaryId: String = "diaryId"
     }
     
     // MARK: - FirestoreModel에서 사용할 String 데이터
@@ -26,10 +27,17 @@ enum AppConfig {
     }
     
     enum DiariesModel {
-        static let id: String = "id"
-        static let author: String = "author"
-        static let content: String = "content"
+        static let diaryTitle: String = "diaryTitle"
+        static let diaryId: String = "diaryId"
+        static let diarySubTitle: String = "diarySubTitle"
+        static let diaryColor: String = "diaryColor"
+        static let diaryCreatedAt: String = "diaryCreatedAt"
         static let coupleId: String = "coupleId"
+        
+        static let id: String = "id"
+        static let title: String = "title"
+        static let createdBy: String = "createdBy"
+        static let content: String = "content"
         static let createdAt: String = "createdAt"
         static let image: String = "image"
     }
@@ -63,7 +71,7 @@ enum AppConfig {
     
     enum PlanerView {
         static let title: String = "다가오는 일정"
-        static let info: String = "아직 일정이 추가되지 않았어요"
+        static let info: String = "다가오는 일정이 없어요."
         static let cellId: String = "PlanViewCell"
     }
     
@@ -100,5 +108,20 @@ enum AppConfig {
         static let versionInfo = "앱 버전"
         static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         static let appstoreLink = "itms-apps://apps.apple.com/app/id6741835898"
+    }
+    
+    // MARK: - Lovechive Alert에서 쓰일 String 데이터
+    
+    enum LovechiveAlertConfig {
+        static let AlertSectionCell = "AlertSectionCell"
+    }
+    
+    // MARK: - DiaryView에서 쓰일 String 데이터
+    
+    enum DiaryConfig {
+        static let cellId = "DiaryListCell"
+        static let infoMessage = "아직 다이어리가 없습니다.\n다이어리를 만들어 연인과 공유해 보세요!"
+        static let tableCellId = "DiaryTableCell"
+        static let collectionCellId = "DiaryCollectionCell"
     }
 }

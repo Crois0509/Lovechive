@@ -23,7 +23,7 @@ final class MainViewController: UIViewController {
     private let pages: [UIViewController] = [
         MainPageViewController(),
         CalendarViewController(),
-        TestDiaryViewController(),
+        DiaryListViewController(),
         SettingViewController()
     ]
     
@@ -63,6 +63,7 @@ private extension MainViewController {
     }
     
     func configureSelf() {
+        navigationItem.title = ""
         view.backgroundColor = .white
         [backgroundView, logoView, tabBarView].forEach {
             view.addSubview($0)

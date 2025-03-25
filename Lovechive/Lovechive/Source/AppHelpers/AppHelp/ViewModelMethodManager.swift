@@ -17,21 +17,28 @@ class ViewModelMethodManager: AnyObject {
     /// - Parameter type: 호출할 Alert의 타입
     /// - Returns: 데이터 저장 성공 여부를 담은 옵저버블
     func showAlertView(type: AlertTypes) -> PublishRelay<Bool> {
-        let vc = AppHelpers.getTopViewController()
+        guard let vc = AppHelpers.getTopViewController(),
+              vc.children.last as? LovechiveAlertViewController == nil
+        else { return .init() }
+        
         let alert = LovechiveAlertViewController(type: type)
-        vc?.addChild(alert)
-        vc?.view.addSubview(alert.view)
+        
+        vc.addChild(alert)
+        vc.view.addSubview(alert.view)
         alert.view.snp.makeConstraints {
             $0.edges.equalToSuperview()
         }
         alert.didMove(toParent: vc)
+        
+        vc.navigationItem.rightBarButtonItem?.isEnabled = false
+        vc.navigationItem.hidesBackButton = true
         
         return alert.rx.dataSavedRelay
     }
     
     /// 커스텀 Alert 뷰를 dismiss 시키는 메소드
     func dismissAlertView() {
-        guard let topView = AppHelpers.getTopViewController() as? MainViewController,
+        guard let topView = AppHelpers.getTopViewController(),
               let alert = topView.children.last as? LovechiveAlertViewController
         else { return }
         
@@ -40,6 +47,9 @@ class ViewModelMethodManager: AnyObject {
             alert.view.removeFromSuperview()
             alert.removeFromParent()
         }
+        
+        topView.navigationItem.rightBarButtonItem?.isEnabled = true
+        topView.navigationItem.hidesBackButton = false
     }
     
     /// 키보드의 유무에 따라 커스텀 Alert 뷰의 위치를 변화 시키는 메소드
@@ -67,6 +77,10 @@ class ViewModelMethodManager: AnyObject {
         FirestoreManager.shared.readFromFirestore(type: type)
     }
     
+    func fetchDiaryData(_ id: String) -> Single<[QueryDocumentSnapshot]> {
+        FirestoreManager.shared.fetchDiaries(id)
+    }
+    
     /// FirestoreModelProtocol 데이터를 Firestore에 저장하는 메소드
     /// - Parameter data: 저장할 FirestoreModelProtocol 타입 데이터
     /// - Returns: 데이터 저장 성공 여부를 담은 옵저버블
@@ -77,8 +91,11 @@ class ViewModelMethodManager: AnyObject {
             
             return FirestoreManager.shared.saveToFirestore(scheduleData, type: .schedule(id: scheduleData.id))
             
-        case .newDiary, .editDiary: return .just(false)
+        case .newDiary, .editDiary:
+            guard let diaryData = data.first as? DiaryListDataModel else { return .error(NSError(domain: "❌ 타입 변환 실패", code: 0)) }
             
+            return FirestoreManager.shared.saveToFirestore(diaryData, type: .diary(id: diaryData.diaryId))
+                        
         case .editMyPage:
             guard let userData = data.first as? UserDataModel,
                   let coupleData = data.last as? CoupleDataModel

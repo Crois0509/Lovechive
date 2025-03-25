@@ -26,7 +26,6 @@ final class LovechiveAlertView: UIView {
     fileprivate let firstSectionTextFieldRelay = BehaviorRelay<String>(value: "")
     fileprivate let secondSectionTextFieldRelay = BehaviorRelay<String>(value: "")
     fileprivate let thirdSectionTextFieldRelay = BehaviorRelay<String>(value: "")
-    fileprivate let thirdSectionColorRelay = BehaviorRelay<String>(value: "")
     
     // MARK: - Properties
     
@@ -38,7 +37,8 @@ final class LovechiveAlertView: UIView {
         
         [
             AlertTextFieldView(type: .limit(value: 10), placeHolder: "다이어리 제목"),
-            AlertTextFieldView(type: .limit(value: 20), placeHolder: "다이어리 설명")
+            AlertTextFieldView(type: .limit(value: 15), placeHolder: "다이어리 설명"),
+            AlertColorSelectView()
         ],
         
         [
@@ -140,7 +140,7 @@ private extension LovechiveAlertView {
         sectionView.showsHorizontalScrollIndicator = false
         sectionView.showsVerticalScrollIndicator = false
         sectionView.dataSource = self
-        sectionView.register(AlertSectionCell.self, forCellWithReuseIdentifier: "AlertSectionCell")
+        sectionView.register(AlertSectionCell.self, forCellWithReuseIdentifier: AppConfig.LovechiveAlertConfig.AlertSectionCell)
     }
     
     func createdCollectionViewLayout(items: Int) -> UICollectionViewLayout {
@@ -171,7 +171,16 @@ private extension LovechiveAlertView {
             firstView.configureTextField(data.date.formattedDateToString(.hourMinute))
             secondView.configureTextField(data.title)
             
-        case .editDiary: break
+        case .editDiary(data: let data):
+            let section = sections[1]
+            guard let firstView = section[0] as? AlertTextFieldView,
+                  let secondView = section[1] as? AlertTextFieldView,
+                  let thirdView = section[2] as? AlertColorSelectView
+            else { return }
+            
+            firstView.configureTextField(data.diaryTitle)
+            secondView.configureTextField(data.diarySubTitle)
+            thirdView.configureColor(data.diaryColor)
             
         case .editMyPage(user: let user, couple: let couple):
             let section = sections[2]
@@ -193,8 +202,14 @@ private extension LovechiveAlertView {
                 view.rx.editingTextField.bind(to: self.firstSectionTextFieldRelay).disposed(by: disposeBag)
             } else if let view = section as? AlertTextFieldView, index == 1 {
                 view.rx.editingTextField.bind(to: self.secondSectionTextFieldRelay).disposed(by: disposeBag)
-            } else if let view = section as? AlertTextFieldView, index == 2 {
-                // 추후 구현
+            } else if let view = section as? AlertColorSelectView , index == 2 {
+                view.rx.colorButtonTapped
+                    .map { index -> String in
+                        let color = AlertColorSetModel.allCases[index]
+                        return color.sendColorName
+                    }
+                    .bind(to: self.thirdSectionTextFieldRelay)
+                    .disposed(by: disposeBag)
             }
             
             if let view = section as? AlertMyTextFieldView, index == 0 {
@@ -217,7 +232,7 @@ extension LovechiveAlertView: UICollectionViewDataSource {
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: "AlertSectionCell", for: indexPath) as? AlertSectionCell else {
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: AppConfig.LovechiveAlertConfig.AlertSectionCell, for: indexPath) as? AlertSectionCell else {
             return UICollectionViewCell()
         }
         
@@ -261,10 +276,5 @@ extension Reactive where Base: LovechiveAlertView {
     /// 세 번째 섹션의 TextField 변경 이벤트를 방출하는 옵저버블
     var thirdSectionTextFieldRelay: BehaviorRelay<String> {
         return base.thirdSectionTextFieldRelay
-    }
-    
-    /// 세 번째 섹션의 색상 변경 이벤트를 방출하는 옵저버블
-    var thirdSectionColorRelay: BehaviorRelay<String> {
-        return base.thirdSectionColorRelay
     }
 }

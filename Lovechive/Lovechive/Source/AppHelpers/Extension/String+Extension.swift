@@ -5,13 +5,14 @@
 //  Created by 장상경 on 3/13/25.
 //
 
-import Foundation
+import UIKit
 
 extension String {
     
     enum StringFormatType {
         case fullTime
         case yearMonthDay
+        case yearMonth
         case hourMinute
         
         var stringFormat: String {
@@ -20,6 +21,8 @@ extension String {
                 return "yyyy년 M월 d일 a h시 m분"
             case .yearMonthDay:
                 return "yyyy년 M월 d일"
+            case .yearMonth:
+                return "yyyy년 M월"
             case .hourMinute:
                 return "a h시 m분"
             }
@@ -34,6 +37,10 @@ extension String {
         formatter.dateFormat = type.stringFormat
         
         return formatter.date(from: self) ?? Date()
+    }
+    
+    var transStringToColor: UIColor? {
+        return UIColor(named: self)
     }
     
 }

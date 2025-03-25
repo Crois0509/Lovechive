@@ -22,6 +22,11 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
             }
         }
         
+        if UserDefaults.standard.object(forKey: "정렬 방법") == nil {
+            UserDefaults.standard.set("List", forKey: "정렬 방법")
+        } else if UserDefaults.standard.object(forKey: "정렬 순서") == nil {
+            UserDefaults.standard.set("최신순", forKey: "정렬 순서")
+        }
         return true
     }
 
