@@ -281,6 +281,15 @@ private extension DiaryViewController {
                 owner.updateDiaryData.accept(())
             }
             .disposed(by: disposeBag)
+        
+        output.dismissDiaryView
+            .withUnretained(self)
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { owner, _ in
+                owner.updateDiaryData.accept(())
+                owner.navigationController?.popViewController(animated: true)
+            }
+            .disposed(by: disposeBag)
     }
 }
 

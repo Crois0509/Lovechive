@@ -92,6 +92,10 @@ extension Reactive where Base: DiarySettingAlertViewController {
         base.alertView.rx.editButtonTapped
     }
     
+    var deleteButtonTapped: ControlEvent<Void> {
+        base.alertView.rx.deleteButtonTapped
+    }
+    
     var changedSortValue: BehaviorRelay<String> {
         base.alertView.rx.changedSortMethod
     }

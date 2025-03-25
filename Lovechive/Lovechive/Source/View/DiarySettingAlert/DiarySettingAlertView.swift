@@ -16,6 +16,7 @@ final class DiarySettingAlertView: UIView {
     fileprivate let cancelButton = UIButton()
     
     fileprivate let editButton = LabelButton(title: "편집하기")
+    fileprivate let deleteButton = LabelButton(title: "삭제하기")
     fileprivate let sortButton = MenuButton(title: "정렬 방법", menus: ["List", "Collection"])
     fileprivate let sortOrderButton = MenuButton(title: "정렬 순서", menus: ["최신순", "오래된순"])
     
@@ -45,7 +46,7 @@ private extension DiarySettingAlertView {
     func configureSelf() {
         backgroundColor = .white
         layer.cornerRadius = 16
-        [titleView, cancelButton, editButton, sortButton, sortOrderButton].forEach {
+        [titleView, cancelButton, editButton, deleteButton, sortButton, sortOrderButton].forEach {
             addSubview($0)
         }
     }
@@ -68,8 +69,14 @@ private extension DiarySettingAlertView {
             $0.height.equalTo(24)
         }
         
-        sortButton.snp.makeConstraints {
+        deleteButton.snp.makeConstraints {
             $0.top.equalTo(editButton.snp.bottom).offset(16)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(24)
+        }
+        
+        sortButton.snp.makeConstraints {
+            $0.top.equalTo(deleteButton.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(24)
         }
@@ -109,6 +116,10 @@ extension Reactive where Base: DiarySettingAlertView {
     
     var editButtonTapped: ControlEvent<Void> {
         base.editButton.rx.tap
+    }
+    
+    var deleteButtonTapped: ControlEvent<Void> {
+        base.deleteButton.rx.tap
     }
     
     var changedSortMethod: BehaviorRelay<String> {

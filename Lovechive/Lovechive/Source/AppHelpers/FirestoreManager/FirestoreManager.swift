@@ -178,7 +178,7 @@ final class FirestoreManager {
     
     /// Firestore의 데이터를 삭제하는 메소드
     /// - Parameter type: 삭제할 데이터 타입
-    func deleteFromFirestore(type: FirestoreDataTypes) -> Single<Void> {
+    func deleteFromFirestore(type: FirestoreDataTypes) -> Single<Bool> {
         return Single.create { single in
             let collectionRef = self.db.collection(type.typeName)
             var documentRef: DocumentReference
@@ -213,7 +213,7 @@ final class FirestoreManager {
                     single(.failure(error))
                 } else {
                     debugPrint("✅ \(type.typeName) 데이터 삭제 성공")
-                    single(.success(()))
+                    single(.success(true))
                 }
             }
             

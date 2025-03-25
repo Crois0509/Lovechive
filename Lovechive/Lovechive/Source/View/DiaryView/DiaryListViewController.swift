@@ -64,8 +64,8 @@ private extension DiaryListViewController {
                 let dismissSignal = diaryVC.rx.deallocated
                 
                 diaryVC.rx.updateDiaryData.take(until: dismissSignal)
-                    .bind(to: self.fetchTrigger)
-                    .disposed(by: self.disposeBag)
+                    .bind(to: owner.fetchTrigger)
+                    .disposed(by: owner.disposeBag)
                 
                 owner.navigationController?.pushViewController(diaryVC, animated: true)
             }

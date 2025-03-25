@@ -27,6 +27,7 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
         let sortMethodRelay: BehaviorRelay<DiaryState>
         let fetchDiaryTitle: PublishRelay<String>
         let pushNewDiary: PublishRelay<String>
+        let dismissDiaryView: PublishRelay<Void>
     }
     
     private var disposeBag = DisposeBag()
@@ -39,6 +40,7 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
     private let sortMethodRelay = BehaviorRelay<DiaryState>(value: .table)
     private let fetchDiaryTitle = PublishRelay<String>()
     private let pushNewDiary = PublishRelay<String>()
+    private let dismissDiaryView = PublishRelay<Void>()
     
     init(_ diaryData: DiaryListDataModel) {
         self.diaryId = diaryData.diaryId
@@ -139,7 +141,8 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
                       pushDiaryPage: pushDiaryPage,
                       sortMethodRelay: sortMethodRelay,
                       fetchDiaryTitle: fetchDiaryTitle,
-                      pushNewDiary: pushNewDiary
+                      pushNewDiary: pushNewDiary,
+                      dismissDiaryView: dismissDiaryView
         )
     }
 }
@@ -286,6 +289,27 @@ private extension DiaryViewModel {
             .emit { [weak self] data in
                 debugPrint("✅ 다이어리 데이터 편집 성공")
                 self?.fetchDiaryTitle.accept(data.diaryTitle)
+            }
+            .disposed(by: disposeBag)
+        
+        alert.rx.deleteButtonTapped.take(until: dismissSignal)
+            .withUnretained(self)
+            .flatMapLatest { owner, _ in
+                return owner.alert.showAlert(.alert)
+                    .filter { $0 }
+            }
+            .flatMap { [weak self] _ -> Single<Bool> in
+                guard let self else { return .just(false) }
+                return FirestoreManager.shared.deleteFromFirestore(type: .diary(id: self.diaryId))
+            }
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { [weak self] isSuccess in
+                if isSuccess {
+                    self?.dismissSettingAlertView()
+                    self?.dismissDiaryView.accept(())
+                } else {
+                    debugPrint("🚨 다이어리 삭제 실패")
+                }
             }
             .disposed(by: disposeBag)
         
