@@ -192,6 +192,19 @@ private extension DiaryViewController {
         }
     }
     
+    func pushDiariesView(type: DiaryViewState, id: String) -> Observable<Void> {
+        guard let titleView = navigationItem.titleView as? UILabel,
+              let title = titleView.text
+        else { return .empty() }
+        
+        let editDiaryVC = EditDiaryViewController(title, type, id)
+        navigationController?.pushViewController(editDiaryVC, animated: true)
+        
+        let dismissSignal = editDiaryVC.rx.deallocated
+        
+        return editDiaryVC.rx.diarySavedIsSuccess.take(until: dismissSignal)
+    }
+    
     func bind() {
         let input = DiaryViewModel.Input(fetchTrigger: fetchTrigger,
                                          settingButtonTapped: navigationItem.rightBarButtonItem!.rx.tap,
@@ -226,29 +239,24 @@ private extension DiaryViewController {
         
         output.pushDiaryPage
             .withUnretained(self)
+            .flatMap { owner, data in
+                debugPrint("다이어리 선택됨", data.data.title)
+                return owner.pushDiariesView(type: .view(data: data.data), id: data.id)
+            }
             .asSignal(onErrorSignalWith: .empty())
-            .emit { owner, data in
-                debugPrint("다이어리 선택됨", data.title)
-                guard let titleView = owner.navigationItem.titleView as? UILabel,
-                      let title = titleView.text
-                else { return }
-                
-                let editDiaryVC = EditDiaryViewController(title)
-                editDiaryVC.configureDiary(data)
-                owner.navigationController?.pushViewController(editDiaryVC, animated: true)
+            .emit { [weak self] _ in
+                self?.fetchTrigger.accept(())
             }
             .disposed(by: disposeBag)
         
         output.pushNewDiary
             .withUnretained(self)
+            .flatMap { owner, id in
+                return owner.pushDiariesView(type: .edit(data: nil), id: id)
+            }
             .asSignal(onErrorSignalWith: .empty())
-            .emit { owner, _ in
-                guard let titleView = owner.navigationItem.titleView as? UILabel,
-                      let title = titleView.text
-                else { return }
-                
-                let editDiaryVC = EditDiaryViewController(title)
-                owner.navigationController?.pushViewController(editDiaryVC, animated: true)
+            .emit { [weak self] _ in
+                self?.fetchTrigger.accept(())
             }
             .disposed(by: disposeBag)
         
