@@ -37,13 +37,13 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
             .flatMap { owner, _ -> Single<[QueryDocumentSnapshot]> in
                 owner.fetchData(.diary(id: ""))
             }
-            .compactMap { [weak self] query -> DiaryListSection? in
-                guard let self else { return nil }
+            .map { [weak self] query -> [DiaryListSection] in
+                guard let self else { return [] }
                 return self.mappingQueryDataToDiaryListData(query)
             }
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] data in
-                self?.sections.accept([data])
+                self?.sections.accept(data)
             }
             .disposed(by: disposeBag)
         
@@ -90,7 +90,7 @@ private extension DiaryListViewModel {
     /// Query 데이터를 DiaryListSection 타입으로 가공하는 메소드
     /// - Parameter data: Query 데이터
     /// - Returns: 변환된 DiaryListSection 데이터 배열
-    func mappingQueryDataToDiaryListData(_ data: [QueryDocumentSnapshot]) -> DiaryListSection? {
+    func mappingQueryDataToDiaryListData(_ data: [QueryDocumentSnapshot]) -> [DiaryListSection] {
         let data = data.compactMap { data -> DiaryListDataModel? in
             let item = DiaryListDataModel(coupleId: data.data()[AppConfig.DiariesModel.coupleId] as? String ?? "",
                                           diaryId: data.data()[AppConfig.DiariesModel.diaryId] as? String ?? "",
@@ -109,12 +109,12 @@ private extension DiaryListViewModel {
         })
         
         if data.isEmpty {
-            return nil
+            return []
         }
         
         let section = DiaryListSection(items: data)
         
-        return section
+        return [section]
     }
     
     /// Query 데이터를 DiaryDataModel 타입으로 가공하는 메소드
