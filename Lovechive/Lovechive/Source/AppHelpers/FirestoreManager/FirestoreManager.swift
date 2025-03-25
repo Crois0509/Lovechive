@@ -43,6 +43,26 @@ final class FirestoreManager {
         }
     }
     
+    func saveDiaries(_ data: DiaryDataModel, _ documentId: String, _ dataId: String) -> Single<Bool> {
+        return Single.create { single in
+            
+            let collectionRef = self.db.collection("diaries").document(documentId).collection("Diaries")
+            let documentRef: DocumentReference = collectionRef.document(dataId)
+            
+            documentRef.setData(data.transform()) { error in
+                if let error {
+                    debugPrint("❌ 다이어리 데이터 저장 실패: \(error.localizedDescription)")
+                    single(.failure(error))
+                } else {
+                    debugPrint("✅ 다이어리 데이터 저장 성공: \(data.transform().values)")
+                    single(.success(true))
+                }
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
     /// Firestore에 저장/업데이트를 실행하는 메소드
     /// - Parameters:
     ///   - data: 저장/업데이트 할 데이터
