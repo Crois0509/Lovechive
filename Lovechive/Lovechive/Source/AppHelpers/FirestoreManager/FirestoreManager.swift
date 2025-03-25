@@ -156,6 +156,26 @@ final class FirestoreManager {
         }
     }
     
+    func deletedDiaries(_ documentId: String, _ dataId: String) -> Single<Bool> {
+        return Single.create { single in
+            
+            let collectionRef = self.db.collection("diaries").document(documentId).collection("Diaries")
+            let documentRef: DocumentReference = collectionRef.document(dataId)
+            
+            documentRef.delete { error in
+                if let error {
+                    debugPrint("❌ 다이어리 데이터 삭제 실패: \(error.localizedDescription)")
+                    single(.failure(error))
+                } else {
+                    debugPrint("✅ 다이어리 데이터 삭제 성공")
+                    single(.success(true))
+                }
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
     /// Firestore의 데이터를 삭제하는 메소드
     /// - Parameter type: 삭제할 데이터 타입
     func deleteFromFirestore(type: FirestoreDataTypes) -> Single<Void> {
