@@ -71,6 +71,8 @@ final class DiaryViewController: UIViewController {
                 } else if dataSource.sectionModels[indexPath.section].items.count - 1 == indexPath.row {
                     cell.containerView.layer.cornerRadius = 16
                     cell.containerView.layer.maskedCorners = [.layerMinXMaxYCorner, .layerMaxXMaxYCorner]
+                } else {
+                    cell.containerView.layer.cornerRadius = 0
                 }
             }
             
