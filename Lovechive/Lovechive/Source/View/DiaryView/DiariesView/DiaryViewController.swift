@@ -22,6 +22,7 @@ final class DiaryViewController: UIViewController {
     private var disposeBag = DisposeBag()
     private var viewModel: DiaryViewModel
     private let fetchTrigger = PublishRelay<Void>()
+    private let diaryItemDelete = PublishRelay<IndexPath>()
     fileprivate let updateDiaryData = PublishRelay<Void>()
     
     var collectionDataSource: DataSource {
@@ -61,8 +62,9 @@ final class DiaryViewController: UIViewController {
             cell.configureCell(item.createdAt, item.title)
             cell.selectionStyle = .none
             
-            if dataSource.sectionModels[indexPath.section].items.count == 1 {
+            if dataSource.sectionModels[indexPath.section].items.count <= 1 {
                 cell.containerView.layer.cornerRadius = 16
+                cell.containerView.layer.maskedCorners = [.layerMinXMinYCorner, .layerMaxXMinYCorner, .layerMaxXMaxYCorner, .layerMinXMaxYCorner]
             } else {
                 if dataSource.sectionModels[indexPath.section].items.startIndex == indexPath.row {
                     cell.containerView.layer.cornerRadius = 16
@@ -212,7 +214,8 @@ private extension DiaryViewController {
                                          settingButtonTapped: navigationItem.rightBarButtonItem!.rx.tap,
                                          addButtonTapped: addButton.rx.tap,
                                          tableItemSelected: tableView.tableView.rx.itemSelected,
-                                         collectionItemSelected: collectionView.collectionView.rx.itemSelected
+                                         collectionItemSelected: collectionView.collectionView.rx.itemSelected,
+                                         diaryItemDelete: diaryItemDelete
         )
         
         let output = viewModel.transform(input: input)
@@ -307,6 +310,24 @@ extension DiaryViewController: UITableViewDelegate {
         }
         
         return headerView
+    }
+    
+    func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
+        return true // 모든 셀에서 삭제 가능하도록 설정
+    }
+    
+    func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        
+        let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
+            guard let self = self else { return }
+            
+            self.diaryItemDelete.accept(indexPath)
+            completion(true) // ✅ 삭제 후 애니메이션 적용
+        }
+        
+        deleteAction.backgroundColor = .red // 버튼 색상
+        
+        return UISwipeActionsConfiguration(actions: [deleteAction])
     }
     
 }
