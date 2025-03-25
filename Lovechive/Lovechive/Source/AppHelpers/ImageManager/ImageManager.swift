@@ -16,8 +16,9 @@ final class ImageManager {
     /// - Parameters:
     ///   - image: 저장할 이미지
     ///   - completion: 저장 완료 후에 실행할 액션
-    func saveImage(image: UIImage, completion: @escaping (String?) -> Void) {
-        guard let data = image.jpegData(compressionQuality: 0.7) ?? image.pngData(),
+    func saveImage(image: UIImage?, completion: @escaping (String?) -> Void) {
+        guard let image,
+              let data = image.jpegData(compressionQuality: 0.7) ?? image.pngData(),
               let directory = try? FileManager.default.url(for: .documentDirectory, in: .userDomainMask, appropriateFor: nil, create: false)
         else {
             completion(nil)
