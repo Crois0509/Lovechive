@@ -34,6 +34,15 @@ final class DiaryListViewController: UIViewController {
 
 private extension DiaryListViewController {
     
+    func pushDiariesView(_ data: DiaryListDataModel) -> Observable<Void> {
+        let diaryVC = DiaryViewController(data)
+        let dismissSignal = diaryVC.rx.deallocated
+        
+        navigationController?.pushViewController(diaryVC, animated: true)
+        
+        return diaryVC.rx.updateDiaryData.take(until: dismissSignal)
+    }
+    
     func bind() {
         let input = DiaryListViewModel.Input(fetchTrigger: fetchTrigger,
                                              itemSelected: diaryListView.collectionView.rx.itemSelected,
@@ -47,27 +56,24 @@ private extension DiaryListViewController {
             .disposed(by: disposeBag)
         
         output.sections
-            .asDriver(onErrorJustReturn: [])
-            .drive { [weak self] items in
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, items in
                 let itemIsEmpty = items.isEmpty
-                self?.diaryListView.setInfoLabelHidden(itemIsEmpty)
+                debugPrint(itemIsEmpty, items.count)
+                owner.diaryListView.setInfoLabelHidden(itemIsEmpty)
             }
             .disposed(by: disposeBag)
         
         output.pushDiaryView
             .withUnretained(self)
-            .asSignal(onErrorSignalWith: .empty())
-            .emit { owner, diaryInfo in
+            .flatMap { owner, diaryInfo in
                 debugPrint("\(diaryInfo.diaryTitle) 선택 됨")
-                
-                let diaryVC = DiaryViewController(diaryInfo)
-                let dismissSignal = diaryVC.rx.deallocated
-                
-                diaryVC.rx.updateDiaryData.take(until: dismissSignal)
-                    .bind(to: owner.fetchTrigger)
-                    .disposed(by: owner.disposeBag)
-                
-                owner.navigationController?.pushViewController(diaryVC, animated: true)
+                return owner.pushDiariesView(diaryInfo)
+            }
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { [weak self] _ in
+                self?.fetchTrigger.accept(())
             }
             .disposed(by: disposeBag)
     }

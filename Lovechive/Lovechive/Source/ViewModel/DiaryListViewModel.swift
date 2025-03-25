@@ -37,11 +37,11 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
             .flatMap { owner, _ -> Single<[QueryDocumentSnapshot]> in
                 owner.fetchData(.diary(id: ""))
             }
-            .map { [weak self] query -> DiaryListSection in
-                guard let self else { return DiaryListSection(items: []) }
+            .compactMap { [weak self] query -> DiaryListSection? in
+                guard let self else { return nil }
                 return self.mappingQueryDataToDiaryListData(query)
             }
-            .asDriver(onErrorJustReturn: DiaryListSection(items: []))
+            .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] data in
                 self?.sections.accept([data])
             }
@@ -90,7 +90,7 @@ private extension DiaryListViewModel {
     /// Query 데이터를 DiaryListSection 타입으로 가공하는 메소드
     /// - Parameter data: Query 데이터
     /// - Returns: 변환된 DiaryListSection 데이터 배열
-    func mappingQueryDataToDiaryListData(_ data: [QueryDocumentSnapshot]) -> DiaryListSection {
+    func mappingQueryDataToDiaryListData(_ data: [QueryDocumentSnapshot]) -> DiaryListSection? {
         let data = data.compactMap { data -> DiaryListDataModel? in
             let item = DiaryListDataModel(coupleId: data.data()[AppConfig.DiariesModel.coupleId] as? String ?? "",
                                           diaryId: data.data()[AppConfig.DiariesModel.diaryId] as? String ?? "",
@@ -107,6 +107,10 @@ private extension DiaryListViewModel {
         }.sorted(by: {
             $0.diaryCreatedAt > $1.diaryCreatedAt
         })
+        
+        if data.isEmpty {
+            return nil
+        }
         
         let section = DiaryListSection(items: data)
         
