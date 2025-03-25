@@ -72,6 +72,8 @@ private extension DiaryCollectionCell {
         contentsView.snp.makeConstraints {
             $0.top.equalTo(titleView.snp.bottom).offset(8)
             $0.leading.equalTo(titleView)
+            $0.trailing.lessThanOrEqualToSuperview().inset(16)
+            $0.bottom.equalTo(diaryImageView).inset(14)
         }
     }
     
@@ -97,6 +99,7 @@ private extension DiaryCollectionCell {
         label.textColor = color
         label.textAlignment = .left
         label.backgroundColor = .clear
+        label.numberOfLines = 0
         
         return label
     }
