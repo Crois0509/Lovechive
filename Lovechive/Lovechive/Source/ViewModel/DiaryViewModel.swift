@@ -18,6 +18,7 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
         let addButtonTapped: ControlEvent<Void>
         let tableItemSelected: ControlEvent<IndexPath>
         let collectionItemSelected: ControlEvent<IndexPath>
+        let diaryItemDelete: PublishRelay<IndexPath>
     }
 
     struct Output {
@@ -29,6 +30,7 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
     }
     
     private var disposeBag = DisposeBag()
+    private let alert = AlertManager(title: "경고", message: "정말 삭제하시겠습니까?", cancelTitle: "취소", destructiveTitle: "삭제")
     private var diaryId: String
     private var diaryData: DiaryListDataModel
     
@@ -105,6 +107,34 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
             .bind(to: pushNewDiary)
             .disposed(by: disposeBag)
         
+        input.diaryItemDelete
+            .withUnretained(self)
+            .flatMapLatest { owner, indexPath in
+                return owner.alert.showAlert(.alert)
+                    .filter { $0 }
+                    .map { _ in indexPath }
+            }
+            .compactMap { [weak self] indexPath -> DiaryDataModel? in
+                guard let self else { return nil }
+                var section = sections.value
+                section[indexPath.section].items.remove(at: indexPath.row)
+                
+                return self.searchItem(indexPath)
+            }
+            .flatMap { [weak self] data -> Single<Bool> in
+                guard let self else { return .just(false) }
+                return FirestoreManager.shared.deletedDiaries(self.diaryId, data.id)
+            }
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { isSuccess in
+                if isSuccess {
+                    input.fetchTrigger.accept(())
+                } else {
+                    debugPrint("🚨 다이어리 데이터 삭제 실패")
+                }
+            }
+            .disposed(by: disposeBag)
+        
         return Output(sections: sections,
                       pushDiaryPage: pushDiaryPage,
                       sortMethodRelay: sortMethodRelay,
@@ -122,6 +152,8 @@ private extension DiaryViewModel {
     /// - Parameter data: Query 데이터
     /// - Returns: 변환된 DiaryDataModel 데이터 배열
     func mappingQueryDataToDiaryData(_ data: [QueryDocumentSnapshot]) -> [DiariesSection] {
+        let state: String = UserDefaults.standard.string(forKey: "정렬 순서") == nil ? "최신순" : UserDefaults.standard.string(forKey: "정렬 순서")!
+        
         let data = data.map {
             DiaryDataModel(id: $0.data()[AppConfig.DiariesModel.id] as? String ?? "",
                            title: $0.data()[AppConfig.DiariesModel.title] as? String ?? "",
@@ -130,8 +162,6 @@ private extension DiaryViewModel {
                            createdAt: ($0.data()[AppConfig.DiariesModel.createdAt] as? Timestamp)?.dateValue() ?? Date(),
                            createdBy: $0.data()[AppConfig.DiariesModel.createdBy] as? String ?? "")
         }.sorted(by: {
-            let state: String = UserDefaults.standard.string(forKey: "정렬 순서") == nil ? "최신순" : UserDefaults.standard.string(forKey: "정렬 순서")!
-            
             if state == "최신순" {
                 return $0.createdAt > $1.createdAt
             } else {
@@ -146,8 +176,6 @@ private extension DiaryViewModel {
         let section = groupingData.map { data in
             DiariesSection(header: data.key, items: data.value)
         }.sorted {
-            let state: String = UserDefaults.standard.string(forKey: "정렬 순서") == nil ? "최신순" : UserDefaults.standard.string(forKey: "정렬 순서")!
-            
             if state == "최신순" {
                 return $0.header.formattedStringToDate(.yearMonth) > $1.header.formattedStringToDate(.yearMonth)
             } else {

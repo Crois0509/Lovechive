@@ -32,6 +32,7 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
     private var disposeBag = DisposeBag()
     
     private let umd = UserDefaultsManager()
+    private let alert = AlertManager.init(title: "경고", message: "모든 내용을 입력해 주세요!!", cancelTitle: "확인")
     
     private var currentState: DiaryViewState
     private var diaryId: String
@@ -115,8 +116,18 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
             .compactMap { owner, data in
                 owner.mappingDiaryDataModel(data)
             }
+            .flatMapLatest { [weak self] data -> Observable<DiaryDataModel?> in
+                guard let self else { return .empty() }
+                let isEmpty = self.checkDataIsEmpty()
+                
+                if isEmpty {
+                    return self.alert.showAlert(.alert).map { _ in nil }
+                } else {
+                    return .just(data)
+                }
+            }
             .flatMap { [weak self] data -> Single<Bool> in
-                guard let self else { return .just(false) }
+                guard let self, let data else { return .just(false) }
                 return self.saveDiaryData(data)
             }
             .asSignal(onErrorJustReturn: false)
@@ -155,6 +166,19 @@ private extension EditDiaryViewModel {
     
     func saveDiaryData(_ data: DiaryDataModel) -> Single<Bool> {
         return FirestoreManager.shared.saveDiaries(data, diaryId, data.id)
+    }
+    
+    func checkDataIsEmpty() -> Bool {
+        guard let titleData,
+              let createdDate,
+              let contentData
+        else { return true }
+        
+        if titleData.isEmpty || contentData.isEmpty {
+            return true
+        } else {
+            return false
+        }
     }
     
     func mappingDiaryDataModel(_ data: DiaryDataModel?) -> DiaryDataModel? {

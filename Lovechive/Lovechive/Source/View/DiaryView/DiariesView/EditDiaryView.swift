@@ -45,10 +45,13 @@ final class EditDiaryView: UIView {
         guard let data else { return }
         let image = ImageManager.shared.loadImage(path: data.image)
         
-        imageView.image = image
         editDateView.configureTextField(data.createdAt.formattedDateToString(.yearMonthDay))
         titleView.configureTextField(data.title)
         contentsView.configureTextField(data.content)
+        
+        if let image {
+            setupImage(image)
+        }
     }
     
 }
