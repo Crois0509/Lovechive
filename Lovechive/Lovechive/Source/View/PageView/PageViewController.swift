@@ -20,11 +20,16 @@ final class PageViewController: UIPageViewController {
     
     // MARK: - Properties
     
-    private let pages: [UIViewController] = [
-        MainPageViewController(),
-        CalendarViewController(),
-        DiaryListViewController(),
-        SettingViewController()
+    fileprivate let mainPage = MainPageViewController()
+    fileprivate let calendar = CalendarViewController()
+    fileprivate let diary = DiaryListViewController()
+    fileprivate let setting = SettingViewController()
+    
+    private lazy var pages: [UIViewController] = [
+        mainPage,
+        calendar,
+        diary,
+        setting
     ]
     
     private var isScrolling: Bool = false
@@ -57,6 +62,10 @@ final class PageViewController: UIPageViewController {
             self.isScrolling = false
             completion()
         }
+    }
+    
+    func mainPageFetch() {
+        mainPage.fetch()
     }
 }
 
@@ -94,5 +103,17 @@ extension Reactive where Base: PageViewController {
     // 현재 페이지 인덱스를 이벤트로 전달
     var currentPage: PublishRelay<Int> {
         base.currentPageIndex
+    }
+    
+    var calendarDataRelay: PublishRelay<Void> {
+        base.calendar.rx.calendarDataRelay
+    }
+    
+    var diaryDataRelay: PublishRelay<Void> {
+        base.diary.rx.diaryDataRelay
+    }
+    
+    var settingDataRelay: PublishRelay<Void> {
+        base.setting.rx.settingDataRelay
     }
 }

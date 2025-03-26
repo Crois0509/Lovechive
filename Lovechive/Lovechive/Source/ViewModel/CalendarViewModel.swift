@@ -24,6 +24,7 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
         let selectedDate: BehaviorRelay<Date>
         let tableViewItemDeleted: ControlEvent<IndexPath>
         let tableViewItemEdited: ControlEvent<IndexPath>
+        let containerViewHeight: Observable<CGFloat>
     }
     
     struct Output {
@@ -31,6 +32,8 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
         let selectedDate: BehaviorRelay<Date>
         let scheduleSection: BehaviorRelay<[ScheduleModelSection]>
         let eventsRelay: BehaviorRelay<[Date]>
+        let scrollViewHeight: PublishRelay<CGFloat>
+        let editDataRelay: PublishRelay<Bool>
     }
     
     // MARK: - Properties
@@ -45,6 +48,8 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
     private let selectedDate = BehaviorRelay<Date>(value: Date())
     private let scheduleSection = BehaviorRelay<[ScheduleModelSection]>(value: [])
     private let eventsRelay = BehaviorRelay<[Date]>(value: [])
+    private let scrollViewHeight = PublishRelay<CGFloat>()
+    private let editDataRelay = PublishRelay<Bool>()
     
     /// input을 output으로 변환하는 메소드
     /// - Parameter input: input 데이터
@@ -124,11 +129,13 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
                 owner.showAlertView(type: .newSchedule(date: owner.selectedDate.value))
             }
             .asSignal(onErrorSignalWith: .empty())
-            .emit { isSuccess in
+            .emit { [weak self] isSuccess in
                 if isSuccess {
                     input.fetchTrigger.accept(())
+                    self?.editDataRelay.accept(isSuccess)
                 } else {
                     debugPrint("❌ 일정 추가 실패")
+                    self?.editDataRelay.accept(isSuccess)
                 }
             }
             .disposed(by: disposeBag)
@@ -142,8 +149,14 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
                 self!.showAlertView(type: .editSchedule(data: item))
             }
             .asSignal(onErrorSignalWith: .empty())
-            .emit { _ in
-                input.fetchTrigger.accept(())
+            .emit { [weak self] isSuccess in
+                if isSuccess {
+                    input.fetchTrigger.accept(())
+                    self?.editDataRelay.accept(isSuccess)
+                } else {
+                    debugPrint("❌ 캘린더 일정 수정 실패")
+                    self?.editDataRelay.accept(isSuccess)
+                }
             }
             .disposed(by: disposeBag)
         
@@ -160,15 +173,28 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
                 FirestoreManager.shared.deleteFromFirestore(type: .schedule(id: $0))
             }
             .asDriver(onErrorDriveWith: .empty())
-            .drive { _ in
-                input.fetchTrigger.accept(())
+            .drive { [weak self] isSuccess in
+                if isSuccess {
+                    input.fetchTrigger.accept(())
+                    self?.editDataRelay.accept(isSuccess)
+                } else {
+                    debugPrint("❌ 캘린더 일정 삭제 실패")
+                    self?.editDataRelay.accept(isSuccess)
+                }
             }
+            .disposed(by: disposeBag)
+        
+        input.containerViewHeight
+            .bind(to: scrollViewHeight)
             .disposed(by: disposeBag)
         
         return Output(changeCurrentDatePage: changeCurrentDatePage,
                       selectedDate: selectedDate,
                       scheduleSection: scheduleSection,
-                      eventsRelay: eventsRelay)
+                      eventsRelay: eventsRelay,
+                      scrollViewHeight: scrollViewHeight,
+                      editDataRelay: editDataRelay
+        )
     }
 }
 

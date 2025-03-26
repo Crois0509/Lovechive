@@ -44,6 +44,9 @@ final class ScheduleView: UIView {
         if isEmpty {
             infoLabel.isHidden = false
             scheduleTableView.isHidden = true
+            scheduleTableView.snp.updateConstraints {
+                $0.height.equalTo(28)
+            }
         } else {
             infoLabel.isHidden = true
             scheduleTableView.isHidden = false
@@ -90,13 +93,15 @@ private extension ScheduleView {
         
         infoLabel.snp.makeConstraints {
             $0.top.equalTo(titleView.snp.bottom).offset(8)
-            $0.bottom.horizontalEdges.equalToSuperview().inset(16)
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(28)
         }
         
         scheduleTableView.snp.makeConstraints {
             $0.top.equalTo(titleView.snp.bottom).offset(4)
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.height.equalTo(28)
+            $0.bottom.equalToSuperview().inset(16)
         }
     }
     

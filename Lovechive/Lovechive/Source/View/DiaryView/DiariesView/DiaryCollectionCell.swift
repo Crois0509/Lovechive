@@ -87,7 +87,7 @@ private extension DiaryCollectionCell {
     
     func setupImageView() {
         diaryImageView.image = .no
-        diaryImageView.contentMode = .scaleAspectFit
+        diaryImageView.contentMode = .scaleAspectFill
         diaryImageView.layer.cornerRadius = 8
         diaryImageView.clipsToBounds = true
         diaryImageView.backgroundColor = .clear

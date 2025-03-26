@@ -42,7 +42,7 @@ private extension SettingView {
     func configureSelf() {
         backgroundColor = .white
         layer.cornerRadius = 16
-        [tableView].forEach { addSubview($0) }
+        addSubview(tableView)
     }
     
     func setupLayout() {

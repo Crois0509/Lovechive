@@ -55,7 +55,7 @@ class ViewModelMethodManager: AnyObject {
     /// 키보드의 유무에 따라 커스텀 Alert 뷰의 위치를 변화 시키는 메소드
     /// - Parameter isTure: 키보드의 존재 유무
     func showKeyboard(_ isTure: Bool) {
-        guard let topView = AppHelpers.getTopViewController() as? MainViewController,
+        guard let topView = AppHelpers.getTopViewController(),
               let alert = topView.children.last as? LovechiveAlertViewController
         else { return }
         

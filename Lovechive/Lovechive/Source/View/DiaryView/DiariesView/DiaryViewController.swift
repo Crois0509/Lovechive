@@ -251,6 +251,7 @@ private extension DiaryViewController {
             .asSignal(onErrorSignalWith: .empty())
             .emit { [weak self] _ in
                 self?.fetchTrigger.accept(())
+                self?.updateDiaryData.accept(())
             }
             .disposed(by: disposeBag)
         
@@ -262,6 +263,7 @@ private extension DiaryViewController {
             .asSignal(onErrorSignalWith: .empty())
             .emit { [weak self] _ in
                 self?.fetchTrigger.accept(())
+                self?.updateDiaryData.accept(())
             }
             .disposed(by: disposeBag)
         

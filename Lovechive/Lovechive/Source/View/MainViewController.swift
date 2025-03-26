@@ -18,21 +18,12 @@ final class MainViewController: UIViewController {
     private let viewModel = MainViewModel()
     private var disposeBag = DisposeBag()
     
-    // MARK: - Properties
-    
-    private let pages: [UIViewController] = [
-        MainPageViewController(),
-        CalendarViewController(),
-        DiaryListViewController(),
-        SettingViewController()
-    ]
-    
     // MARK: - UI Components
     
     private let tabBarView = TabBarView()
     private let logoView = LogoView()
     private let backgroundView = UIView()
-    private var currentPageViewController: UIViewController?
+    private var currentPageViewController = PageViewController(transitionStyle: .scroll, navigationOrientation: .horizontal)
 
     // MARK: - VC LifeCycle
     
@@ -58,7 +49,7 @@ private extension MainViewController {
         setupBackgroundView()
         configureSelf()
         setupLayout()
-        setupChildViewController(0)
+        setupChildViewController()
         bind()
     }
     
@@ -71,30 +62,19 @@ private extension MainViewController {
     }
     
     /// 서브 뷰 컨트롤러를 설정하는 메소드
-    func setupChildViewController(_ index: Int) {
-        if let currentVC = self.currentPageViewController {
-            currentVC.view.removeFromSuperview()
-            currentVC.removeFromParent()
+    func setupChildViewController() {
+        addChild(currentPageViewController)
+        view.addSubview(currentPageViewController.view)
+        
+        currentPageViewController.view.snp.makeConstraints {
+            $0.top.equalTo(logoView.snp.bottom).offset(16)
+            $0.horizontalEdges.equalToSuperview()
+            $0.bottom.equalTo(tabBarView.snp.top)
         }
         
-        let selectedVC = pages[index]
-        
-        UIView.transition(with: view, duration: 0.3, options: .transitionCrossDissolve) {
-            self.addChild(selectedVC)
-            self.view.addSubview(selectedVC.view)
-            
-            selectedVC.view.snp.makeConstraints {
-                $0.top.equalTo(self.logoView.snp.bottom).offset(16)
-                $0.horizontalEdges.equalToSuperview()
-                $0.bottom.equalTo(self.tabBarView.snp.top)
-            }
-            
-            selectedVC.didMove(toParent: self)
-            self.currentPageViewController = selectedVC
-            
-            self.view.bringSubviewToFront(self.tabBarView)
-            self.view.bringSubviewToFront(self.logoView)
-        }
+        currentPageViewController.didMove(toParent: self)
+        view.bringSubviewToFront(tabBarView)
+        view.bringSubviewToFront(logoView)
     }
     
     func setupLayout() {
@@ -125,7 +105,11 @@ private extension MainViewController {
         let input = MainViewModel.Input(firstButtonTapped: tabBarView.rx.firstButtonTapped,
                                         secondButtonTapped: tabBarView.rx.secondButtonTapped,
                                         thirdButtonTapped: tabBarView.rx.thirdButtonTapped,
-                                        forthButtonTapped: tabBarView.rx.forthButtonTapped
+                                        forthButtonTapped: tabBarView.rx.forthButtonTapped,
+                                        changedPage: currentPageViewController.rx.currentPage,
+                                        calendarDataRelay: currentPageViewController.rx.calendarDataRelay,
+                                        diaryDataRelay: currentPageViewController.rx.diaryDataRelay,
+                                        settingDataRelay: currentPageViewController.rx.settingDataRelay
         )
         
         let output = viewModel.transform(input: input)
@@ -134,9 +118,24 @@ private extension MainViewController {
         output.changedCurretPage
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] state in
-                guard let self, let index = TabBarButtonState.allCases.firstIndex(of: state) else { return }
-                self.setupChildViewController(index)
-                self.tabBarView.changeButtonState(state: state)
+                self?.currentPageViewController.changePage(to: state, {
+                    self?.tabBarView.changeButtonState(state: state)
+                })
             }.disposed(by: disposeBag)
+        
+        // 페이지를 스와이프 했을 때 해당 페이지로 이동하는 이벤트
+        output.scrollToPage
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { [weak self] state in
+                self?.tabBarView.changeButtonState(state: state)
+            }.disposed(by: disposeBag)
+        
+        output.updateMainPage
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, _ in
+                owner.currentPageViewController.mainPageFetch()
+            }
+            .disposed(by: disposeBag)
     }
 }

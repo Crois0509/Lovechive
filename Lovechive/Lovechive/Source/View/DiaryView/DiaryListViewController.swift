@@ -13,7 +13,7 @@ import RxCocoa
 final class DiaryListViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
-    private let fetchTrigger = PublishRelay<Void>()
+    fileprivate let fetchTrigger = PublishRelay<Void>()
     
     private let viewModel = DiaryListViewModel()
     
@@ -78,4 +78,12 @@ private extension DiaryListViewController {
             .disposed(by: disposeBag)
     }
     
+}
+
+// MARK: - Reactive Extension
+
+extension Reactive where Base: DiaryListViewController {
+    var diaryDataRelay: PublishRelay<Void> {
+        base.fetchTrigger
+    }
 }

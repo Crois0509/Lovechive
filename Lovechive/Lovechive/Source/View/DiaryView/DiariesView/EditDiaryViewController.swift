@@ -48,6 +48,11 @@ final class EditDiaryViewController: UIViewController {
         setupUI()
     }
     
+    override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+        super.touchesBegan(touches, with: event)
+        
+        editDiaryView.endEditing(true)
+    }
 }
 
 // MARK: - UI Setting Method
@@ -146,7 +151,6 @@ private extension EditDiaryViewController {
         switch state {
         case .view(data: let data):
             diaryView.configureDiary(data)
-            editDiaryView.configureDiary(data)
             currentState = state
             scrollView.contentSize.height = diaryView.bounds.height
             

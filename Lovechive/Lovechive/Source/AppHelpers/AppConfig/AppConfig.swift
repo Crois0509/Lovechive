@@ -63,7 +63,7 @@ enum AppConfig {
     
     enum LatestDiary {
         static let title: String = "최근 작성한 일기"
-        static let content: String = "아직 작성한 일기가 없습니다."
+        static let content: String = "최근 작성한 일기가 없습니다."
         static let date: String = "2000.01.01 오후 12시"
     }
     

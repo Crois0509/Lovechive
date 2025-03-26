@@ -17,6 +17,7 @@ final class CalendarViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
     private let fetchTrigger = PublishRelay<Void>()
+    fileprivate let dataRelay = PublishRelay<Void>()
     
     // MARK: - Properties
     
@@ -27,6 +28,9 @@ final class CalendarViewController: UIViewController {
     private let headerView = CalendarHeaderView()
     private let calendarView = CalendarView()
     private let scheduleView = ScheduleView()
+    
+    private let containerView = UIView()
+    private let scrollView = UIScrollView()
     
     // MARK: - LifeCycle
     
@@ -44,6 +48,8 @@ final class CalendarViewController: UIViewController {
 private extension CalendarViewController {
     
     func setupUI() {
+        setupScrollView()
+        setupContainerView()
         configureSelf()
         setupLayout()
         bind()
@@ -51,12 +57,21 @@ private extension CalendarViewController {
     
     func configureSelf() {
         view.backgroundColor = .Personal.backgroundPink
-        [headerView, calendarView, scheduleView].forEach {
-            view.addSubview($0)
-        }
+        view.addSubview(scrollView)
     }
     
     func setupLayout() {
+        scrollView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+        }
+        
+        containerView.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+            $0.width.equalToSuperview()
+            $0.height.greaterThanOrEqualTo(500)
+        }
+        
         headerView.snp.makeConstraints {
             $0.top.equalToSuperview()
             $0.horizontalEdges.equalToSuperview().inset(16)
@@ -66,14 +81,30 @@ private extension CalendarViewController {
         calendarView.snp.makeConstraints {
             $0.top.equalTo(headerView.snp.bottom).offset(8)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.equalTo(336) // TODO: 스케줄 리스트 뷰 구현 후 수정
+            $0.height.equalTo(336).priority(.high)
         }
         
         scheduleView.snp.makeConstraints {
             $0.top.equalTo(calendarView.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.equalTo(100) // TODO: 동적으로 변하도록 수정
+            $0.height.greaterThanOrEqualTo(92)
+            $0.bottom.equalToSuperview()
         }
+    }
+    
+    func setupContainerView() {
+        containerView.backgroundColor = .clear
+        [headerView, calendarView, scheduleView].forEach {
+            containerView.addSubview($0)
+        }
+    }
+    
+    func setupScrollView() {
+        scrollView.contentInset.bottom = 16
+        scrollView.backgroundColor = .clear
+        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsHorizontalScrollIndicator = false
+        scrollView.addSubview(containerView)
     }
     
     func bind() {
@@ -83,7 +114,8 @@ private extension CalendarViewController {
                                             addButtonTapped: scheduleView.rx.addButtonTapped,
                                             selectedDate: calendarView.rx.selectedDate,
                                             tableViewItemDeleted: scheduleView.scheduleTableView.rx.itemDeleted,
-                                            tableViewItemEdited: scheduleView.scheduleTableView.rx.itemSelected
+                                            tableViewItemEdited: scheduleView.scheduleTableView.rx.itemSelected,
+                                            containerViewHeight: containerView.rx.boundsHeight
         )
         
         let output = viewModel.transform(input: input)
@@ -129,18 +161,30 @@ private extension CalendarViewController {
             .drive { owner, data in
                 let isEmpty = data.first?.items.isEmpty ?? true
                 owner.scheduleView.updateTableViewSize(isEmpty)
-                
-                if isEmpty {
-                    owner.scheduleView.snp.updateConstraints {
-                        $0.height.equalTo(100)
-                    }
-                } else {
-                    owner.scheduleView.snp.updateConstraints {
-                        $0.height.equalTo(owner.scheduleView.scheduleTableView.contentSize.height + 60)
-                    }
-                }
             }
+            .disposed(by: disposeBag)
+        
+        output.scrollViewHeight
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, height in
+                owner.scrollView.contentSize.height = height
+            }
+            .disposed(by: disposeBag)
+        
+        output.editDataRelay
+            .filter { $0 }
+            .map { _ in () }
+            .bind(to: dataRelay)
             .disposed(by: disposeBag)
     }
     
+}
+
+// MARK: - Reactive Extension
+
+extension Reactive where Base: CalendarViewController {
+    var calendarDataRelay: PublishRelay<Void> {
+        base.dataRelay
+    }
 }
