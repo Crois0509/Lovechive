@@ -76,7 +76,7 @@ private extension MainPageScrollView {
         planerView.snp.makeConstraints {
             $0.top.equalTo(dDayView.snp.bottom).offset(16)
             $0.leading.trailing.equalToSuperview().inset(16)
-            $0.height.equalTo(100)
+            $0.height.greaterThanOrEqualTo(100)
         }
         
         diaryView.snp.makeConstraints {
@@ -87,7 +87,7 @@ private extension MainPageScrollView {
     }
     
     func setupContentView() {
-        contentView.backgroundColor = .clear
+        contentView.backgroundColor = .red
         [dDayView, planerView, diaryView].forEach {
             contentView.addSubview($0)
         }
@@ -108,14 +108,15 @@ private extension MainPageScrollView {
         planerView.planView.layoutIfNeeded()
         let tableHeight = planerView.planView.contentSize.height
         
-        if tableHeight == 0 {
+        if tableHeight <= 0 {
             planerView.tableViewIsNoItem(true)
         } else {
             planerView.tableViewIsNoItem(false)
-            planerView.snp.updateConstraints {
-                $0.height.equalTo(tableHeight + 50)
+            planerView.planView.snp.updateConstraints {
+                $0.height.equalTo(tableHeight)
             }
-            contentsScrollView.contentSize.height = 516
+            let totalHeight = dDayView.bounds.height + planerView.bounds.height + diaryView.bounds.height
+            contentsScrollView.contentSize.height = totalHeight
         }
     }
 
