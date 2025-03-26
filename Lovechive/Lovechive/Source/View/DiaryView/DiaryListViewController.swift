@@ -40,7 +40,11 @@ private extension DiaryListViewController {
         
         navigationController?.pushViewController(diaryVC, animated: true)
         
-        return diaryVC.rx.updateDiaryData.take(until: dismissSignal)
+        return diaryVC.rx.updateDiaryData
+            .take(until: dismissSignal)
+            .do(onDispose: { [weak diaryVC] in
+                debugPrint("\(diaryVC?.description ?? "DiaryViewController")", "deallocated")
+            })
     }
     
     func bind() {
@@ -71,7 +75,7 @@ private extension DiaryListViewController {
                 debugPrint("\(diaryInfo.diaryTitle) 선택 됨")
                 return owner.pushDiariesView(diaryInfo)
             }
-            .asSignal(onErrorSignalWith: .empty())
+            .asSignal(onErrorJustReturn: ())
             .emit { [weak self] _ in
                 self?.fetchTrigger.accept(())
             }

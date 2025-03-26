@@ -125,11 +125,11 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
                 
                 return self.searchItem(indexPath)
             }
-            .flatMap { [weak self] data -> Single<Bool> in
+            .flatMapLatest { [weak self] data -> Single<Bool> in
                 guard let self else { return .just(false) }
                 return FirestoreManager.shared.deletedDiaries(self.diaryId, data.id)
             }
-            .asSignal(onErrorSignalWith: .empty())
+            .asSignal(onErrorJustReturn: false)
             .emit { isSuccess in
                 if isSuccess {
                     input.fetchTrigger.accept(())

@@ -27,6 +27,13 @@ final class SettingView: UIView {
         fatalError("init(coder:) has not been implemented")
     }
     
+    func updateTableViewSize() {
+        tableView.layoutIfNeeded()
+        tableView.snp.updateConstraints {
+            $0.height.equalTo(tableView.contentSize.height)
+        }
+    }
+    
 }
 
 // MARK: - UI Setting Method
@@ -49,6 +56,7 @@ private extension SettingView {
         tableView.snp.makeConstraints {
             $0.top.equalToSuperview().offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(40)
             $0.bottom.equalToSuperview().inset(16)
         }
     }

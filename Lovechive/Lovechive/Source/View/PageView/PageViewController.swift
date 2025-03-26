@@ -16,7 +16,6 @@ final class PageViewController: UIPageViewController {
     // MARK: - Rx Properties
     
     private var disposeBag = DisposeBag()
-    fileprivate let currentPageIndex = PublishRelay<Int>()
     
     // MARK: - Properties
     
@@ -40,9 +39,13 @@ final class PageViewController: UIPageViewController {
         super.viewDidLoad()
         
         self.dataSource = self
-        self.delegate = self
         
         setViewControllers([pages[0]], direction: .forward, animated: false)
+        
+        // 스와이프(스크롤) 비활성화
+        if let scrollView = view.subviews.first(where: { $0 is UIScrollView }) as? UIScrollView {
+            scrollView.isScrollEnabled = false
+        }
     }
     
     /// 현재 보여지는 페이지를 변경하는 메소드
@@ -83,28 +86,9 @@ extension PageViewController: UIPageViewControllerDataSource {
     }
 }
 
-// MARK: - UIPageViewControllerDelegate Method
-
-extension PageViewController: UIPageViewControllerDelegate {
-    // 페이지 변환이 완료되면 호출되는 메소드
-    // 편경된 페이지의 인덱스를 이벤트로 전달
-    func pageViewController(_ pageViewController: UIPageViewController, didFinishAnimating finished: Bool, previousViewControllers: [UIViewController], transitionCompleted completed: Bool) {
-        guard let currentVC = viewControllers?.first,
-              let currentIndex = pages.firstIndex(of: currentVC)
-        else { return }
-        
-        currentPageIndex.accept(currentIndex)
-    }
-}
-
 // MARK: - Reactive Extension
 
 extension Reactive where Base: PageViewController {
-    // 현재 페이지 인덱스를 이벤트로 전달
-    var currentPage: PublishRelay<Int> {
-        base.currentPageIndex
-    }
-    
     var calendarDataRelay: PublishRelay<Void> {
         base.calendar.rx.calendarDataRelay
     }

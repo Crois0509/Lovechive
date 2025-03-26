@@ -19,7 +19,6 @@ final class MainViewModel: ViewModelType {
         let secondButtonTapped: ControlEvent<Void>
         let thirdButtonTapped: ControlEvent<Void>
         let forthButtonTapped: ControlEvent<Void>
-        let changedPage: PublishRelay<Int>
         let calendarDataRelay: PublishRelay<Void>
         let diaryDataRelay: PublishRelay<Void>
         let settingDataRelay: PublishRelay<Void>
@@ -27,7 +26,6 @@ final class MainViewModel: ViewModelType {
     
     struct Output {
         let changedCurretPage: PublishRelay<TabBarButtonState>
-        let scrollToPage: PublishRelay<TabBarButtonState>
         let updateMainPage: PublishRelay<Void>
     }
     
@@ -36,7 +34,6 @@ final class MainViewModel: ViewModelType {
     private var disposeBag = DisposeBag()
     
     private let changedCurretPage = PublishRelay<TabBarButtonState>()
-    private let scrollToPage = PublishRelay<TabBarButtonState>()
     private let updateMainPage = PublishRelay<Void>()
     
     /// input을 output으로 변환하는 메소드
@@ -71,14 +68,6 @@ final class MainViewModel: ViewModelType {
                 owner.changedCurretPage.accept(.setting)
             }.disposed(by: disposeBag)
         
-        input.changedPage
-            .asSignal(onErrorSignalWith: .empty())
-            .withUnretained(self)
-            .emit { owner, index in
-                let state = TabBarButtonState.allCases[index]
-                owner.scrollToPage.accept(state)
-            }.disposed(by: disposeBag)
-        
         input.calendarDataRelay
             .skip(1)
             .bind(to: updateMainPage)
@@ -95,7 +84,6 @@ final class MainViewModel: ViewModelType {
             .disposed(by: disposeBag)
         
         return Output(changedCurretPage: changedCurretPage,
-                      scrollToPage: scrollToPage,
                       updateMainPage: updateMainPage
         )
     }

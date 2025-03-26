@@ -15,7 +15,7 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
     struct Input {
         let editImageButtonTapped: ControlEvent<Void>
         let activeButtonTapped: ControlEvent<Void>
-        let imageData: PublishRelay<UIImage>
+        let imageData: Observable<UIImage>
         let createdDate: ControlProperty<String>
         let titleData: ControlProperty<String>
         let contentData: ControlProperty<String>
@@ -34,6 +34,7 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
     
     private let umd = UserDefaultsManager()
     private let alert = AlertManager.init(title: "경고", message: "모든 내용을 입력해 주세요!!", cancelTitle: "확인")
+    private lazy var actionSheet = AlertManager(title: "알림", message: "", cancelTitle: "닫기")
     
     private var currentState: DiaryViewState
     private var diaryId: String
@@ -118,8 +119,8 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
             .compactMap { owner, data in
                 owner.mappingDiaryDataModel(data)
             }
-            .flatMapLatest { [weak self] data -> Observable<DiaryDataModel?> in
-                guard let self else { return .empty() }
+            .flatMap { [weak self] data -> Observable<DiaryDataModel?> in
+                guard let self else { return .just(nil) }
                 let isEmpty = self.checkDataIsEmpty()
                 
                 if isEmpty {

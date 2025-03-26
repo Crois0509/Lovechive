@@ -95,6 +95,10 @@ final class DiaryViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        debugPrint(Self.self, "deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -107,6 +111,7 @@ final class DiaryViewController: UIViewController {
         
         navigationController?.navigationBar.isHidden = false
     }
+
 }
 
 // MARK: - UI Setting Method
@@ -199,14 +204,18 @@ private extension DiaryViewController {
     func pushDiariesView(type: DiaryViewState, id: String) -> Observable<Void> {
         guard let titleView = navigationItem.titleView as? UILabel,
               let title = titleView.text
-        else { return .empty() }
+        else { return .just(()) }
         
         let editDiaryVC = EditDiaryViewController(title, type, id)
         navigationController?.pushViewController(editDiaryVC, animated: true)
         
         let dismissSignal = editDiaryVC.rx.deallocated
         
-        return editDiaryVC.rx.diarySavedIsSuccess.take(until: dismissSignal)
+        return editDiaryVC.rx.diarySavedIsSuccess
+            .take(until: dismissSignal)
+            .do(onDispose: { [weak editDiaryVC] in
+                print("\(editDiaryVC?.description ?? "EditDiaryVC") deallocated")
+            })
     }
     
     func bind() {
@@ -239,6 +248,7 @@ private extension DiaryViewController {
                 self.infoLabel.isHidden = !isEmpty
                 self.tableView.isHidden = isEmpty
                 self.collectionView.isHidden = isEmpty
+                self.updateDiaryData.accept(())
             }
             .disposed(by: disposeBag)
         
@@ -251,7 +261,6 @@ private extension DiaryViewController {
             .asSignal(onErrorSignalWith: .empty())
             .emit { [weak self] _ in
                 self?.fetchTrigger.accept(())
-                self?.updateDiaryData.accept(())
             }
             .disposed(by: disposeBag)
         
@@ -263,7 +272,6 @@ private extension DiaryViewController {
             .asSignal(onErrorSignalWith: .empty())
             .emit { [weak self] _ in
                 self?.fetchTrigger.accept(())
-                self?.updateDiaryData.accept(())
             }
             .disposed(by: disposeBag)
         
@@ -289,7 +297,9 @@ private extension DiaryViewController {
             .asSignal(onErrorSignalWith: .empty())
             .emit { owner, _ in
                 owner.updateDiaryData.accept(())
+                owner.disposeBag = DisposeBag()
                 owner.navigationController?.popViewController(animated: true)
+                owner.dismiss(animated: false)
             }
             .disposed(by: disposeBag)
     }

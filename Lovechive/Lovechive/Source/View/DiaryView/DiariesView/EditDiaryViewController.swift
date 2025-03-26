@@ -22,7 +22,6 @@ final class EditDiaryViewController: UIViewController {
     private let scrollView = UIScrollView()
     
     private lazy var photoPicker = PHPickerViewController(configuration: createdPhotoPickerConfiguration())
-    private lazy var actionSheet = AlertManager(title: "알림", message: "", cancelTitle: "닫기")
     
     private let viewModel: EditDiaryViewModel
     
@@ -42,10 +41,21 @@ final class EditDiaryViewController: UIViewController {
         fatalError("init(coder:) has not been implemented")
     }
     
+    deinit {
+        debugPrint(Self.self, "deinit")
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         setupUI()
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        
+        disposeBag = DisposeBag()
+        photoPicker.dismiss(animated: false)
     }
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -219,12 +229,9 @@ private extension EditDiaryViewController {
             .asSignal(onErrorSignalWith: .empty())
             .emit { owner, isSuccess in
                 if isSuccess {
-                    owner.actionSheet.message = "다이어리 저장 성공!"
-                    owner.actionSheet.showAlert(.actionSheet)
                     owner.diarySavedIsSuccess.accept(())
                 } else {
-                    owner.actionSheet.message = "다이어리 저장 실패..."
-                    owner.actionSheet.showAlert(.actionSheet)
+                    debugPrint("다이어리 저장 실패...")
                 }
             }
             .disposed(by: disposeBag)
@@ -247,9 +254,9 @@ extension EditDiaryViewController: PHPickerViewControllerDelegate {
             
             if let error {
                 debugPrint("🚨 이미지 추출 실패", error.localizedDescription)
-            } else if let self, let image = provider as? UIImage {
+            } else if let image = provider as? UIImage {
                 debugPrint("✅ 이미지 추출 성공")
-                self.editDiaryView.insertImage(image)
+                self?.editDiaryView.insertImage(image)
             }
             
         }

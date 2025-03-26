@@ -86,12 +86,12 @@ struct AlertManager {
             })
             
             if let activeTitle {
-                alert.addAction(UIAlertAction(title: activeTitle, style: .default) { [weak view] _ in
+                alert.addAction(UIAlertAction(title: activeTitle, style: .default) { _ in
                     observer.onNext(true)
                     observer.onCompleted()
                 })
             } else if let destructiveTitle {
-                alert.addAction(UIAlertAction(title: destructiveTitle, style: .destructive) { [weak view] _ in
+                alert.addAction(UIAlertAction(title: destructiveTitle, style: .destructive) { _ in
                     observer.onNext(true)
                     observer.onCompleted()
                 })

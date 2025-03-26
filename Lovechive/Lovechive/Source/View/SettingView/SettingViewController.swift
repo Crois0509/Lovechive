@@ -68,7 +68,7 @@ private extension SettingViewController {
         settingView.snp.makeConstraints {
             $0.top.equalTo(myProfile.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.greaterThanOrEqualTo(272)
+            $0.height.greaterThanOrEqualTo(32)
         }
     }
     
@@ -83,6 +83,16 @@ private extension SettingViewController {
         // 설정 뷰 섹션 설정
         output.sections
             .bind(to: settingView.tableView.rx.items(dataSource: dataSource))
+            .disposed(by: disposeBag)
+        
+        output.sections
+            .skip(1)
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, items in
+                debugPrint(items.count)
+                owner.settingView.updateTableViewSize()
+            }
             .disposed(by: disposeBag)
         
         // 마이 페이지 데이터 입력
