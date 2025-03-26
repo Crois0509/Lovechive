@@ -83,6 +83,7 @@ private extension PlanView {
         planView.snp.makeConstraints {
             $0.top.equalTo(titleView.snp.bottom).offset(8)
             $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.height.equalTo(64)
             $0.bottom.equalToSuperview().inset(8)
         }
     }

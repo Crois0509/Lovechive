@@ -21,7 +21,7 @@ final class MainPageViewModel: ViewModelMethodManager, ViewModelType {
     
     struct Output {
         let sections: BehaviorRelay<[ScheduleModelSection]>
-        let latestDiaryRelay: PublishRelay<DiaryDataModel>
+        let latestDiaryRelay: PublishRelay<DiaryDataModel?>
         let dDayRelay: PublishRelay<CoupleDataModel>
     }
     
@@ -32,7 +32,7 @@ final class MainPageViewModel: ViewModelMethodManager, ViewModelType {
     private let umd = UserDefaultsManager()
     
     private let sections = BehaviorRelay<[ScheduleModelSection]>(value: [])
-    private let latestDiaryRelay = PublishRelay<DiaryDataModel>()
+    private let latestDiaryRelay = PublishRelay<DiaryDataModel?>()
     private let dDayRelay = PublishRelay<CoupleDataModel>()
     
     /// input을 output으로 변환하는 메소드
@@ -65,8 +65,11 @@ final class MainPageViewModel: ViewModelMethodManager, ViewModelType {
             }
             .asDriver(onErrorDriveWith: .empty())
             .drive { [weak self] diaries in
-                guard let latestDiaryData = diaries.last else { return }
-                self?.latestDiaryRelay.accept(latestDiaryData)
+                if let latestDiaryData = diaries.last {
+                    self?.latestDiaryRelay.accept(latestDiaryData)
+                } else {
+                    self?.latestDiaryRelay.accept(nil)
+                }
             }
             .disposed(by: disposeBag)
         

@@ -19,10 +19,14 @@ final class MainViewModel: ViewModelType {
         let secondButtonTapped: ControlEvent<Void>
         let thirdButtonTapped: ControlEvent<Void>
         let forthButtonTapped: ControlEvent<Void>
+        let calendarDataRelay: PublishRelay<Void>
+        let diaryDataRelay: PublishRelay<Void>
+        let settingDataRelay: PublishRelay<Void>
     }
     
     struct Output {
         let changedCurretPage: PublishRelay<TabBarButtonState>
+        let updateMainPage: PublishRelay<Void>
     }
     
     // MARK: - Properties
@@ -30,7 +34,7 @@ final class MainViewModel: ViewModelType {
     private var disposeBag = DisposeBag()
     
     private let changedCurretPage = PublishRelay<TabBarButtonState>()
-    private let scrollToPage = PublishRelay<TabBarButtonState>()
+    private let updateMainPage = PublishRelay<Void>()
     
     /// input을 output으로 변환하는 메소드
     /// - Parameter input: input 데이터
@@ -64,6 +68,23 @@ final class MainViewModel: ViewModelType {
                 owner.changedCurretPage.accept(.setting)
             }.disposed(by: disposeBag)
         
-        return Output(changedCurretPage: changedCurretPage)
+        input.calendarDataRelay
+            .skip(1)
+            .bind(to: updateMainPage)
+            .disposed(by: disposeBag)
+        
+        input.diaryDataRelay
+            .skip(1)
+            .bind(to: updateMainPage)
+            .disposed(by: disposeBag)
+        
+        input.settingDataRelay
+            .skip(1)
+            .bind(to: updateMainPage)
+            .disposed(by: disposeBag)
+        
+        return Output(changedCurretPage: changedCurretPage,
+                      updateMainPage: updateMainPage
+        )
     }
 }

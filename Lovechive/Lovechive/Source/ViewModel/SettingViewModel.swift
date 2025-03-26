@@ -29,6 +29,8 @@ final class SettingViewModel: ViewModelMethodManager, ViewModelType {
     
     private var disposeBag = DisposeBag()
     
+    private var alert = AlertManager(title: "경고", message: "", cancelTitle: "취소", destructiveTitle: "확인")
+    
     private lazy var sections = BehaviorRelay<[SetTableSection]>(value: [])
     private let userDataRelay = BehaviorRelay<[UserDataModel]>(value: [])
     private let coupleDataRelay = BehaviorRelay<[CoupleDataModel]>(value: [])
@@ -190,6 +192,18 @@ private extension SettingViewModel {
                 title: AppConfig.SettingConfig.versionInfo,
                 extraView: setupLabel(AppConfig.SettingConfig.version),
                 action: nil
+            ),
+            
+            SettingTableCellModel(
+                title: AppConfig.SettingConfig.membershipWithdrawal,
+                extraView: nil,
+                action: showDestructiveAlert
+            ),
+            
+            SettingTableCellModel(
+                title: AppConfig.SettingConfig.signOut,
+                extraView: nil,
+                action: showSignoutAlert
             )
         ]
     }
@@ -223,6 +237,30 @@ private extension SettingViewModel {
         toggleSwitch.onTintColor = .Personal.highlightPink
         
         return toggleSwitch
+    }
+    
+    func showSignoutAlert() {
+        alert.message = "정말 로그아웃 하시겠습니까?"
+        
+        alert.showAlert(.alert)
+            .withUnretained(self)
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { owner, isConfirm in
+                debugPrint(isConfirm)
+            }
+            .disposed(by: disposeBag)
+    }
+    
+    func showDestructiveAlert() {
+        alert.message = "회원 정보는 복구되지 않습니다.\n정말 회원 탈퇴를 진행하시겠습니까?"
+        
+        alert.showAlert(.alert)
+            .withUnretained(self)
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { owner, isConfirm in
+                debugPrint(isConfirm)
+            }
+            .disposed(by: disposeBag)
     }
     
     /// 앱스토어 링크로 이동하는 메소드

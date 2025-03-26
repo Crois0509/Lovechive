@@ -32,6 +32,10 @@ final class MainPageViewController: UIViewController {
         setupUI()
         fetchTrigger.accept(())
     }
+    
+    func fetch() {
+        fetchTrigger.accept(())
+    }
 
 }
 
@@ -80,7 +84,11 @@ private extension MainPageViewController {
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
             .drive { owner, data in
-                owner.contentsView.diaryView.configureView(content: data.content, date: data.createdAt, image: data.image)
+                if let data {
+                    owner.contentsView.diaryView.configureView(content: data.content, date: data.createdAt, image: data.image)
+                } else {
+                    owner.contentsView.diaryView.resetView()
+                }
             }.disposed(by: disposeBag)
         
         // D-Day 업데이트

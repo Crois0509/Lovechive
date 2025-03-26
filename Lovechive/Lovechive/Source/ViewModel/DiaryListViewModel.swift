@@ -41,7 +41,7 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
                 guard let self else { return [] }
                 return self.mappingQueryDataToDiaryListData(query)
             }
-            .asDriver(onErrorDriveWith: .empty())
+            .asDriver(onErrorJustReturn: [])
             .drive { [weak self] data in
                 self?.sections.accept(data)
             }

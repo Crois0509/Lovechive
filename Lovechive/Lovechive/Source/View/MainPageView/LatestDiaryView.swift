@@ -38,8 +38,14 @@ final class LatestDiaryView: UIView {
     ///   - image: 일기의 이미지 경로
     func configureView(content: String, date: Date, image: String) {
         contentView.text = content
-        dateView.text = date.formattedDateToString(.yearMonthDayHourMinute)
+        dateView.text = date.formattedDateToString(.yearMonthDayE)
         imageView.image = ImageManager.shared.loadImage(path: image) == nil ? .no : ImageManager.shared.loadImage(path: image)
+    }
+    
+    func resetView() {
+        contentView.text = AppConfig.LatestDiary.content
+        dateView.text = AppConfig.LatestDiary.date
+        imageView.image = .no
     }
     
 }
@@ -131,7 +137,7 @@ private extension LatestDiaryView {
     
     func setupImageView() {
         imageView.image = .no
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         imageView.layer.cornerRadius = 8
         imageView.clipsToBounds = true
         imageView.backgroundColor = .Personal.backgroundPink

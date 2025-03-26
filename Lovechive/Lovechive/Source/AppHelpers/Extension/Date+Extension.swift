@@ -13,6 +13,7 @@ extension Date {
     enum DateFormatType {
         case yearMonthDay
         case yearMonthDayHourMinute
+        case yearMonthDayE
         case yearMonth
         case monthDay
         case hourMinute
@@ -25,6 +26,8 @@ extension Date {
                 return "yyyy년 M월 d일"
             case .yearMonthDayHourMinute:
                 return "yyyy.M.d(E) a h시 m분"
+            case .yearMonthDayE:
+                return "yyyy년 M월 d일(E)"
             case .yearMonth:
                 return "yyyy년 M월"
             case .monthDay:

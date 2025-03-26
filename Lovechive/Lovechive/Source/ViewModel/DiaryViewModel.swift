@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import RxKeyboard
 import FirebaseFirestore
 
 final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
@@ -41,6 +42,7 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
     private let fetchDiaryTitle = PublishRelay<String>()
     private let pushNewDiary = PublishRelay<String>()
     private let dismissDiaryView = PublishRelay<Void>()
+    private let keyboardHeight = BehaviorRelay<CGFloat>(value: 0)
     
     init(_ diaryData: DiaryListDataModel) {
         self.diaryId = diaryData.diaryId
@@ -123,17 +125,34 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
                 
                 return self.searchItem(indexPath)
             }
-            .flatMap { [weak self] data -> Single<Bool> in
+            .flatMapLatest { [weak self] data -> Single<Bool> in
                 guard let self else { return .just(false) }
                 return FirestoreManager.shared.deletedDiaries(self.diaryId, data.id)
             }
-            .asSignal(onErrorSignalWith: .empty())
+            .asSignal(onErrorJustReturn: false)
             .emit { isSuccess in
                 if isSuccess {
                     input.fetchTrigger.accept(())
                 } else {
                     debugPrint("🚨 다이어리 데이터 삭제 실패")
                 }
+            }
+            .disposed(by: disposeBag)
+        
+        RxKeyboard.instance.visibleHeight
+            .asObservable()
+            .bind(to: keyboardHeight)
+            .disposed(by: disposeBag)
+        
+        keyboardHeight
+            .skip(1)
+            .distinctUntilChanged()
+            .filter { $0 >= 0 }
+            .map { $0 != 0 }
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, isShowKeyboard in
+                owner.showKeyboard(isShowKeyboard)
             }
             .disposed(by: disposeBag)
         

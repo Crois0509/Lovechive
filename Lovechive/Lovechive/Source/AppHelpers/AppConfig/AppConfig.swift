@@ -63,7 +63,7 @@ enum AppConfig {
     
     enum LatestDiary {
         static let title: String = "최근 작성한 일기"
-        static let content: String = "아직 작성한 일기가 없습니다."
+        static let content: String = "최근 작성한 일기가 없습니다."
         static let date: String = "2000.01.01 오후 12시"
     }
     
@@ -107,7 +107,9 @@ enum AppConfig {
         static let bug = "버그 제보 / 문의"
         static let versionInfo = "앱 버전"
         static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
-        static let appstoreLink = "itms-apps://apps.apple.com/app/id6741835898"
+        static let appstoreLink = "itms-apps://apps.apple.com/app/id6741835898" // TODO: 앱스토어 커넥트 연결 후 링크 수정
+        static let signOut = "로그아웃"
+        static let membershipWithdrawal = "회원 탈퇴"
     }
     
     // MARK: - Lovechive Alert에서 쓰일 String 데이터

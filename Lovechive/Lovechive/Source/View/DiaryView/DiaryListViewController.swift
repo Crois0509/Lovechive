@@ -13,7 +13,7 @@ import RxCocoa
 final class DiaryListViewController: UIViewController {
     
     private var disposeBag = DisposeBag()
-    private let fetchTrigger = PublishRelay<Void>()
+    fileprivate let fetchTrigger = PublishRelay<Void>()
     
     private let viewModel = DiaryListViewModel()
     
@@ -40,7 +40,11 @@ private extension DiaryListViewController {
         
         navigationController?.pushViewController(diaryVC, animated: true)
         
-        return diaryVC.rx.updateDiaryData.take(until: dismissSignal)
+        return diaryVC.rx.updateDiaryData
+            .take(until: dismissSignal)
+            .do(onDispose: { [weak diaryVC] in
+                debugPrint("\(diaryVC?.description ?? "DiaryViewController")", "deallocated")
+            })
     }
     
     func bind() {
@@ -71,11 +75,19 @@ private extension DiaryListViewController {
                 debugPrint("\(diaryInfo.diaryTitle) 선택 됨")
                 return owner.pushDiariesView(diaryInfo)
             }
-            .asSignal(onErrorSignalWith: .empty())
+            .asSignal(onErrorJustReturn: ())
             .emit { [weak self] _ in
                 self?.fetchTrigger.accept(())
             }
             .disposed(by: disposeBag)
     }
     
+}
+
+// MARK: - Reactive Extension
+
+extension Reactive where Base: DiaryListViewController {
+    var diaryDataRelay: PublishRelay<Void> {
+        base.fetchTrigger
+    }
 }

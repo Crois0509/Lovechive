@@ -19,6 +19,7 @@ final class SettingViewController: UIViewController {
     private let disposeBag = DisposeBag()
     
     private let fetchTrigger = PublishRelay<Void>()
+    fileprivate let dataRelay = PublishRelay<Void>()
     
     // MARK: - Properties
     
@@ -67,7 +68,7 @@ private extension SettingViewController {
         settingView.snp.makeConstraints {
             $0.top.equalTo(myProfile.snp.bottom).offset(16)
             $0.horizontalEdges.equalToSuperview().inset(16)
-            $0.height.equalTo(272)
+            $0.height.greaterThanOrEqualTo(32)
         }
     }
     
@@ -84,14 +85,26 @@ private extension SettingViewController {
             .bind(to: settingView.tableView.rx.items(dataSource: dataSource))
             .disposed(by: disposeBag)
         
+        output.sections
+            .skip(1)
+            .withUnretained(self)
+            .asDriver(onErrorDriveWith: .empty())
+            .drive { owner, items in
+                debugPrint(items.count)
+                owner.settingView.updateTableViewSize()
+            }
+            .disposed(by: disposeBag)
+        
         // 마이 페이지 데이터 입력
         output.myPageDataRelay
             .withUnretained(self)
             .asDriver(onErrorDriveWith: .empty())
             .drive { owner, data in
                 owner.myProfile.configureMyPage(data)
+                owner.dataRelay.accept(())
             }
             .disposed(by: disposeBag)
+
         
         // 설정뷰 아이템 선택시 이벤트
         settingView.tableView.rx.itemSelected
@@ -117,4 +130,12 @@ private extension SettingViewController {
             }.disposed(by: disposeBag)
     }
     
+}
+
+// MARK: - Reactive Extension
+
+extension Reactive where Base: SettingViewController {
+    var settingDataRelay: PublishRelay<Void> {
+        base.dataRelay
+    }
 }

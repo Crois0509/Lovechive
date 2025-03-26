@@ -153,8 +153,8 @@ extension Reactive where Base: EditDiaryView {
         base.editImageButton.rx.tap
     }
     
-    var sendImageData: PublishRelay<UIImage> {
-        base.sendImageData
+    var sendImageData: Observable<UIImage> {
+        base.sendImageData.take(until: base.rx.deallocated)
     }
     
     var sendCreatedDate: ControlProperty<String> {
