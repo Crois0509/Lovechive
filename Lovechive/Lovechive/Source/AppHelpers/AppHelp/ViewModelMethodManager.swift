@@ -11,7 +11,7 @@ import RxSwift
 import RxCocoa
 import FirebaseFirestore
 
-class ViewModelMethodManager: AnyObject {
+class ViewModelMethodManager: NSObject {
     
     /// 커스텀 Alert 뷰를 호출하는 메소드
     /// - Parameter type: 호출할 Alert의 타입

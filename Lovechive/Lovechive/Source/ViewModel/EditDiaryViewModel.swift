@@ -43,6 +43,7 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
     private var titleData: String?
     private var contentData: String?
     private var diaryData: DiaryDataModel?
+    private var maxKeyboardHeihgt: CGFloat = 0
     
     private let scrollContentHeight = BehaviorRelay<CGFloat>(value: 0)
     private let keyboardHeight = BehaviorRelay<CGFloat>(value: 0)
@@ -163,15 +164,18 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
             .disposed(by: disposeBag)
         
         keyboardHeight
+            .distinctUntilChanged()
             .withUnretained(self)
             .map { owner, height in
+                owner.maxKeyboardHeihgt = max(height, owner.maxKeyboardHeihgt)
+                
                 if height > 0 {
                     let scrollSize = owner.scrollContentHeight.value
                     let totalHeight = scrollSize + height
                     return totalHeight
                 } else {
                     let scrollSize = owner.scrollContentHeight.value
-                    return scrollSize - 336
+                    return scrollSize - owner.maxKeyboardHeihgt
                 }
             }
             .bind(to: scrollContentHeight)
