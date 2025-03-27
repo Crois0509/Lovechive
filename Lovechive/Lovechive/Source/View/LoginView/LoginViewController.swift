@@ -22,6 +22,7 @@ final class LoginViewController: UIViewController {
         super.viewDidLoad()
         
         view = loginView
+        bind()
     }
 }
 
@@ -29,24 +30,18 @@ final class LoginViewController: UIViewController {
 
 private extension LoginViewController {
     
-    func changeRootViewController() {
-        DispatchQueue.main.async {
-            UIView.transition(with: self.view.window!, duration: 0.5, options: .transitionCrossDissolve) {
-                self.view.window?.rootViewController = UINavigationController(rootViewController: MainViewController())
-            }
-        }
-    }
-    
     func bind() {
         
-        let input = LoginViewModel.Input(appleLoginButtonTapped: loginView.rx.appleLoginButtonTapped)
+        let input = LoginViewModel.Input(appleLoginButtonTapped: loginView.rx.appleLoginButtonTapped,
+                                         guestLoginButtonTapped: loginView.rx.guestButtonTapped
+        )
+        
         let output = viewModel.transform(input: input)
         
         output.userDataSaved
-            .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())
-            .emit { owner, _ in
-                owner.changeRootViewController()
+            .emit { _ in
+                AppHelpers.changeRootViewControllerFromWindow(.main)
             }
             .disposed(by: disposeBag)
         

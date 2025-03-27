@@ -16,6 +16,7 @@ final class LoginViewModel: ViewModelMethodManager, ViewModelType {
     
     struct Input {
         let appleLoginButtonTapped: ControlEvent<Void>
+        let guestLoginButtonTapped: ControlEvent<Void>
     }
     
     struct Output {
@@ -25,11 +26,28 @@ final class LoginViewModel: ViewModelMethodManager, ViewModelType {
     private var disposeBag = DisposeBag()
     
     private let alert = AlertManager(title: "알림", message: "로그인에 실패했습니다.\n잠시 후 다시 시도해 주세요.", cancelTitle: "확인")
+    private let guestAlert = AlertManager(title: "알림", message: "게스트로 로그인 시\n일부 기능을 이용할 수 없습니다.\n게스트로 로그인 하시겠습니까?", cancelTitle: "취소", activeTitle: "확인")
     
     private let loginSuccess = PublishRelay<UserInfo>()
     private let userDataSaved = PublishRelay<Void>()
     
     func transform(input: Input) -> Output {
+        
+        input.guestLoginButtonTapped
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.guestAlert.showAlert(.alert)
+            }
+            .asSignal(onErrorJustReturn: false)
+            .emit { [weak self] isConfirm in
+                if isConfirm {
+                    UserDefaultsManager().saveToUserDefaults(true, forKey: AppConfig.UserDefaultsConfig.guestMode)
+                    self?.userDataSaved.accept(())
+                } else {
+                    debugPrint("게스트모드 로그인 취소")
+                }
+            }
+            .disposed(by: disposeBag)
         
         input.appleLoginButtonTapped
             .withUnretained(self)
@@ -60,6 +78,7 @@ final class LoginViewModel: ViewModelMethodManager, ViewModelType {
             .asSignal(onErrorJustReturn: false)
             .emit { [weak self] isSuccess in
                 if isSuccess {
+                    UserDefaultsManager().saveToUserDefaults(true, forKey: AppConfig.UserDefaultsConfig.login)
                     self?.userDataSaved.accept(())
                 }
             }

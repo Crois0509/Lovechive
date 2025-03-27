@@ -15,6 +15,7 @@ final class LoginView: UIView {
     
     private let logoView = UIImageView()
     fileprivate let appleLogin = ASAuthorizationAppleIDButton(type: .signIn, style: .white)
+    fileprivate let guestModeButton = UIButton()
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -33,6 +34,7 @@ final class LoginView: UIView {
 private extension LoginView {
     
     func setupUI() {
+        setupGuestModeButton()
         setupAppleButton()
         setupLogo()
         configureSelf()
@@ -41,7 +43,7 @@ private extension LoginView {
     
     func configureSelf() {
         backgroundColor = .Personal.backgroundPink
-        [logoView, appleLogin].forEach {
+        [logoView, guestModeButton, appleLogin].forEach {
             addSubview($0)
         }
     }
@@ -53,9 +55,15 @@ private extension LoginView {
             $0.width.height.equalTo(224)
         }
         
-        appleLogin.snp.makeConstraints {
+        guestModeButton.snp.makeConstraints {
             $0.horizontalEdges.equalToSuperview().inset(16)
             $0.bottom.equalTo(safeAreaLayoutGuide).inset(16)
+            $0.height.equalTo(56)
+        }
+        
+        appleLogin.snp.makeConstraints {
+            $0.horizontalEdges.equalToSuperview().inset(16)
+            $0.bottom.equalTo(guestModeButton.snp.top).offset(-8)
             $0.height.equalTo(56)
         }
     }
@@ -69,6 +77,17 @@ private extension LoginView {
     func setupAppleButton() {
         appleLogin.cornerRadius = 8
     }
+    
+    func setupGuestModeButton() {
+        guestModeButton.setTitle("게스트로 로그인", for: .normal)
+        guestModeButton.setTitleColor(.white, for: .normal)
+        guestModeButton.setImage(UIImage(systemName: "heart.fill"), for: .normal)
+        guestModeButton.tintColor = .white
+        guestModeButton.titleLabel?.font = .systemFont(ofSize: 24, weight: .medium)
+        guestModeButton.titleLabel?.textAlignment = .center
+        guestModeButton.layer.cornerRadius = 8
+        guestModeButton.backgroundColor = .Personal.highlightPink
+    }
 
 }
 
@@ -77,5 +96,9 @@ private extension LoginView {
 extension Reactive where Base: LoginView {
     var appleLoginButtonTapped: ControlEvent<Void> {
         base.appleLogin.rx.controlEvent(.touchUpInside)
+    }
+    
+    var guestButtonTapped: ControlEvent<Void> {
+        base.guestModeButton.rx.tap
     }
 }

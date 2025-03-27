@@ -30,6 +30,8 @@ final class SettingViewModel: ViewModelMethodManager, ViewModelType {
     private var disposeBag = DisposeBag()
     
     private var alert = AlertManager(title: "경고", message: "", cancelTitle: "취소", destructiveTitle: "확인")
+    private var alarmAlert = AlertManager(title: "알림", message: "", cancelTitle: "취소", activeTitle: "확인")
+    private let guestModeAlert = AlertManager(title: "알림", message: "이 기능은 로그인 후 사용할 수 있습니다.\n로그인 하시겠습니까?", cancelTitle: "취소", activeTitle: "확인")
     
     private lazy var sections = BehaviorRelay<[SetTableSection]>(value: [])
     private let userDataRelay = BehaviorRelay<[UserDataModel]>(value: [])
@@ -115,6 +117,41 @@ final class SettingViewModel: ViewModelMethodManager, ViewModelType {
                       myPageDataRelay: myPageDataRelay
         )
     }
+    
+    func transformToGuestMode(input: Input) -> Output {
+        
+        input.editButtonTapped
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.guestModeAlert.showAlert(.alert)
+            }
+            .asSignal(onErrorJustReturn: false)
+            .emit { isConfirm in
+                if isConfirm {
+                    UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.guestMode)
+                    AppHelpers.changeRootViewControllerFromWindow(.login)
+                } else {
+                    debugPrint("로그인 취소")
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        input.fetchTrigger
+            .take(1)
+            .withUnretained(self)
+            .map { owner, _ in
+                SetTableSection(items: owner.defaultSettingModels)
+            }
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { [weak self] section in
+                self?.sections.accept([section])
+            }
+            .disposed(by: disposeBag)
+        
+        return Output(sections: sections,
+                      myPageDataRelay: myPageDataRelay
+        )
+    }
 }
 
 // MARK: - ViewModel Private Method
@@ -161,31 +198,31 @@ private extension SettingViewModel {
             SettingTableCellModel(
                 title: AppConfig.SettingConfig.alarm,
                 extraView: setupSwitch(),
-                action: nil
+                action: toggleNotificationSetting
             ),
             
             SettingTableCellModel(
                 title: AppConfig.SettingConfig.privacy,
                 extraView: setupLabel(">"),
-                action: nil
+                action: pushURLPage(.privacyInfo)
             ),
             
             SettingTableCellModel(
                 title: AppConfig.SettingConfig.playInfo,
                 extraView: setupLabel(">"),
-                action: nil
+                action: pushURLPage(.playInfo)
             ),
             
             SettingTableCellModel(
                 title: AppConfig.SettingConfig.review,
                 extraView: setupLabel(">"),
-                action: moveAppstore
+                action: pushURLPage(.review)
             ),
             
             SettingTableCellModel(
                 title: AppConfig.SettingConfig.bug,
                 extraView: setupLabel(">"),
-                action: nil
+                action: pushURLPage(.bug)
             ),
             
             SettingTableCellModel(
@@ -246,35 +283,88 @@ private extension SettingViewModel {
             .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())
             .emit { owner, isConfirm in
-                debugPrint(isConfirm)
+                if isConfirm {
+                    UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.login)
+                    UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.guestMode)
+                    AppHelpers.changeRootViewControllerFromWindow(.login)
+                } else {
+                    debugPrint("로그아웃 취소")
+                }
             }
             .disposed(by: disposeBag)
     }
     
     func showDestructiveAlert() {
-        alert.message = "회원 정보는 복구되지 않습니다.\n정말 회원 탈퇴를 진행하시겠습니까?"
+        let isGuestMode = UserDefaults.standard.bool(forKey: AppConfig.UserDefaultsConfig.guestMode)
+        alert.message = isGuestMode ? "회원가입을 위해\n로그인 화면으로 돌아가시겠습니까?" : "회원 정보는 복구되지 않습니다.\n정말 회원 탈퇴를 진행하시겠습니까?"
         
         alert.showAlert(.alert)
+            .flatMap { isConfirm in
+                if isConfirm && !isGuestMode {
+                    return FirestoreManager.shared.deleteFromFirestore(type: .user)
+                } else {
+                    return .just(isConfirm)
+                }
+            }
             .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())
             .emit { owner, isConfirm in
-                debugPrint(isConfirm)
+                if isConfirm {
+                    UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.login)
+                    UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.guestMode)
+                    AppHelpers.changeRootViewControllerFromWindow(.login)
+                } else {
+                    debugPrint("실행 취소")
+                }
             }
             .disposed(by: disposeBag)
     }
     
     /// 앱스토어 링크로 이동하는 메소드
-    func moveAppstore() {
-        let appUrl = AppConfig.SettingConfig.appstoreLink // TODO: 추후 id 수정 필요
-        if let url = URL(string: appUrl), UIApplication.shared.canOpenURL(url) {
-            if #available(iOS 10.0, *) {
-                UIApplication.shared.open(url, options: [:], completionHandler: nil)
+    func pushURLPage(_ page: SettingURLModel) -> (() -> Void)? {
+        return {
+            let pageUrl = page.urlString
+            if let url = URL(string: pageUrl), UIApplication.shared.canOpenURL(url) {
+                if #available(iOS 10.0, *) {
+                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                } else {
+                    UIApplication.shared.openURL(url)
+                }
+                debugPrint(page.urlString, "이동")
             } else {
-                UIApplication.shared.openURL(url)
+                debugPrint("페이지 이동 실패", "\(pageUrl)은 이동할 수 없는 URL 입니다.")
             }
         }
-        
-        debugPrint("앱스토어 이동")
     }
-
+    
+    func toggleNotificationSetting() {
+        NotificationPermissionCheck.check(completion: { [weak self] isOn in
+            guard let self else { return }
+            
+            if isOn {
+                self.alarmAlert.message = "알람 설정을 해제하시겠습니까?\n(확인 클릭 시 설정으로 이동)"
+            } else {
+                self.alarmAlert.message = "알람을 설정 하시겠습니까?\n(확인 클릭 시 설정으로 이동)"
+            }
+            
+            DispatchQueue.main.async {
+                self.alarmAlert.showAlert(.alert)
+                    .asSignal(onErrorJustReturn: false)
+                    .emit { isConfirm in
+                        if isConfirm {
+                            if let url = URL(string: UIApplication.openSettingsURLString) {
+                                if UIApplication.shared.canOpenURL(url) {
+                                    UIApplication.shared.open(url, options: [:], completionHandler: nil)
+                                }
+                            }
+                        } else {
+                            debugPrint("알람 설정 취소")
+                        }
+                    }
+                    .disposed(by: self.disposeBag)
+            }
+            
+        })
+    }
+    
 }

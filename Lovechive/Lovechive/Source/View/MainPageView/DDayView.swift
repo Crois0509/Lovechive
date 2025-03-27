@@ -15,7 +15,7 @@ final class DDayView: UIView {
     
     private lazy var dDayView = createLabelView("D + 0", 20, .bold, .Personal.deepPink)
     private lazy var titleTextView = createLabelView("우리의 시작", 14, .regular, .Personal.highlightPink)
-    private lazy var infoLabel = createLabelView("2000.01.01부터", 14, .regular, .Personal.highlightPink)
+    private lazy var infoLabel = createLabelView("2025.01.01부터", 14, .regular, .Personal.highlightPink)
     
     private let textStackView = UIStackView()
     

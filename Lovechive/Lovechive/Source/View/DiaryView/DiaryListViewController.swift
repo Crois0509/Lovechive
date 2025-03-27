@@ -53,7 +53,13 @@ private extension DiaryListViewController {
                                              diaryAddButtonTapped: diaryListView.rx.diaryAddButtonTapped
         )
         
-        let output = viewModel.transform(input: input)
+        let output: DiaryListViewModel.Output
+        
+        if UserDefaults.standard.bool(forKey: AppConfig.UserDefaultsConfig.guestMode) == true {
+            output = viewModel.transformToGuestMode(input: input)
+        } else {
+            output = viewModel.transform(input: input)
+        }
         
         output.sections
             .bind(to: diaryListView.collectionView.rx.items(dataSource: dataSource))

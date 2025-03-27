@@ -62,6 +62,7 @@ private extension MainPageViewController {
     
     /// 데이터 바인딩 메소드
     func bind() {
+        guard UserDefaults.standard.bool(forKey: AppConfig.UserDefaultsConfig.guestMode) == false else { return }
         let input = MainPageViewModel.Input(fetchTrigger: fetchTrigger)
         
         let output = viewModel.transform(input: input)

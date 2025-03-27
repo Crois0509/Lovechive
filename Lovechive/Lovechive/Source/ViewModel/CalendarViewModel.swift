@@ -43,6 +43,7 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
     private var sections: [ScheduleModelSection] = []
     private var queryDatas: [QueryDocumentSnapshot] = []
     private let confirmAlert = AlertManager(title: "경고", message: "정말 삭제하시겠습니까?", cancelTitle: "취소", destructiveTitle: "삭제")
+    private let guestModeAlert = AlertManager(title: "알림", message: "이 기능은 로그인 후 사용할 수 있습니다.\n로그인 하시겠습니까?", cancelTitle: "취소", activeTitle: "확인")
     
     private let changeCurrentDatePage = BehaviorRelay<Date>(value: Date())
     private let selectedDate = BehaviorRelay<Date>(value: Date())
@@ -186,6 +187,59 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
         
         input.containerViewHeight
             .bind(to: scrollViewHeight)
+            .disposed(by: disposeBag)
+        
+        return Output(changeCurrentDatePage: changeCurrentDatePage,
+                      selectedDate: selectedDate,
+                      scheduleSection: scheduleSection,
+                      eventsRelay: eventsRelay,
+                      scrollViewHeight: scrollViewHeight,
+                      editDataRelay: editDataRelay
+        )
+    }
+    
+    func transformToGuestMode(input: Input) -> Output {
+        
+        input.addButtonTapped
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.guestModeAlert.showAlert(.alert)
+            }
+            .asSignal(onErrorJustReturn: false)
+            .emit { isConfirm in
+                if isConfirm {
+                    UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.guestMode)
+                    AppHelpers.changeRootViewControllerFromWindow(.login)
+                } else {
+                    debugPrint("로그인 취소")
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        input.previousButtonTapped
+            .withUnretained(self)
+            .map { owner, _ -> Date in
+                let currentDate = owner.changeCurrentDatePage.value
+                let previousDate = Calendar.current.date(byAdding: .month, value: -1, to: currentDate) ?? currentDate
+                return previousDate
+            }
+            .asObservable()
+            .bind(to: changeCurrentDatePage)
+            .disposed(by: disposeBag)
+        
+        input.nextButtonTapped
+            .withUnretained(self)
+            .map { owner, _ -> Date in
+                let currentDate = owner.changeCurrentDatePage.value
+                let nextDate = Calendar.current.date(byAdding: .month, value: 1, to: currentDate) ?? currentDate
+                return nextDate
+            }
+            .asObservable()
+            .bind(to: changeCurrentDatePage)
+            .disposed(by: disposeBag)
+        
+        input.selectedDate
+            .bind(to: selectedDate)
             .disposed(by: disposeBag)
         
         return Output(changeCurrentDatePage: changeCurrentDatePage,

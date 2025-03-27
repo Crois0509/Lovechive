@@ -40,4 +40,26 @@ enum AppHelpers {
         return haveBottomSize
     }
     
+    static func changeRootViewControllerFromWindow(_ rootViewType: RootViews) {
+        guard let topView = self.getTopViewController()?.view else { return }
+        
+        var rootView: UIViewController
+        
+        switch rootViewType {
+        case .main:
+            rootView = UINavigationController(rootViewController: MainViewController())
+        case .login:
+            rootView = LoginViewController()
+        }
+        
+        DispatchQueue.main.async {
+            UIView.transition(with: topView.window!, duration: 0.5, options: .transitionCrossDissolve) {
+                topView.window?.rootViewController = rootView
+            }
+        }
+    }
+}
+
+enum RootViews {
+    case main, login
 }
