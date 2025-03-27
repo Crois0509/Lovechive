@@ -4,8 +4,8 @@
     <dependencies>
         <deployment identifier="iOS"/>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="23506"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
-        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
@@ -17,15 +17,28 @@
                         <rect key="frame" x="0.0" y="0.0" width="393" height="852"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="LaunchImage" translatesAutoresizingMaskIntoConstraints="NO" id="DqV-KS-au5">
-                                <rect key="frame" x="-4.6666666666666572" y="-11" width="402.33333333333326" height="874"/>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="loginIcon" translatesAutoresizingMaskIntoConstraints="NO" id="5tF-b7-6dr">
+                                <rect key="frame" x="84.666666666666686" y="159" width="224" height="224"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="224" id="Bfh-kT-Obz"/>
+                                    <constraint firstAttribute="height" constant="224" id="LLy-9G-UBK"/>
+                                </constraints>
+                            </imageView>
+                            <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="Lovechive" translatesAutoresizingMaskIntoConstraints="NO" id="odK-Ea-qSj">
+                                <rect key="frame" x="121.66666666666669" y="698" width="150" height="40"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="150" id="0C7-gX-Ukl"/>
+                                    <constraint firstAttribute="height" constant="40" id="az8-Vf-E2i"/>
+                                </constraints>
                             </imageView>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
-                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <color key="backgroundColor" name="personalColor/backgroundPink"/>
                         <constraints>
-                            <constraint firstItem="DqV-KS-au5" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="SDc-Jc-f75"/>
-                            <constraint firstItem="DqV-KS-au5" firstAttribute="centerY" secondItem="Ze5-6b-2t3" secondAttribute="centerY" id="XmL-X8-wpE"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="odK-Ea-qSj" secondAttribute="bottom" constant="80" id="G1V-ms-ZWp"/>
+                            <constraint firstItem="5tF-b7-6dr" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="T5T-xk-Gw4"/>
+                            <constraint firstItem="5tF-b7-6dr" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" constant="100" id="rqQ-bH-HFd"/>
+                            <constraint firstItem="odK-Ea-qSj" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="wbh-nc-PGl"/>
                         </constraints>
                     </view>
                 </viewController>
@@ -35,9 +48,10 @@
         </scene>
     </scenes>
     <resources>
-        <image name="LaunchImage" width="402" height="874"/>
-        <systemColor name="systemBackgroundColor">
-            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
-        </systemColor>
+        <image name="Lovechive" width="733" height="177"/>
+        <image name="loginIcon" width="800" height="888"/>
+        <namedColor name="personalColor/backgroundPink">
+            <color red="1" green="0.91764705882352937" blue="0.96470588235294119" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
     </resources>
 </document>

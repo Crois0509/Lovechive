@@ -26,6 +26,8 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
     
     private var disposeBag = DisposeBag()
     
+    private let guestModeAlert = AlertManager(title: "알림", message: "이 기능은 로그인 후 사용할 수 있습니다.\n로그인 하시겠습니까?", cancelTitle: "취소", activeTitle: "확인")
+    
     private let sections = BehaviorRelay<[DiaryListSection]>(value: [])
     private let pushDiaryView = PublishRelay<DiaryListDataModel>()
     private let itemIndexRelay = PublishRelay<Int>()
@@ -75,6 +77,29 @@ final class DiaryListViewModel: ViewModelMethodManager, ViewModelType {
                     input.fetchTrigger.accept(())
                 } else {
                     debugPrint("❌ 일정 추가 실패")
+                }
+            }
+            .disposed(by: disposeBag)
+        
+        return Output(sections: sections,
+                      pushDiaryView: pushDiaryView
+        )
+    }
+    
+    func transformToGuestMode(input: Input) -> Output {
+        
+        input.diaryAddButtonTapped
+            .withUnretained(self)
+            .flatMap { owner, _ in
+                owner.guestModeAlert.showAlert(.alert)
+            }
+            .asSignal(onErrorJustReturn: false)
+            .emit { isConfirm in
+                if isConfirm {
+                    UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.guestMode)
+                    AppHelpers.changeRootViewControllerFromWindow(.login)
+                } else {
+                    debugPrint("로그인 취소")
                 }
             }
             .disposed(by: disposeBag)

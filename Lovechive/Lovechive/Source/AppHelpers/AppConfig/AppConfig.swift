@@ -14,6 +14,8 @@ enum AppConfig {
         static let userId: String = "userId"
         static let coupleId: String = "coupleId"
         static let diaryId: String = "diaryId"
+        static let guestMode: String = "isGuestModeLogin"
+        static let login: String = "isLogin"
     }
     
     // MARK: - FirestoreModel에서 사용할 String 데이터
@@ -64,7 +66,7 @@ enum AppConfig {
     enum LatestDiary {
         static let title: String = "최근 작성한 일기"
         static let content: String = "최근 작성한 일기가 없습니다."
-        static let date: String = "2000.01.01 오후 12시"
+        static let date: String = ""
     }
     
     // MARK: - PlanerView에서 사용할 String 데이터
@@ -96,7 +98,7 @@ enum AppConfig {
         static let birth = "생년월일"
         static let birthD = "2000년 1월 1일"
         static let anni = "연애 기념일"
-        static let anniV = "2024년 1월 29일"
+        static let anniV = "2025년 1월 1일"
         static let myInfo = "내 정보"
         static let edit = "편집"
         
@@ -108,8 +110,8 @@ enum AppConfig {
         static let versionInfo = "앱 버전"
         static let version = Bundle.main.infoDictionary?["CFBundleShortVersionString"] as? String ?? "1.0.0"
         static let appstoreLink = "itms-apps://apps.apple.com/app/id6741835898" // TODO: 앱스토어 커넥트 연결 후 링크 수정
-        static let signOut = "로그아웃"
-        static let membershipWithdrawal = "회원 탈퇴"
+        static let signOut: String = "로그아웃"
+        static let membershipWithdrawal: String = UserDefaults.standard.bool(forKey: AppConfig.UserDefaultsConfig.guestMode) == true ? "회원가입" : "회원탈퇴"
     }
     
     // MARK: - Lovechive Alert에서 쓰일 String 데이터

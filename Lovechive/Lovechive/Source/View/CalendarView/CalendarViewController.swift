@@ -118,7 +118,13 @@ private extension CalendarViewController {
                                             containerViewHeight: containerView.rx.boundsHeight
         )
         
-        let output = viewModel.transform(input: input)
+        let output: CalendarViewModel.Output
+        
+        if UserDefaults.standard.bool(forKey: AppConfig.UserDefaultsConfig.guestMode) == true {
+            output = viewModel.transformToGuestMode(input: input)
+        } else {
+            output = viewModel.transform(input: input)
+        }
         
         // 캘린더 이벤트 설정
         output.eventsRelay

@@ -30,6 +30,13 @@ final class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let authOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
+        UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { res, error in
+            DispatchQueue.main.async {
+                UserDefaultsManager().saveToUserDefaults(res, forKey: "isNotificationEnabled")
+            }
+        }
+        
         setupUI()
     }
     

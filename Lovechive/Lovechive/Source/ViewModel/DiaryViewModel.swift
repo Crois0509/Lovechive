@@ -319,6 +319,10 @@ private extension DiaryViewModel {
             }
             .flatMap { [weak self] _ -> Single<Bool> in
                 guard let self else { return .just(false) }
+                return FirestoreManager.shared.deletedDiaries(self.diaryId, nil)
+            }
+            .flatMap { [weak self] isSuccess -> Single<Bool> in
+                guard let self, isSuccess else { return .just(false) }
                 return FirestoreManager.shared.deleteFromFirestore(type: .diary(id: self.diaryId))
             }
             .asSignal(onErrorSignalWith: .empty())

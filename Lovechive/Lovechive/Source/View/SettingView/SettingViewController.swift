@@ -78,7 +78,13 @@ private extension SettingViewController {
         let input = SettingViewModel.Input(fetchTrigger: fetchTrigger,
                                            editButtonTapped: myProfile.rx.editButtonTapped)
         
-        let output = viewModel.transform(input: input)
+        let output: SettingViewModel.Output
+        
+        if UserDefaults.standard.bool(forKey: AppConfig.UserDefaultsConfig.guestMode) == true {
+            output = viewModel.transformToGuestMode(input: input)
+        } else {
+            output = viewModel.transform(input: input)
+        }
         
         // 설정 뷰 섹션 설정
         output.sections
@@ -115,15 +121,6 @@ private extension SettingViewController {
                 guard
                     let cell = owner.settingView.tableView.cellForRow(at: indexPath) as? SetTableViewCell
                 else { return }
-                
-                // 셀의 extraView가 토글 스위치인 경우 액션 구현
-                if let toggleSwitch = cell.extraView as? UISwitch {
-                    if toggleSwitch.isOn {
-                        toggleSwitch.setOn(false, animated: true)
-                    } else {
-                        toggleSwitch.setOn(true, animated: true)
-                    }
-                }
                 
                 cell.action?()
                 

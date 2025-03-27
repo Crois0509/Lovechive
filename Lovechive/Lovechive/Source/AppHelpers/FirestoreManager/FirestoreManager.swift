@@ -22,7 +22,7 @@ final class FirestoreManager {
         return Single.create { single in
             let coupleDocumentRef = self.db.collection("diaries").document(id)
             
-            coupleDocumentRef.collection("Diaries").getDocuments { querySnapshot, error in
+            coupleDocumentRef.collection("Diaries").addSnapshotListener { querySnapshot, error in
                 if let error = error {
                     debugPrint("❌ Diary 데이터 불러오기 실패: \(error.localizedDescription)")
                     single(.failure(error))
@@ -156,11 +156,17 @@ final class FirestoreManager {
         }
     }
     
-    func deletedDiaries(_ documentId: String, _ dataId: String) -> Single<Bool> {
+    func deletedDiaries(_ documentId: String, _ dataId: String?) -> Single<Bool> {
         return Single.create { single in
             
             let collectionRef = self.db.collection("diaries").document(documentId).collection("Diaries")
-            let documentRef: DocumentReference = collectionRef.document(dataId)
+            var documentRef: DocumentReference
+            
+            if let dataId {
+                documentRef = collectionRef.document(dataId)
+            } else {
+                documentRef = collectionRef.document()
+            }
             
             documentRef.delete { error in
                 if let error {
