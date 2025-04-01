@@ -12,14 +12,25 @@ import FirebaseCore
 class AppDelegate: UIResponder, UIApplicationDelegate {
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
-        sleep(2)
+        
         FirebaseApp.configure()
         
-        if UserDefaults.standard.object(forKey: "정렬 방법") == nil {
-            UserDefaults.standard.set("List", forKey: "정렬 방법")
-        } else if UserDefaults.standard.object(forKey: "정렬 순서") == nil {
-            UserDefaults.standard.set("최신순", forKey: "정렬 순서")
+        let defaults = UserDefaults.standard
+        if defaults.object(forKey: "정렬 방법") == nil {
+            defaults.set("List", forKey: "정렬 방법")
         }
+        
+        if defaults.object(forKey: "정렬 순서") == nil {
+            defaults.set("최신순", forKey: "정렬 순서")
+        }
+        
+        if defaults.bool(forKey: AppConfig.UserDefaultsConfig.ready) {
+            DispatchQueue.global(qos: .background).async {
+                AppHelpers.checkCoupleData()
+            }
+        }
+        
+        sleep(3)
         
         return true
     }

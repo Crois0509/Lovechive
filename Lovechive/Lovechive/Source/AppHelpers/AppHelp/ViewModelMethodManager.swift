@@ -102,7 +102,7 @@ class ViewModelMethodManager: NSObject {
             else { return .error(NSError(domain: "❌ 타입 변환 실패", code: 0)) }
             
             let saveUser = FirestoreManager.shared.saveToFirestore(userData, type: .user)
-            let saveCouple = FirestoreManager.shared.saveToFirestore(coupleData, type: .couple)
+            let saveCouple = FirestoreManager.shared.saveToFirestore(coupleData, type: .couple(id: nil))
             
             return Single.zip(saveUser, saveCouple).map { $0.0 && $0.1 }
             

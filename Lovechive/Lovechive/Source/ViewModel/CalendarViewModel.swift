@@ -73,6 +73,7 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
             .disposed(by: disposeBag)
         
         eventsRelay
+            .skip(1)
             .withUnretained(self)
             .compactMap { owner, data in
                 return owner.filteredToDayDateToScheduleSection(owner.eventsRelay.value, owner.queryDatas)
@@ -112,6 +113,7 @@ final class CalendarViewModel: ViewModelMethodManager, ViewModelType {
             .disposed(by: disposeBag)
         
         selectedDate
+            .skip(1)
             .withUnretained(self)
             .map { owner, date in
                 let data = owner.filteredSection(date)

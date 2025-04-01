@@ -10,7 +10,7 @@ import Foundation
 /// FirestoreManager의 State를 정의하는 enum
 enum FirestoreDataTypes {
     case user
-    case couple
+    case couple(id: String?)
     case diary(id: String)
     case schedule(id: String)
     

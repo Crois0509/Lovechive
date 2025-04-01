@@ -16,6 +16,7 @@ enum AppConfig {
         static let diaryId: String = "diaryId"
         static let guestMode: String = "isGuestModeLogin"
         static let login: String = "isLogin"
+        static let ready: String = "isReady"
     }
     
     // MARK: - FirestoreModel에서 사용할 String 데이터

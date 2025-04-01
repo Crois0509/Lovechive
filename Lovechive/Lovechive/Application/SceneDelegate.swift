@@ -18,6 +18,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         if UserDefaults.standard.bool(forKey: AppConfig.UserDefaultsConfig.guestMode) || UserDefaults.standard.bool(forKey: AppConfig.UserDefaultsConfig.login) {
             window.rootViewController = UINavigationController(rootViewController: MainViewController())
+        } else if UserDefaults.standard.bool(forKey: AppConfig.UserDefaultsConfig.ready) {
+            window.rootViewController = LoginAlertViewController(type: .start)
         } else {
             window.rootViewController = LoginViewController()
         }

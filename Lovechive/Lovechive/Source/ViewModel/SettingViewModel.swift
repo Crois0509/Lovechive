@@ -83,7 +83,7 @@ final class SettingViewModel: ViewModelMethodManager, ViewModelType {
         userDataRelay
             .withUnretained(self)
             .flatMap { owner, _ in
-                owner.fetchData(.couple)
+                owner.fetchData(.couple(id: nil))
             }
             .compactMap { [weak self] query in
                 self?.mappingCoupleData(query)
@@ -280,18 +280,49 @@ private extension SettingViewModel {
         alert.message = "정말 로그아웃 하시겠습니까?"
         
         alert.showAlert(.alert)
-            .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())
-            .emit { owner, isConfirm in
+            .emit { isConfirm in
                 if isConfirm {
                     UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.login)
                     UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.guestMode)
+                    UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.ready)
+                    UserDefaultsManager().saveToUserDefaults("0", forKey: AppConfig.UserDefaultsConfig.coupleId)
+                    UserDefaultsManager().saveToUserDefaults("0", forKey: AppConfig.UserDefaultsConfig.userId)
                     AppHelpers.changeRootViewControllerFromWindow(.login)
                 } else {
                     debugPrint("로그아웃 취소")
                 }
             }
             .disposed(by: disposeBag)
+    }
+    
+    func createCoupleData(_ query: [QueryDocumentSnapshot]) -> CoupleDataModel? {
+        if query.isEmpty {
+            return nil
+            
+        } else if let user1Id = query.first?.data()[AppConfig.CouplesModel.user1Id] as? String,
+                  let user2Id = query.first?.data()[AppConfig.CouplesModel.user2Id] as? String
+        {
+            if user1Id == "" || user2Id == "" {
+                return nil
+                
+            } else if user1Id == UserDefaultsManager().userId {
+                return CoupleDataModel(user1Id: "",
+                                       user2Id: user2Id,
+                                       user1Name: "",
+                                       user2Name: query.first?.data()[AppConfig.CouplesModel.user2Name] as? String ?? "",
+                                       dDay: (query.first?.data()[AppConfig.CouplesModel.dDay] as? Timestamp)?.dateValue() ?? Date())
+            } else {
+                return CoupleDataModel(user1Id: user1Id,
+                                       user2Id: "",
+                                       user1Name: query.first?.data()[AppConfig.CouplesModel.user1Name] as? String ?? "",
+                                       user2Name: "",
+                                       dDay: (query.first?.data()[AppConfig.CouplesModel.dDay] as? Timestamp)?.dateValue() ?? Date())
+            }
+            
+        } else {
+            return nil
+        }
     }
     
     func showDestructiveAlert() {
@@ -306,15 +337,35 @@ private extension SettingViewModel {
                     return .just(isConfirm)
                 }
             }
-            .withUnretained(self)
-            .asSignal(onErrorSignalWith: .empty())
-            .emit { owner, isConfirm in
+            .flatMap { isConfirm -> Single<[QueryDocumentSnapshot]> in
                 if isConfirm {
+                    return FirestoreManager.shared.readFromFirestore(type: .couple(id: nil))
+                } else {
+                    return .just([])
+                }
+            }
+            .map { [weak self] query -> CoupleDataModel? in
+                self?.createCoupleData(query)
+            }
+            .flatMap { data in
+                if let data {
+                    return FirestoreManager.shared.saveToFirestore(data, type: .couple(id: nil))
+                } else {
+                    return FirestoreManager.shared.deletedAllCoupleData()
+                }
+            }
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { isSuccess in
+                if isSuccess {
+                    debugPrint("✅ 커플 데이터 교체 성공")
                     UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.login)
                     UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.guestMode)
+                    UserDefaultsManager().saveToUserDefaults(false, forKey: AppConfig.UserDefaultsConfig.ready)
+                    UserDefaultsManager().saveToUserDefaults("0", forKey: AppConfig.UserDefaultsConfig.coupleId)
+                    UserDefaultsManager().saveToUserDefaults("0", forKey: AppConfig.UserDefaultsConfig.userId)
                     AppHelpers.changeRootViewControllerFromWindow(.login)
                 } else {
-                    debugPrint("실행 취소")
+                    debugPrint("🚨 커플 데이터 교체 실패")
                 }
             }
             .disposed(by: disposeBag)

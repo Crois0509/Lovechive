@@ -76,7 +76,7 @@ final class MainPageViewModel: ViewModelMethodManager, ViewModelType {
         input.fetchTrigger
             .withUnretained(self)
             .flatMap { (owner, _) -> Single<[QueryDocumentSnapshot]> in
-                owner.fetchData(.couple)
+                owner.fetchData(.couple(id: nil))
             }
             .map { [weak self] data in
                 guard let self else { return [CoupleDataModel]() }

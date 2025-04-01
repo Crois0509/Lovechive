@@ -77,9 +77,14 @@ final class FirestoreManager {
                 let userId = self.udm.userId
                 documentRef = collectionRef.document(userId)
                 
-            case .couple:
+            case .couple(id: let id):
                 let coupleId = self.udm.coupleId
-                documentRef = collectionRef.document(coupleId)
+                
+                if let id {
+                    documentRef = collectionRef.document(id)
+                } else {
+                    documentRef = collectionRef.document(coupleId)
+                }
                 
             case .diary(id: let id):
                 if !id.isEmpty {
@@ -124,9 +129,14 @@ final class FirestoreManager {
                 let userId = self.udm.userId
                 query = collectionRef.whereField(FieldPath.documentID(), isEqualTo: userId)
                 
-            case .couple:
+            case .couple(id: let id):
                 let coupleId = self.udm.coupleId
-                query = collectionRef.whereField(FieldPath.documentID(), isEqualTo: coupleId)
+                
+                if let id {
+                    query = collectionRef.whereField(FieldPath.documentID(), isEqualTo: id)
+                } else {
+                    query = collectionRef.whereField(FieldPath.documentID(), isEqualTo: coupleId)
+                }
                 
             case .diary:
                 let coupleId = self.udm.coupleId
@@ -182,6 +192,90 @@ final class FirestoreManager {
         }
     }
     
+    func deleteDiariesForCouple() -> Single<Bool> {
+        let coupleId = self.udm.coupleId
+        let diariesCollection = db.collection("diaries")
+        
+        return Single.create { single in
+            // 1️⃣ coupleId와 동일한 문서를 조회
+            diariesCollection.whereField("coupleId", isEqualTo: coupleId).getDocuments { (snapshot, error) in
+                if let error = error {
+                    print("🚨 문서 조회 실패: \(error.localizedDescription)")
+                    single(.failure(error))
+                    return
+                }
+                
+                guard let documents = snapshot?.documents, !documents.isEmpty else {
+                    print("⚠️ 해당 coupleId에 대한 문서가 없음")
+                    single(.success(false))
+                    return
+                }
+                
+                let dispatchGroup = DispatchGroup() // 비동기 작업 완료 여부를 추적
+                
+                for document in documents {
+                    let documentRef = diariesCollection.document(document.documentID)
+                    let diariesSubCollection = documentRef.collection("Diaries")
+                    
+                    dispatchGroup.enter()
+                    
+                    // 2️⃣ Diaries 서브 컬렉션 삭제
+                    self.deleteCollection(collectionRef: diariesSubCollection) {
+                        // 3️⃣ 부모 문서 삭제
+                        documentRef.delete { error in
+                            if let error = error {
+                                print("🚨 문서 삭제 실패: \(error.localizedDescription)")
+                            } else {
+                                print("✅ 문서 삭제 완료: \(document.documentID)")
+                            }
+                            dispatchGroup.leave()
+                        }
+                    }
+                }
+                
+                dispatchGroup.notify(queue: .main) {
+                    print("🎉 모든 데이터 삭제 완료")
+                    single(.success(true))
+                }
+            }
+            
+            return Disposables.create()
+        }
+    }
+    
+    // 🔹 Firestore 컬렉션을 재귀적으로 삭제하는 함수
+    func deleteCollection(collectionRef: CollectionReference, batchSize: Int = 10, completion: @escaping () -> Void) {
+        collectionRef.limit(to: batchSize).getDocuments { (snapshot, error) in
+            if let error = error {
+                print("🚨 서브 컬렉션 조회 실패: \(error.localizedDescription)")
+                completion()
+                return
+            }
+
+            guard let documents = snapshot?.documents, !documents.isEmpty else {
+                print("✅ 서브 컬렉션 삭제 완료")
+                completion()
+                return
+            }
+
+            let batch = Firestore.firestore().batch()
+            for document in documents {
+                batch.deleteDocument(document.reference)
+            }
+
+            batch.commit { error in
+                if let error = error {
+                    print("🚨 서브 컬렉션 삭제 실패: \(error.localizedDescription)")
+                    completion()
+                    return
+                }
+                
+                // 🔥 남아있는 데이터가 있으면 다시 삭제 요청
+                self.deleteCollection(collectionRef: collectionRef, batchSize: batchSize, completion: completion)
+            }
+        }
+    }
+    
     /// Firestore의 데이터를 삭제하는 메소드
     /// - Parameter type: 삭제할 데이터 타입
     func deleteFromFirestore(type: FirestoreDataTypes) -> Single<Bool> {
@@ -225,5 +319,25 @@ final class FirestoreManager {
             
             return Disposables.create()
         }
+    }
+    
+    func deletedAllCoupleData() -> Single<Bool> {
+        let manager = FirestoreManager.shared
+        
+        return manager.deleteFromFirestore(type: .couple(id: nil))
+            .flatMap { isSuccess in
+                if isSuccess {
+                    return manager.deleteFromFirestore(type: .schedule(id: ""))
+                } else {
+                    return .just(false)
+                }
+            }
+            .flatMap { isSuccess in
+                if isSuccess {
+                    return manager.deleteDiariesForCouple()
+                } else {
+                    return .just(false)
+                }
+            }
     }
 }

@@ -40,8 +40,8 @@ private extension LoginViewController {
         
         output.userDataSaved
             .asSignal(onErrorSignalWith: .empty())
-            .emit { _ in
-                AppHelpers.changeRootViewControllerFromWindow(.main)
+            .emit { state in
+                AppHelpers.changeRootViewControllerFromWindow(state)
             }
             .disposed(by: disposeBag)
         
