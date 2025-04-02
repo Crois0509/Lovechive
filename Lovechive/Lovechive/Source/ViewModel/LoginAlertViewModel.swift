@@ -226,7 +226,7 @@ private extension LoginAlertViewModel {
             guard let self else { return nil }
             return UserDataModel(id: UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.userId) ?? "",
                                  name: query.data()[AppConfig.UserModel.name] as? String ?? "",
-                                 email: query.data()[AppConfig.UserModel.name] as? String ?? "",
+                                 email: query.data()[AppConfig.UserModel.email] as? String ?? "",
                                  coupleId: self.inputDataRelay.value,
                                  birthDay: (query.data()[AppConfig.UserModel.birthDay] as? Timestamp)?.dateValue() ?? Date(),
                                  createdAt: (query.data()[AppConfig.UserModel.createdAt] as? Timestamp)?.dateValue() ?? Date()
