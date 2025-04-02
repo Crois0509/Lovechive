@@ -57,8 +57,8 @@ final class LoginViewModel: ViewModelMethodManager, ViewModelType {
             .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())
             .emit { owner, _ in
-//                owner.didTapAppleSignIn()
-                owner.testLogin()
+                owner.didTapAppleSignIn()
+                // owner.testLogin()
             }
             .disposed(by: disposeBag)
         
@@ -251,7 +251,10 @@ extension LoginViewModel: ASAuthorizationControllerDelegate {
             let userId: String = userIdentifier
             
             // 로그인 성공 후 작업
-            loginSuccess.accept((userEmail, userId, userName))
+            UserDefaultsManager().saveToUserDefaults(userId, forKey: AppConfig.UserDefaultsConfig.userId)
+            debugPrint(userEmail, userId, userName)
+            
+            checkUserData.accept((userEmail, userId, userName))
             
         default: break
             
