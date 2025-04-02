@@ -25,29 +25,25 @@ final class DiaryViewController: UIViewController {
     private let diaryItemDelete = PublishRelay<IndexPath>()
     fileprivate let updateDiaryData = PublishRelay<Void>()
     
-    var collectionDataSource: DataSource {
-        let dataSource = DataSource(
-            animationConfiguration:
-                AnimationConfiguration(insertAnimation: .fade,  // 삽입 시 애니메이션
-                                       reloadAnimation: .fade,  // 변경 시 애니메이션 없음
-                                       deleteAnimation: .fade   // 삭제 시 왼쪽으로 사라짐
-                                      ),
-            configureCell: { dataSource, collectionView, indexPath, item in
-                
-                guard let cell = collectionView.dequeueReusableCell(withIdentifier: AppConfig.DiaryConfig.collectionCellId, for: indexPath) as? DiaryCollectionCell else { return .init() }
-                
-                cell.configureCell(item)
-                cell.selectionStyle = .none
-                
-                return cell
+    private lazy var collectionDataSource = DataSource(
+        animationConfiguration:
+            AnimationConfiguration(insertAnimation: .fade,  // 삽입 시 애니메이션
+                                   reloadAnimation: .fade,  // 변경 시 애니메이션 없음
+                                   deleteAnimation: .fade   // 삭제 시 왼쪽으로 사라짐
+                                  ),
+        configureCell: { dataSource, collectionView, indexPath, item in
             
-            }, titleForHeaderInSection: { dataSource, index in
-                return dataSource.sectionModels[index].header
-                
-            }, canEditRowAtIndexPath: { _, _ in true })
-        
-        return dataSource
-    }
+            guard let cell = collectionView.dequeueReusableCell(withIdentifier: AppConfig.DiaryConfig.collectionCellId, for: indexPath) as? DiaryCollectionCell else { return .init() }
+            
+            cell.configureCell(item)
+            cell.selectionStyle = .none
+            
+            return cell
+            
+        }, titleForHeaderInSection: { dataSource, index in
+            return dataSource.sectionModels[index].header
+            
+        }, canEditRowAtIndexPath: { _, _ in true })
     
     private lazy var tableDataSource = DataSource(
         animationConfiguration:
@@ -340,7 +336,7 @@ extension DiaryViewController: UITableViewDelegate {
     func tableView(_ tableView: UITableView, trailingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
         
         let deleteAction = UIContextualAction(style: .destructive, title: "삭제") { [weak self] _, _, completion in
-            guard let self = self else { return }
+            guard let self else { return }
             
             self.diaryItemDelete.accept(indexPath)
             completion(true) // ✅ 삭제 후 애니메이션 적용
