@@ -9,6 +9,9 @@
 /* Begin PBXBuildFile section */
 		AA14DE0C2D7DA02600664CE5 /* RxDataSources in Frameworks */ = {isa = PBXBuildFile; productRef = AA14DE0B2D7DA02600664CE5 /* RxDataSources */; };
 		AA14E3B92D8000F600664CE5 /* FSCalendar in Frameworks */ = {isa = PBXBuildFile; productRef = AA14E3B82D8000F600664CE5 /* FSCalendar */; };
+		AA260F1B2D9E6D2A00AEE737 /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA260F1A2D9E6D2A00AEE737 /* WidgetKit.framework */; };
+		AA260F1D2D9E6D2A00AEE737 /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AA260F1C2D9E6D2A00AEE737 /* SwiftUI.framework */; };
+		AA260F2A2D9E6D2C00AEE737 /* LovechiveWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = AA260F182D9E6D2A00AEE737 /* LovechiveWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		AAA080A82D797A2B0025DE23 /* FirebaseAnalytics in Frameworks */ = {isa = PBXBuildFile; productRef = AAA080A72D797A2B0025DE23 /* FirebaseAnalytics */; };
 		AAA080AA2D797A2B0025DE23 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = AAA080A92D797A2B0025DE23 /* FirebaseAuth */; };
 		AAA080AC2D797A2B0025DE23 /* FirebaseCrashlytics in Frameworks */ = {isa = PBXBuildFile; productRef = AAA080AB2D797A2B0025DE23 /* FirebaseCrashlytics */; };
@@ -21,6 +24,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		AA260F282D9E6D2C00AEE737 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = AAB858BB2D786771000AEBB2 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = AA260F172D9E6D2A00AEE737;
+			remoteInfo = LovechiveWidgetExtension;
+		};
 		AAB858DA2D786772000AEBB2 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = AAB858BB2D786771000AEBB2 /* Project object */;
@@ -37,13 +47,45 @@
 		};
 /* End PBXContainerItemProxy section */
 
+/* Begin PBXCopyFilesBuildPhase section */
+		AA260F2F2D9E6D2C00AEE737 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				AA260F2A2D9E6D2C00AEE737 /* LovechiveWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
 /* Begin PBXFileReference section */
+		AA260F182D9E6D2A00AEE737 /* LovechiveWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = LovechiveWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		AA260F1A2D9E6D2A00AEE737 /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		AA260F1C2D9E6D2A00AEE737 /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
+		AA260F312D9E6D6400AEE737 /* LovechiveWidgetExtension.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = LovechiveWidgetExtension.entitlements; sourceTree = "<group>"; };
 		AAB858C32D786771000AEBB2 /* Lovechive.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Lovechive.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAB858D92D786772000AEBB2 /* LovechiveTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LovechiveTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		AAB858E32D786772000AEBB2 /* LovechiveUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = LovechiveUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		AA260F2E2D9E6D2C00AEE737 /* Exceptions for "LovechiveWidget" folder in "LovechiveWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = AA260F172D9E6D2A00AEE737 /* LovechiveWidgetExtension */;
+		};
+		AA260F5E2D9E74A500AEE737 /* Exceptions for "LovechiveWidget" folder in "Lovechive" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				CustomFonts.swift,
+			);
+			target = AAB858C22D786771000AEBB2 /* Lovechive */;
+		};
 		AAB858EB2D786772000AEBB2 /* Exceptions for "Lovechive" folder in "Lovechive" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -54,6 +96,15 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		AA260F1E2D9E6D2A00AEE737 /* LovechiveWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				AA260F5E2D9E74A500AEE737 /* Exceptions for "LovechiveWidget" folder in "Lovechive" target */,
+				AA260F2E2D9E6D2C00AEE737 /* Exceptions for "LovechiveWidget" folder in "LovechiveWidgetExtension" target */,
+			);
+			path = LovechiveWidget;
+			sourceTree = "<group>";
+		};
 		AAB858C52D786771000AEBB2 /* Lovechive */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -75,6 +126,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		AA260F152D9E6D2A00AEE737 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				AA260F1D2D9E6D2A00AEE737 /* SwiftUI.framework in Frameworks */,
+				AA260F1B2D9E6D2A00AEE737 /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AAB858C02D786771000AEBB2 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -110,12 +170,24 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		AA260F192D9E6D2A00AEE737 /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				AA260F1A2D9E6D2A00AEE737 /* WidgetKit.framework */,
+				AA260F1C2D9E6D2A00AEE737 /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		AAB858BA2D786771000AEBB2 = {
 			isa = PBXGroup;
 			children = (
+				AA260F312D9E6D6400AEE737 /* LovechiveWidgetExtension.entitlements */,
 				AAB858C52D786771000AEBB2 /* Lovechive */,
 				AAB858DC2D786772000AEBB2 /* LovechiveTests */,
 				AAB858E62D786772000AEBB2 /* LovechiveUITests */,
+				AA260F1E2D9E6D2A00AEE737 /* LovechiveWidget */,
+				AA260F192D9E6D2A00AEE737 /* Frameworks */,
 				AAB858C42D786771000AEBB2 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -126,6 +198,7 @@
 				AAB858C32D786771000AEBB2 /* Lovechive.app */,
 				AAB858D92D786772000AEBB2 /* LovechiveTests.xctest */,
 				AAB858E32D786772000AEBB2 /* LovechiveUITests.xctest */,
+				AA260F182D9E6D2A00AEE737 /* LovechiveWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -133,6 +206,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		AA260F172D9E6D2A00AEE737 /* LovechiveWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = AA260F2B2D9E6D2C00AEE737 /* Build configuration list for PBXNativeTarget "LovechiveWidgetExtension" */;
+			buildPhases = (
+				AA260F142D9E6D2A00AEE737 /* Sources */,
+				AA260F152D9E6D2A00AEE737 /* Frameworks */,
+				AA260F162D9E6D2A00AEE737 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				AA260F1E2D9E6D2A00AEE737 /* LovechiveWidget */,
+			);
+			name = LovechiveWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = LovechiveWidgetExtension;
+			productReference = AA260F182D9E6D2A00AEE737 /* LovechiveWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		AAB858C22D786771000AEBB2 /* Lovechive */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = AAB858EC2D786772000AEBB2 /* Build configuration list for PBXNativeTarget "Lovechive" */;
@@ -140,10 +235,12 @@
 				AAB858BF2D786771000AEBB2 /* Sources */,
 				AAB858C02D786771000AEBB2 /* Frameworks */,
 				AAB858C12D786771000AEBB2 /* Resources */,
+				AA260F2F2D9E6D2C00AEE737 /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				AA260F292D9E6D2C00AEE737 /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				AAB858C52D786771000AEBB2 /* Lovechive */,
@@ -222,6 +319,9 @@
 				LastSwiftUpdateCheck = 1620;
 				LastUpgradeCheck = 1620;
 				TargetAttributes = {
+					AA260F172D9E6D2A00AEE737 = {
+						CreatedOnToolsVersion = 16.2;
+					};
 					AAB858C22D786771000AEBB2 = {
 						CreatedOnToolsVersion = 16.2;
 					};
@@ -261,11 +361,19 @@
 				AAB858C22D786771000AEBB2 /* Lovechive */,
 				AAB858D82D786772000AEBB2 /* LovechiveTests */,
 				AAB858E22D786772000AEBB2 /* LovechiveUITests */,
+				AA260F172D9E6D2A00AEE737 /* LovechiveWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		AA260F162D9E6D2A00AEE737 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AAB858C12D786771000AEBB2 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -290,6 +398,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		AA260F142D9E6D2A00AEE737 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		AAB858BF2D786771000AEBB2 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -314,6 +429,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		AA260F292D9E6D2C00AEE737 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = AA260F172D9E6D2A00AEE737 /* LovechiveWidgetExtension */;
+			targetProxy = AA260F282D9E6D2C00AEE737 /* PBXContainerItemProxy */;
+		};
 		AAB858DB2D786772000AEBB2 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = AAB858C22D786771000AEBB2 /* Lovechive */;
@@ -327,11 +447,68 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		AA260F2C2D9E6D2C00AEE737 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LovechiveWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 52LJKQN5WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LovechiveWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LovechiveWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Crois.Lovechive.LovechiveWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		AA260F2D2D9E6D2C00AEE737 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_ENTITLEMENTS = LovechiveWidgetExtension.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = 52LJKQN5WQ;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = LovechiveWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = LovechiveWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.Crois.Lovechive.LovechiveWidget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		AAB858ED2D786772000AEBB2 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Lovechive/Lovechive.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.0.0;
 				DEVELOPMENT_TEAM = 52LJKQN5WQ;
@@ -364,6 +541,7 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_ENTITLEMENTS = Lovechive/Lovechive.entitlements;
 				CODE_SIGN_STYLE = Automatic;
 				CURRENT_PROJECT_VERSION = 1.0.0;
 				DEVELOPMENT_TEAM = 52LJKQN5WQ;
@@ -589,6 +767,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		AA260F2B2D9E6D2C00AEE737 /* Build configuration list for PBXNativeTarget "LovechiveWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				AA260F2C2D9E6D2C00AEE737 /* Debug */,
+				AA260F2D2D9E6D2C00AEE737 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		AAB858BE2D786771000AEBB2 /* Build configuration list for PBXProject "Lovechive" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

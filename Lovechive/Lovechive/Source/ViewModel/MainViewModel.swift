@@ -69,7 +69,6 @@ final class MainViewModel: ViewModelType {
             }.disposed(by: disposeBag)
         
         input.calendarDataRelay
-            .skip(1)
             .bind(to: updateMainPage)
             .disposed(by: disposeBag)
         

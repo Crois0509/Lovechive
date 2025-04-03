@@ -57,8 +57,8 @@ final class LoginViewModel: ViewModelMethodManager, ViewModelType {
             .withUnretained(self)
             .asSignal(onErrorSignalWith: .empty())
             .emit { owner, _ in
-                owner.didTapAppleSignIn()
-                // owner.testLogin()
+//                owner.didTapAppleSignIn()
+                 owner.testLogin()
             }
             .disposed(by: disposeBag)
         
