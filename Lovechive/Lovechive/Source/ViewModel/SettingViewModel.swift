@@ -32,6 +32,7 @@ final class SettingViewModel: ViewModelMethodManager, ViewModelType {
     private var alert = AlertManager(title: "경고", message: "", cancelTitle: "취소", destructiveTitle: "확인")
     private var alarmAlert = AlertManager(title: "알림", message: "", cancelTitle: "취소", activeTitle: "확인")
     private let guestModeAlert = AlertManager(title: "알림", message: "이 기능은 로그인 후 사용할 수 있습니다.\n로그인 하시겠습니까?", cancelTitle: "취소", activeTitle: "확인")
+    private let errorAlert = AlertManager(title: "알림", message: "문제가 발생했습니다. 잠시 후 다시 시도해 주세요.", cancelTitle: "확인")
     
     private lazy var sections = BehaviorRelay<[SetTableSection]>(value: [])
     private let userDataRelay = BehaviorRelay<[UserDataModel]>(value: [])
@@ -351,7 +352,15 @@ private extension SettingViewModel {
                 if let data {
                     return FirestoreManager.shared.saveToFirestore(data, type: .couple(id: nil))
                 } else {
-                    return FirestoreManager.shared.deletedAllCoupleData()
+                    return FirestoreManager.shared.deleteAllCoupleData()
+                }
+            }
+            .flatMap { [weak self] isSuccess -> Observable<Bool> in
+                guard let self else { return .just(false) }
+                if isSuccess {
+                    return .just(true)
+                } else {
+                    return self.errorAlert.showAlert(.alert)
                 }
             }
             .asSignal(onErrorSignalWith: .empty())

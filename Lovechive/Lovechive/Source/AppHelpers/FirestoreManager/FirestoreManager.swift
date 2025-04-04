@@ -321,23 +321,77 @@ final class FirestoreManager {
         }
     }
     
-    func deletedAllCoupleData() -> Single<Bool> {
-        let manager = FirestoreManager.shared
-        
-        return manager.deleteFromFirestore(type: .couple(id: nil))
-            .flatMap { isSuccess in
-                if isSuccess {
-                    return manager.deleteFromFirestore(type: .schedule(id: ""))
-                } else {
-                    return .just(false)
+    func deleteAllDataFromFirestore(type: FirestoreDataTypes) -> Single<Bool> {
+        return Single.create { single in
+            let coupleId = self.udm.coupleId
+            let userId = self.udm.userId
+            var query: Query = self.db.collection(type.typeName) // ✅ Query 타입으로 변경
+
+            // ✅ Firestore 필터링 적용
+            switch type {
+            case .user:
+                query = query.whereField(AppConfig.UserModel.id, isEqualTo: userId)
+            case .couple:
+                query = query.whereField(FieldPath.documentID(), isEqualTo: coupleId)
+            case .diary:
+                query = query.whereField(AppConfig.DiariesModel.coupleId, isEqualTo: coupleId)
+            case .schedule:
+                query = query.whereField(AppConfig.SchedulesModel.coupleId, isEqualTo: coupleId)
+            }
+
+            // ✅ Firestore에서 문서 조회 및 삭제
+            query.getDocuments { snapshot, error in
+                if let error = error {
+                    debugPrint("🚨 문서 조회 실패: \(error.localizedDescription)")
+                    single(.failure(error))
+                    return
+                }
+
+                guard let documents = snapshot?.documents, !documents.isEmpty else {
+                    debugPrint("⚠️ 해당 \(type.typeName)에 대한 문서가 없음")
+                    single(.success(false)) // 문서 없음 → 정상적인 상태 처리
+                    return
+                }
+
+                let dispatchGroup = DispatchGroup()
+                var deleteError: Error?
+
+                for document in documents {
+                    dispatchGroup.enter()
+                    document.reference.delete { error in
+                        if let error {
+                            debugPrint("❌ \(type.typeName) 데이터 삭제 실패: \(error.localizedDescription)")
+                            deleteError = error
+                        } else {
+                            debugPrint("✅ \(type.typeName) 데이터 삭제 성공")
+                        }
+                        dispatchGroup.leave()
+                    }
+                }
+
+                dispatchGroup.notify(queue: .main) {
+                    if let error = deleteError {
+                        single(.failure(error))
+                    } else {
+                        single(.success(true))
+                    }
                 }
             }
-            .flatMap { isSuccess in
-                if isSuccess {
-                    return manager.deleteDiariesForCouple()
-                } else {
-                    return .just(false)
-                }
+
+            return Disposables.create()
+        }
+    }
+    
+    func deleteAllCoupleData() -> Single<Bool> {
+        let manager = FirestoreManager.shared
+        
+        return manager.deleteAllDataFromFirestore(type: .schedule(id: ""))
+            .flatMap { _ in
+                return manager.deleteDiariesForCouple()
+            }
+            .flatMap { _ in
+                return manager.deleteFromFirestore(type: .couple(id: nil))
             }
     }
 }
+ 
