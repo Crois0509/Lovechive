@@ -30,6 +30,21 @@ final class MainViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let defaults = UserDefaults.standard
+        if defaults.object(forKey: "정렬 방법") == nil {
+            defaults.set("List", forKey: "정렬 방법")
+        }
+        
+        if defaults.object(forKey: "정렬 순서") == nil {
+            defaults.set("최신순", forKey: "정렬 순서")
+        }
+        
+        if defaults.bool(forKey: AppConfig.UserDefaultsConfig.ready) {
+            Task {
+                await AppHelpers.checkCoupleData()
+            }
+        }
+        
         let authOptions: UNAuthorizationOptions = [.alert, .sound, .badge]
         UNUserNotificationCenter.current().requestAuthorization(options: authOptions) { res, error in
             DispatchQueue.main.async {

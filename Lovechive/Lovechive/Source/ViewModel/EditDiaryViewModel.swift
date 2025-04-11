@@ -28,6 +28,7 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
         let pushPhotoPicker: PublishRelay<Void>
         let changeState: PublishRelay<DiaryViewState>
         let diarySavedIsSuccess: PublishRelay<Bool>
+        let showActivityIndicator: PublishRelay<Bool>
     }
     
     private var disposeBag = DisposeBag()
@@ -48,11 +49,11 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
     private let scrollContentHeight = BehaviorRelay<CGFloat>(value: 0)
     private let keyboardHeight = BehaviorRelay<CGFloat>(value: 0)
     private let pushPhotoPicker = PublishRelay<Void>()
+    private let diarySavedIsSuccess = PublishRelay<Bool>()
+    private let showActivityIndicator = PublishRelay<Bool>()
     
     private let changeState = PublishRelay<DiaryViewState>()
     private let saveDiaryData = PublishRelay<DiaryDataModel?>()
-    
-    private let diarySavedIsSuccess = PublishRelay<Bool>()
     
     init(_ type: DiaryViewState, _ diaryId: String) {
         self.currentState = type
@@ -77,6 +78,7 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
                     self?.changeState.accept(.edit(data: data))
                     self?.currentState = .edit(data: data)
                 case .edit(data: let data):
+                    self?.showActivityIndicator.accept(true)
                     self?.saveDiaryData.accept(data)
                 }
             }
@@ -117,7 +119,7 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
         
         saveDiaryData
             .withUnretained(self)
-            .compactMap { owner, data in
+            .flatMap { owner, data in
                 owner.mappingDiaryDataModel(data)
             }
             .flatMap { [weak self] data -> Observable<DiaryDataModel?> in
@@ -138,12 +140,14 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
             .emit { [weak self] isSuccess in
                 if isSuccess {
                     guard let self, let data = self.diaryData else { return }
+                    self.showActivityIndicator.accept(false)
                     self.changeState.accept(.view(data: data))
                     self.currentState = .view(data: data)
                     self.diarySavedIsSuccess.accept(true)
                     self.umd.saveToUserDefaults(self.diaryId, forKey: AppConfig.UserDefaultsConfig.diaryId)
                 } else {
                     debugPrint("🚨 다이어리 저장 실패")
+                    self?.showActivityIndicator.accept(false)
                     self?.diarySavedIsSuccess.accept(false)
                 }
             }
@@ -184,7 +188,8 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
         return Output(scrollContentHeight: scrollContentHeight,
                       pushPhotoPicker: pushPhotoPicker,
                       changeState: changeState,
-                      diarySavedIsSuccess: diarySavedIsSuccess
+                      diarySavedIsSuccess: diarySavedIsSuccess,
+                      showActivityIndicator: showActivityIndicator
         )
     }
     
@@ -193,6 +198,7 @@ final class EditDiaryViewModel: ViewModelMethodManager, ViewModelType {
 private extension EditDiaryViewModel {
     
     func saveDiaryData(_ data: DiaryDataModel) -> Single<Bool> {
+        diaryData = data
         return FirestoreManager.shared.saveDiaries(data, diaryId, data.id)
     }
     
@@ -208,66 +214,50 @@ private extension EditDiaryViewModel {
         }
     }
     
-    func mappingDiaryDataModel(_ data: DiaryDataModel?) -> DiaryDataModel? {
-        if let data {
-            guard let title = titleData,
+    func mappingDiaryDataModel(_ data: DiaryDataModel?) -> Single<DiaryDataModel?> {
+        return Single.create { [weak self] single in
+            guard let self,
+                  let title = titleData,
                   let date = createdDate,
                   let content = contentData
-            else { return nil }
+            else {
+                single(.success(nil))
+                return Disposables.create()
+            }
             
             var imagePath: String = ""
             
             if imageData != nil {
                 ImageManager.shared.saveImage(image: imageData) { path in
-                    if let path {
-                        if path == data.image {
-                            imagePath = data.image
-                        } else {
-                            imagePath = path
-                        }
-                    }
-                }
-            } else if !data.image.isEmpty {
-                imagePath = data.image
-            }            
-            
-            let diaryData = DiaryDataModel(id: data.id,
-                                           title: title,
-                                           content: content,
-                                           image: imagePath,
-                                           createdAt: date,
-                                           createdBy: umd.userId
-            )
-            
-            self.diaryData = diaryData
-            
-            return diaryData
-            
-        } else {
-            guard let title = titleData,
-                  let date = createdDate,
-                  let content = contentData
-            else { return nil }
-            
-            var imagePath: String = ""
-            
-            ImageManager.shared.saveImage(image: imageData) { path in
-                if let path {
-                    imagePath = path
+                    imagePath = path ?? ""
                 }
             }
             
-            let diaryData = DiaryDataModel(id: UUID().uuidString,
+            var diaryData: DiaryDataModel
+            
+            if let data {
+                diaryData = DiaryDataModel(id: data.id,
                                            title: title,
                                            content: content,
                                            image: imagePath,
                                            createdAt: date,
-                                           createdBy: umd.userId
-            )
+                                           createdBy: self.umd.userId
+                )
+                
+            } else {
+                diaryData = DiaryDataModel(id: UUID().uuidString,
+                                           title: title,
+                                           content: content,
+                                           image: imagePath,
+                                           createdAt: date,
+                                           createdBy: self.umd.userId
+                )
+                
+            }
             
-            self.diaryData = diaryData
+            single(.success(diaryData))
             
-            return diaryData
+            return Disposables.create()
         }
     }
     

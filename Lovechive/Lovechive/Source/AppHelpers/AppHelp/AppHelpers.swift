@@ -8,6 +8,7 @@
 import UIKit
 import RxSwift
 import RxCocoa
+import FirebaseFirestore
 
 enum AppHelpers {
     
@@ -63,41 +64,36 @@ enum AppHelpers {
         }
     }
     
-    static func checkCoupleData() {
+    static func checkCoupleData() async {
         guard let coupleId = UserDefaults.standard.string(forKey: AppConfig.UserDefaultsConfig.coupleId), !coupleId.isEmpty else { return }
         
-        var disposeBag = DisposeBag()
-        
-        FirestoreManager.shared.readFromFirestore(type: .couple(id: nil))
-            .subscribe(onSuccess: { query in
-                if query.isEmpty {
-                    debugPrint("🚨 커플 데이터 없음")
-                    disposeBag = DisposeBag()
-                }
-                
-                guard let id = query.first?.data()[AppConfig.CouplesModel.user2Id] as? String else {
-                    debugPrint("🚨 커플 미등록 상태")
-                    return
-                }
-                
-                if !id.isEmpty {
-                    debugPrint("✅ 커플 등록 완료")
-                    UserDefaults.standard.set(true, forKey: AppConfig.UserDefaultsConfig.login)
-                    UserDefaults.standard.set(false, forKey: AppConfig.UserDefaultsConfig.ready)
-                } else {
-                    debugPrint("🚨 커플 미등록 상태")
-                }
-                
-                disposeBag = DisposeBag()
-                
-            }, onFailure: { error in
-                debugPrint("🚨 커플 데이터 확인 실패", error.localizedDescription)
-                disposeBag = DisposeBag()
-            })
-            .disposed(by: disposeBag)
+        do {
+            let query = try await FirestoreManager.shared.readFromFirestoreInCoupleData()
+            
+            if query.isEmpty {
+                debugPrint("🚨 커플 데이터 없음")
+            }
+            
+            guard let id = query.first?.data()[AppConfig.CouplesModel.user2Id] as? String else {
+                debugPrint("🚨 커플 미등록 상태")
+                return
+            }
+            
+            if !id.isEmpty {
+                debugPrint("✅ 커플 등록 완료")
+                UserDefaults.standard.set(true, forKey: AppConfig.UserDefaultsConfig.login)
+                UserDefaults.standard.set(false, forKey: AppConfig.UserDefaultsConfig.ready)
+            } else {
+                debugPrint("🚨 커플 미등록 상태")
+            }
+
+        } catch {
+            debugPrint("🚨 커플 데이터 확인 실패", error.localizedDescription)
+        }
     }
 }
 
 enum RootViews {
     case main, login, start
 }
+

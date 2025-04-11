@@ -15,21 +15,6 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         
         FirebaseApp.configure()
         
-        let defaults = UserDefaults.standard
-        if defaults.object(forKey: "정렬 방법") == nil {
-            defaults.set("List", forKey: "정렬 방법")
-        }
-        
-        if defaults.object(forKey: "정렬 순서") == nil {
-            defaults.set("최신순", forKey: "정렬 순서")
-        }
-        
-        if defaults.bool(forKey: AppConfig.UserDefaultsConfig.ready) {
-            DispatchQueue.global(qos: .background).async {
-                AppHelpers.checkCoupleData()
-            }
-        }
-        
         sleep(3)
         
         return true

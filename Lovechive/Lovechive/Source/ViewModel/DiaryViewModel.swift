@@ -120,10 +120,12 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
             }
             .compactMap { [weak self] indexPath -> DiaryDataModel? in
                 guard let self else { return nil }
-                var section = sections.value
-                section[indexPath.section].items.remove(at: indexPath.row)
+                var section = self.sections.value
+                let item = section[indexPath.section].items[indexPath.item]
+                section[indexPath.section].items.remove(at: indexPath.item)
+                self.sections.accept(section)
                 
-                return self.searchItem(indexPath)
+                return item
             }
             .flatMapLatest { [weak self] data -> Single<Bool> in
                 guard let self else { return .just(false) }
@@ -132,6 +134,7 @@ final class DiaryViewModel: ViewModelMethodManager, ViewModelType {
             .asSignal(onErrorJustReturn: false)
             .emit { isSuccess in
                 if isSuccess {
+                    debugPrint("✅ 다이어리 데이터 삭제 성공")
                     input.fetchTrigger.accept(())
                 } else {
                     debugPrint("🚨 다이어리 데이터 삭제 실패")
@@ -234,7 +237,7 @@ private extension DiaryViewModel {
               indexPath.row < sections.value[indexPath.section].items.count
         else { return nil }
         
-        let section = sections.value[indexPath.section]
+        var section = self.sections.value[indexPath.section]
         let item = section.items[indexPath.row]
         
         return item

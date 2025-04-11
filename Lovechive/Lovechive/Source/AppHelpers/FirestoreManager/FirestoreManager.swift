@@ -393,5 +393,12 @@ final class FirestoreManager {
                 return manager.deleteFromFirestore(type: .couple(id: nil))
             }
     }
+    
+    func readFromFirestoreInCoupleData() async throws -> [QueryDocumentSnapshot] {
+        let collectionRef = self.db.collection("couples")
+        let snapshot = try await collectionRef.whereField(FieldPath.documentID(), isEqualTo: self.udm.coupleId).getDocuments()
+        
+        return snapshot.documents
+    }
 }
  

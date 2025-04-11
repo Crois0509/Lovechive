@@ -20,6 +20,7 @@ final class EditDiaryViewController: UIViewController {
     private let diaryView = DiaryDetailView()
     private let activeButton = UIButton()
     private let scrollView = UIScrollView()
+    private let activityIndicator = UIActivityIndicatorView()
     
     private lazy var photoPicker = PHPickerViewController(configuration: createdPhotoPickerConfiguration())
     
@@ -58,6 +59,12 @@ final class EditDiaryViewController: UIViewController {
         photoPicker.dismiss(animated: false)
     }
     
+    override func viewDidDisappear(_ animated: Bool) {
+        super.viewDidDisappear(animated)
+        
+        disposeBag = DisposeBag()
+    }
+    
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         
@@ -73,6 +80,7 @@ private extension EditDiaryViewController {
         setupScrollView()
         setupButton()
         setupPhotoPicker()
+        setupActivityView()
         configureSelf()
         setupLayout()
         bind()
@@ -81,8 +89,9 @@ private extension EditDiaryViewController {
     func configureSelf() {
         navigationController?.navigationBar.tintColor = .Personal.deepPink
         view.backgroundColor = .Personal.backgroundPink
-        view.addSubview(scrollView)
-        view.addSubview(activeButton)
+        [scrollView, activeButton, activityIndicator].forEach {
+            view.addSubview($0)
+        }
     }
     
     func setupLayout() {
@@ -112,6 +121,10 @@ private extension EditDiaryViewController {
             $0.bottom.equalTo(view.safeAreaLayoutGuide).inset(16)
             $0.height.equalTo(64)
         }
+        
+        activityIndicator.snp.makeConstraints {
+            $0.edges.equalToSuperview()
+        }
     }
     
     func setupPhotoPicker() {
@@ -135,6 +148,14 @@ private extension EditDiaryViewController {
         [editDiaryView, diaryView].forEach {
             scrollView.addSubview($0)
         }
+    }
+    
+    func setupActivityView() {
+        activityIndicator.alpha = 0
+        activityIndicator.color = .white
+        activityIndicator.style = .large
+        activityIndicator.backgroundColor = .black.withAlphaComponent(0.3)
+        activityIndicator.isHidden = true
     }
     
     func createdPhotoPickerConfiguration() -> PHPickerConfiguration {
@@ -186,6 +207,22 @@ private extension EditDiaryViewController {
         }
     }
     
+    func showActivityIndicator(_ isShowing: Bool) {
+        UIView.animate(withDuration: 0.3) {
+            if isShowing {
+                self.activityIndicator.isHidden = false
+                self.activityIndicator.startAnimating()
+                self.activityIndicator.alpha = 1
+                
+            } else {
+                self.activityIndicator.stopAnimating()
+                self.activityIndicator.alpha = 0
+                self.activityIndicator.isHidden = true
+                
+            }
+        }
+    }
+    
     func bind() {
         
         let input = EditDiaryViewModel.Input(editImageButtonTapped: editDiaryView.rx.editImageButtonTapped,
@@ -233,6 +270,14 @@ private extension EditDiaryViewController {
                 } else {
                     debugPrint("다이어리 저장 실패...")
                 }
+            }
+            .disposed(by: disposeBag)
+        
+        output.showActivityIndicator
+            .withUnretained(self)
+            .asSignal(onErrorSignalWith: .empty())
+            .emit { owner, showing in
+                owner.showActivityIndicator(showing)
             }
             .disposed(by: disposeBag)
         
